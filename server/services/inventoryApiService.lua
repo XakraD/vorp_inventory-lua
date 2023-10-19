@@ -887,7 +887,7 @@ exports("deleteWeapon", InventoryAPI.deleteWeapon)
 ---@param customLabel string | nil? custom label
 ---@return nil | boolean
 function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps, cb, wepId, customSerial, customLabel,
-									 customDesc)
+									 customDesc, status)
 	local targetUser = Core.getUser(_target)
 	local targetCharacter = targetUser.getUsedCharacter
 	local targetIdentifier = targetCharacter.identifier
@@ -900,8 +900,20 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 	local canGive = false
 	local notListed = false
 
-	if not comps then
-		comps = {}
+	local _comps = comps or {}
+	local _status = status or { 
+		dirtlevel = 0, 
+		mudlevel = 0,
+		conditionlevel = 0, 
+		rustlevel = 0, 
+	}
+
+	if _comps.nothing then
+		_comps = {}
+	end
+
+	if components and not components.nothing and not comps then
+		_comps = components
 	end
 
 	-- does weapon exist
@@ -937,18 +949,18 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		end
 	end
 
-	if ammos then
-		for key, value in pairs(ammos) do
-			ammo[key] = value
-		end
-	end
+	-- if ammos then
+	-- 	for key, value in pairs(ammos) do
+	-- 		ammo[key] = value
+	-- 	end
+	-- end
 
-	-- components are not being used? comps table is and yet is by default to empty table ?
-	if components then
-		for key, _ in pairs(components) do
-			component[#component + 1] = key
-		end
-	end
+	-- -- components are not being used? comps table is and yet is by default to empty table ?
+	-- if components then
+	-- 	for key, _ in pairs(components) do
+	-- 		component[#component + 1] = key
+	-- 	end
+	-- end
 
 	if canGive then
 		local function hasSerialNumber() -- on add weapon, weapons already have a serial number
@@ -990,8 +1002,8 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			SvUtils.GenerateWeaponLabel(name) --custom label or existent label or generate new one
 		local desc = customDesc or
 			hasCustomDesc()           -- custom desc or existent desc or nil
-		local query =
-		'INSERT INTO loadout (identifier, charidentifier, name, ammo,components,comps,label,serial_number,custom_label,custom_desc) VALUES (@identifier, @charid, @name, @ammo, @components,@comps,@label,@serial_number,@custom_label,@custom_desc)'
+		local query = 'INSERT INTO loadout (identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) '..
+		'VALUES (@identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
 		local params = {
 			identifier = targetIdentifier,
 			charid = targetCharId,
@@ -999,7 +1011,11 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			label = SvUtils.GenerateWeaponLabel(name),
 			ammo = json.encode(ammo),
 			components = json.encode(component),
-			comps = json.encode(comps),
+			comps = json.encode(_comps),
+			dirtlevel = _status.dirtlevel,
+			mudlevel = _status.mudlevel,
+			conditionlevel = _status.conditionlevel,
+			rustlevel = _status.rustlevel,
 			custom_label = label,
 			serial_number = serialNumber,
 			custom_desc = desc,

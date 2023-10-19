@@ -417,18 +417,25 @@ function InventoryService.addWeapon(target, weaponId)
 	local _source = target
 	local userWeapons = UsersWeapons.default
 	local weaponcomps = {}
-	local query = 'SELECT comps FROM loadout WHERE id = @id'
+	local weaponStatus
+	local query = 'SELECT * FROM loadout WHERE id = @id'
 	local result = DBService.queryAwait(query, { id = weaponId })
 
 	if result[1] then
 		weaponcomps = json.decode(result[1].comps)
+		weaponStatus = { 
+			dirtlevel = result[1].dirtlevel, 
+			mudlevel = result[1].mudlevel,
+			conditionlevel = result[1].conditionlevel, 
+			rustlevel = result[1].rustlevel, 
+		}
 	end
 
 	local weaponname = userWeapons[weaponId]:getName()
 	local ammo = { ["nothing"] = 0 }
 	local components = { ["nothing"] = 0 }
 	InventoryAPI.registerWeapon(_source, weaponname, ammo, components, weaponcomps, function()
-	end, weaponId)
+	end, weaponId, nil, nil, nil, weaponStatus)
 	InventoryAPI.deleteWeapon(_source, weaponId, function()
 	end)
 end
@@ -905,18 +912,25 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	end
 
 	local weaponcomps = {}
-	local query = 'SELECT comps FROM loadout WHERE id = @id'
+	local weaponStatus
+	local query = 'SELECT * FROM loadout WHERE id = @id'
 	local params = { id = weaponId }
 	local result = DBService.singleAwait(query, params)
 	if result then
 		weaponcomps = json.decode(result.comps)
+		weaponStatus = { 
+			dirtlevel = result.dirtlevel, 
+			mudlevel = result.mudlevel,
+			conditionlevel = result.conditionlevel, 
+			rustlevel = result.rustlevel, 
+		}
 	end
 
 	userWeapons[weaponId]:setPropietary('')
 	local ammo = { ["nothing"] = 0 }
 	local components = { ["nothing"] = 0 }
 	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, function()
-	end, weaponId)
+	end, weaponId, nil, nil, nil, weaponStatus)
 	InventoryAPI.deleteWeapon(_source, weaponId, function()
 	end)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _target)
