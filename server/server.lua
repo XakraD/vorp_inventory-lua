@@ -48,19 +48,25 @@ AddEventHandler("vorpinventory:getLabelFromId", function(id, item2, cb)
     end)
 end)
 
-
 RegisterServerEvent("vorpinventory:netduplog")
 AddEventHandler("vorpinventory:netduplog", function()
     local _source = source
-    local name = GetPlayerName(_source)
-    local description = Config.NetDupWebHook.Language.descriptionstart ..
-        name .. Config.NetDupWebHook.Language.descriptionend
+    local playername = GetPlayerName(_source)
+    local description = Logs.NetDupWebHook.Language.descriptionstart ..
+        name ..Logs.NetDupWebHook.Language.descriptionend
 
-    if Config.NetDupWebHook.Active then
-        Core.AddWebhook(Config.NetDupWebHook.Language.title, Config.webhook, description, color, name, logo, footerlogo,
-            avatar)
+    if Logs.NetDupWebHook.Active then
+        Info={
+            source = _source,
+            title = Config.NetDupWebHook.Language.title,
+            name = playername,
+            description = description,
+            webhook = Logs.NetDupWebHook.webhook,
+            color = Logs.NetDupWebHook.color
+        }
+        SvUtils.SendDiscordWebhook(Info)
     else
-        print('[' .. Config.NetDupWebHook.Language.title .. '] ', description)
+        print('[' ..Logs.NetDupWebHook.Language.title .. '] ', description)
     end
 end)
 

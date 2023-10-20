@@ -15,6 +15,7 @@ shared_scripts {
   "config/config.lua",
   "config/weapons.lua",
   "config/ammo.lua",
+  "config/logs.lua",
   "languages/*.lua",
   "shared/models/*.lua",
   'shared/handler/*.lua',

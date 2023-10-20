@@ -26,33 +26,14 @@ Config = {
 	OpenKey                  = 0xC1989F95,
 	--RMB mouse PROMPT PICKUP
 	PickupKey                = 0xF84FA74F,
-	-- NORMAL LOGS
-	webhookavatar            = "",
-	webhook                  = "",
 	discordid                = true, -- turn to true if ur using discord whitelist
 	DeleteOnlyDontDrop       = false, -- if true then dropping items only deletes from inventory and box on the floor is not created
-	-- =================== CUSTOM INVENTORY LOGS =====================--
-	WebHook                  = {
-		color = nil,
-		title = "INV logs",
-		avatar = nil,
-		logo = nil,
-		footerlogo = nil,
-		webhookname = "webhook name",
-		CustomInventoryTakeFrom = "",
-		CustomInventoryMoveTo = ""
-	},
-	NetDupWebHook            = {
-		-- somone tries to use dev tools to cheat
-		Active = true,
-		Language = {
-			title = "Possible Cheater Detected",
-			descriptionstart = "Invalid NUI Callback performed by...\n **Playername** `",
-			descriptionend = "`\n"
-		}
-	},
-	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
-	UseClearAll              = false, -- if you want to use the clear item function if false will use DropOnDeath function
+	
+		
+		-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
+	
+
+		UseClearAll              = false, -- if you want to use the clear item function if false will use DropOnDeath function
 	OnPlayerRespawn          = {
 		Money = {
 			JobLock         = { "police", "doctor" },

@@ -280,6 +280,8 @@ exports("removeAllUserAmmo", InventoryAPI.removeAllUserAmmo)
 ---@return boolean
 function InventoryAPI.addBullets(player, bulletType, amount, cb)
 	local _source = player
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local charidentifier = sourceCharacter.charIdentifier
 	local ammo = allplayersammo[_source].ammo
 
 	if ammo and ammo[bulletType] then
