@@ -18,7 +18,8 @@ exports('vorp_inventoryApi', function()
     end
 
     -- * CUSTOM INVENTORY * --
-    INV.registerInventory = function(id, name, limit, acceptWeapons, shared, ignoreItemStackLimit, whitelistItems, UsePermissions, UseBlackList, whitelistWeapons)
+    INV.registerInventory = function(id, name, limit, acceptWeapons, shared, ignoreItemStackLimit, whitelistItems,
+                                     UsePermissions, UseBlackList, whitelistWeapons)
         local data = {
             id = id,
             name = name,
@@ -59,7 +60,7 @@ exports('vorp_inventoryApi', function()
     end
 
     INV.updateCustomInventorySlots = function(...)
-        TriggerEvent("vorp_inventory:Server:updateCutomInventorySlots", ...)
+        TriggerEvent("vorp_inventory:Server:updateCustomInventorySlots", ...)
     end
 
     -- * WEAPONS * --
@@ -69,9 +70,10 @@ exports('vorp_inventoryApi', function()
 
     INV.createWeapon = function(source, weaponName, ammoaux, compaux, comps, custom_serial, custom_label, custom_desc)
         local result_promise = promise.new()
-        TriggerEvent("vorpCore:registerWeapon", source, tostring(string.upper(weaponName)), ammoaux, compaux, comps, function(res)
-            result_promise:resolve(res)
-        end, nil, custom_serial, custom_label, custom_desc)
+        TriggerEvent("vorpCore:registerWeapon", source, tostring(string.upper(weaponName)), ammoaux, compaux, comps,
+            function(res)
+                result_promise:resolve(res)
+            end, nil, custom_serial, custom_label, custom_desc)
         return Citizen.Await(result_promise)
     end
 
