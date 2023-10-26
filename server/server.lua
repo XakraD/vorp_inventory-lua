@@ -53,10 +53,10 @@ AddEventHandler("vorpinventory:netduplog", function()
     local _source = source
     local playername = GetPlayerName(_source)
     local description = Logs.NetDupWebHook.Language.descriptionstart ..
-        name ..Logs.NetDupWebHook.Language.descriptionend
+        name .. Logs.NetDupWebHook.Language.descriptionend
 
     if Logs.NetDupWebHook.Active then
-        Info={
+        Info = {
             source = _source,
             title = Config.NetDupWebHook.Language.title,
             name = playername,
@@ -66,7 +66,7 @@ AddEventHandler("vorpinventory:netduplog", function()
         }
         SvUtils.SendDiscordWebhook(Info)
     else
-        print('[' ..Logs.NetDupWebHook.Language.title .. '] ', description)
+        print('[' .. Logs.NetDupWebHook.Language.title .. '] ', description)
     end
 end)
 
@@ -82,6 +82,7 @@ Core.addRpcCallback("vorp_inventory:Server:CanOpenCustom", function(source, cb, 
         return cb(true)
     end
 
+    Core.NotifyObjective(_source, "someone is using this stash, wait for your turn", 5000)
     return cb(false)
 end)
 
@@ -102,9 +103,9 @@ AddEventHandler('playerDropped', function()
     allplayersammo[_source] = nil
 
     -- if player is stil in inventory check and remove
-    for i, value in ipairs(InventoryBeingUsed) do
+    for i, value in pairs(InventoryBeingUsed) do
         if value == _source then
-            table.remove(InventoryBeingUsed, i)
+            InventoryBeingUsed[i] = nil
             break
         end
     end
@@ -112,6 +113,7 @@ AddEventHandler('playerDropped', function()
     -- remove weapons from cache on player leave
     local weapons = UsersWeapons.default
     local char = Core.getUser(_source).getUsedCharacter
+
     if char then
         local charid = char.charIdentifier
         for key, value in pairs(weapons) do
