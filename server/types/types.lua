@@ -1,25 +1,26 @@
 ---@diagnostic disable: undefined-global
 ---@meta
 
---- checks item limit
+
+--- check inventory limit
 ---@param source number player id
 ---@param amount number amount of item
 ---@param callback fun(canCarry:boolean)?  callback function async or sync leave nil
 ---@return boolean
-function exports.vorp_inventory:canCarryItem(source, amount, callback) end
+function exports.vorp_inventory:canCarryItems(source, amount, callback) end
 
---- check inventory limit
+--- checks item limit
 ---@param source number player id
 ---@param item string item name
 ---@param amount number amount of item
 ---@param callback fun(canCarry:boolean)?  callback function async or sync leave nil
 ---@return boolean
-function exports.vorp_inventory:canCarryItems(source, item, amount, callback) end
+function exports.vorp_inventory:canCarryItem(source, item, amount, callback) end
 
 --- can carry weapons
 ---@param source number player id
 ---@param amount number amount of weapons
----@param weaponName string weapon name
+---@param weaponName string? weapon name not neccesary but allows to check if weapon is in the list of not weapons
 ---@param callback fun(canCarry: boolean)? callback function async or sync leave nil
 ---@return boolean
 function exports.vorp_inventory:canCarryWeapons(source, amount, callback, weaponName) end
@@ -173,7 +174,7 @@ function exports.vorp_inventory:deleteWeapon(source, weaponId, callback) end
 --- create Weapon
 ---@param source number player id
 ---@param weaponName string weapon name
----@param ammo string? amount of ammo
+---@param ammo table ammo
 ---@param components table? weapon components
 ---@param comps table? weapon components
 ---@param custom_serial string? weapon serial number

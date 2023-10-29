@@ -714,8 +714,8 @@ exports("setItemMetadata", InventoryAPI.setItemMetadata)
 --- can carry ammount of weapons
 ---@param player number source
 ---@param amount number amount to check
----@param weaponName string |nil weapon name not neccesary but allows to check if weapon is in the list of not weapons
----@param cb fun(success: boolean)| nil   async or sync callback
+---@param weaponName string? weapon name not neccesary but allows to check if weapon is in the list of not weapons
+---@param cb fun(success: boolean)?   async or sync callback
 ---@return boolean
 function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	local _source = player
