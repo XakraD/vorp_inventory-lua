@@ -1124,7 +1124,7 @@ function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 		}
 
 		DBService.updateAsync(query, params, function(r)
-			if not _target then
+			if _target then
 				weapon:setSource(_target)
 				TriggerClientEvent('vorp:ShowAdvancedRightNotification', _target, T.youGaveWeapon, "inventory_items",
 					weaponName, "COLOR_PURE_WHITE", 4000)
