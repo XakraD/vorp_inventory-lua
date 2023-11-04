@@ -1394,11 +1394,13 @@ exports("setCustomInventoryWeaponLimit", InventoryAPI.setCustomInventoryWeaponLi
 ---@param player number player
 ---@param id string? inventory id
 function InventoryAPI.openInventory(player, id)
+        local _source = player
+
 	if not id then
-		return TriggerClientEvent("vorp_inventory:OpenInv", source)
+		return TriggerClientEvent("vorp_inventory:OpenInv", _source)
 	end
 
-	local _source = player
+
 	if not CustomInventoryInfos[id] or not UsersInventories[id] then
 		return
 	end
