@@ -683,7 +683,7 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 		item:quitCount(amountRemove)
 		DBService.SetItemAmount(charId, item.id, item:getCount())
 		TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
-		DBService.CreateItem(charId, item:getId(), amount or 1, metadata, function(craftedItem)
+		DBService.CreateItem(charId, ServerItems[item.name].id, amount or 1, metadata, function(craftedItem)
 			item = Item:New(
 				{
 					id = craftedItem.id,
@@ -1394,7 +1394,7 @@ exports("setCustomInventoryWeaponLimit", InventoryAPI.setCustomInventoryWeaponLi
 ---@param player number player
 ---@param id string? inventory id
 function InventoryAPI.openInventory(player, id)
-        local _source = player
+	local _source = player
 
 	if not id then
 		return TriggerClientEvent("vorp_inventory:OpenInv", _source)
@@ -1426,7 +1426,7 @@ function InventoryAPI.openInventory(player, id)
 					canUse = dbItem.canUse,
 					canRemove = dbItem.canRemove,
 					createdAt = item.created_at,
-					owner = owner or item.character_id,
+					owner = item.character_id,
 					desc = dbItem.desc,
 					group = dbItem.group or 1,
 				})
@@ -1454,7 +1454,7 @@ function InventoryAPI.openInventory(player, id)
 			triggerAndReloadInventory()
 		else
 			DBService.GetInventory(charid, id, function(inventory)
-				UsersInventories[id][identifier] = createCharacterInventoryFromDB(inventory, identifier)
+				UsersInventories[id][identifier] = createCharacterInventoryFromDB(inventory)
 				triggerAndReloadInventory()
 			end)
 		end

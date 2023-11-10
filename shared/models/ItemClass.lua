@@ -10,7 +10,7 @@
 ---@field metadata table @Item metadata
 ---@field item string @Item name
 ---@field type string @Item type
----@field canUse boolean  @Item can use 
+---@field canUse boolean  @Item can use
 ---@field canRemove boolean @Item can remove
 ---@field desc string @Item description
 Item = {}
@@ -138,15 +138,6 @@ function Item:getLimit()
 	return self.limit
 end
 
--- WEIGHT
-function Item:setWeight(weight)
-	self.weight = weight
-end
-
-function Item:getWeight()
-	return self.weight
-end
-
 -- CanUse
 function Item:setCanUse(canUse)
 	self.canUse = canUse
@@ -163,11 +154,6 @@ end
 
 function Item:getCanRemove()
 	return self.canRemove
-end
-
--- Owner
-function Item:setOwner(owner)
-	self.owner = owner
 end
 
 function Item:getOwner()

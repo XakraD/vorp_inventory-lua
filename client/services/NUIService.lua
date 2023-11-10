@@ -39,7 +39,10 @@ function NUIService.ReloadInventory(inventory)
 				serial_number = item.serial_number
 			end
 			if item.custom_desc then
-				custom_desc = item.custom_desc .. "<br>" .. T.serialnumber .. serial_number
+				local serial_number_str = "<br><br>" .. T.serialnumber .. serial_number
+				if not string.find(item.custom_desc, serial_number_str, 1, true) then 
+					custom_desc = item.custom_desc .. "<br><br>" .. T.serialnumber .. serial_number
+				end
 			end
 
 			if item.desc and custom_desc then
@@ -47,7 +50,7 @@ function NUIService.ReloadInventory(inventory)
 			end
 
 			if item.desc == nil then
-				item.desc = custom_desc or Utils.GetWeaponDesc(item.name) .. "<br>" .. T.serialnumber .. serial_number
+				item.desc = custom_desc or Utils.GetWeaponDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number
 			end
 		end
 	end
@@ -750,19 +753,13 @@ Citizen.CreateThread(function()
 		if not InInventory then
 			sleep = 0
 			if IsControlJustReleased(1, Config.OpenKey) and IsInputDisabled(0) then
-				if Config.DisableDeathInventory then
-					if InInventory and IsPedDeadOrDying(PlayerPedId(), false) then
-						NUIService.CloseInv()
-					else
-						NUIService.OpenInv()
-					end
-				else
-					if InInventory then
-						NUIService.CloseInv()
-					else
-						NUIService.OpenInv()
-					end
-				end
+				NUIService.OpenInv()
+			end
+		end
+
+		if Config.DisableDeathInventory then
+			if InInventory and IsPedDeadOrDying(PlayerPedId(), false) then
+				NUIService.CloseInv()
 			end
 		end
 		Wait(sleep)

@@ -75,10 +75,9 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 	end
 
 	if custom_desc then
-		if serial_number ~= "" then
-			custom_desc = custom_desc .. "<br><br>" .. T.serialnumber .. serial_number
-		else
-			custom_desc = custom_desc
+		local serial_number_str = "<br><br>" .. T.serialnumber .. serial_number
+		if not string.find(custom_desc, serial_number_str, 1, true) and serial_number ~= "" then
+			custom_desc = custom_desc .. serial_number_str
 		end
 	end
 	if serial_number ~= "" then
