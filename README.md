@@ -43,7 +43,7 @@ and much more
 
 ## DOCUMENTATION
 
-[vorp_inventory](https://vorpcore.github.io/VORP_Documentation/api/inventory)
+[vorp_inventory](https://vorpcore.github.io/VORP_Documentation/api/inventory) 
 
 
 ## Credits
