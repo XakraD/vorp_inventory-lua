@@ -355,6 +355,7 @@ function InventoryService.usedWeapon(id, _used, _used2)
 	local used2 = 0
 
 	if _used then used = 1 end
+
 	if _used2 then used2 = 1 end
 	local query = 'UPDATE loadout SET used = @used, used2 = @used2 WHERE id = @id'
 	local params = {
