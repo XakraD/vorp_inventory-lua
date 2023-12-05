@@ -104,12 +104,31 @@ Citizen.CreateThread(function()
     end
 end)
 
+local ammoupdate = true
+RegisterNetEvent("vorpinventory:ammoUpdateToggle", function(state)
+    if not ammoupdate and state then 
+        getammoinfo = true
+        TriggerServerEvent("vorpinventory:getammoinfo")
+        while getammoinfo do
+            Wait(100)
+        end
+        addAmmoToPed(playerammoinfo.ammo)
+        SendNUIMessage({
+            action = "updateammo",
+            ammo   = playerammoinfo.ammo
+        })
+    end
+    ammoupdate = state
+end)
+
 -- AMMO UPDATE THREAD
 Citizen.CreateThread(function()
     while true do
-        if next(updatedAmmoCache) ~= nil then
-            TriggerServerEvent("vorpinventory:updateammo", playerammoinfo)
-            updatedAmmoCache = {}
+        if ammoupdate then 
+            if next(updatedAmmoCache) ~= nil then
+                TriggerServerEvent("vorpinventory:updateammo", playerammoinfo)
+                updatedAmmoCache = {}
+            end
         end
         Wait(10000) -- every 10 seconds
     end
