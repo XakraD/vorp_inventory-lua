@@ -1065,6 +1065,7 @@ exports("createWeapon", InventoryAPI.registerWeapon)
 ---@return  boolean
 function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 	local _source = player
+
 	if not Core.getUser(_source) then
 		return respond(cb, false)
 	end
@@ -1124,7 +1125,7 @@ function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 		}
 
 		DBService.updateAsync(query, params, function(r)
-			if _target then
+			if Core.getUser(_target) then
 				weapon:setSource(_target)
 				TriggerClientEvent('vorp:ShowAdvancedRightNotification', _target, T.youGaveWeapon, "inventory_items",
 					weaponName, "COLOR_PURE_WHITE", 4000)
