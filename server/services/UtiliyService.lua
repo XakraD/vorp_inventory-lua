@@ -234,12 +234,8 @@ function SvUtils.GenerateSerialNumber(name)
     return string.format("%s-%s", timeStamp, randomNumber)
 end
 
-
 --- discord webhook service
 ---@param data {title: string, webhook: string, description: string, color: number, name: string, logo: string, footerlogo: string, avatar: string, source: number, target: number}
 function SvUtils.SendDiscordWebhook(data)
-    local _source = data.source
-    if _source then
-        Core.AddWebhook(data.title, data.webhook, data.description, data.color, data.name)
-    end
+    Core.AddWebhook(data.title, data.webhook, data.description, data.color, data.name)
 end

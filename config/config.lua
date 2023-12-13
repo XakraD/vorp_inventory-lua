@@ -28,13 +28,13 @@ Config = {
 	PickupKey                = 0xF84FA74F,
 	discordid                = true, -- turn to true if ur using discord whitelist
 	DeleteOnlyDontDrop       = false, -- if true then dropping items only deletes from inventory and box on the floor is not created
-	
-		
-		-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
-	
 
-		UseClearAll              = false, -- if you want to use the clear item function if false will use DropOnDeath function
-	OnPlayerRespawn          = {
+
+	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
+
+
+	UseClearAll     = false,        -- if you want to use the clear item function if false will use DropOnDeath function
+	OnPlayerRespawn = {
 		Money = {
 			JobLock         = { "police", "doctor" },
 			ClearMoney      = true, -- if true then removes all money from player
@@ -63,7 +63,7 @@ Config = {
 
 	-- =================== DROP ON DEATH =====================--
 
-	DropOnRespawn            = {
+	DropOnRespawn   = {
 		AllMoney       = false,
 		PartMoney      = false,
 		PartPercentage = 25,

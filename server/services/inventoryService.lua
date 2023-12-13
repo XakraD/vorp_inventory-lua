@@ -950,57 +950,8 @@ function InventoryService.GiveWeapon(weaponId, target)
 		if UsersWeapons.default[weaponId] ~= nil then
 			InventoryService.giveWeapon2(target, weaponId, _source)
 		end
-		local charname, scourceidentifier, steamname = getSourceInfo(_source)
-		local charname2, scourceidentifier2, steamname2 = getSourceInfo(target)
 		local userWeapons = UsersWeapons.default
-		local weapon = userWeapons[weaponId]
-		local wepname = weapon:getName()
-		local serialNumber = weapon:getSerialNumber()
-		local desc = weapon:getDesc()
-		if desc == nil then
-			desc = "Custom Description not set"
-		end
-		if serialNumber == nil then
-			serialNumber = "Serial Number not set"
-		end
-		local title = T.WebHookLang.gavewep
-		local description = "**" ..
-			T.WebHookLang.charname ..
-			":** `" ..
-			charname ..
-			"`\n**" ..
-			T.WebHookLang.Steamname ..
-			"** `" ..
-			steamname ..
-			"` \n**" ..
-			T.WebHookLang.give ..
-			"**  **" ..
-			1 ..
-			"** \n**" ..
-			T.WebHookLang.Weapontype ..
-			":** `" ..
-			wepname ..
-			"` \n**" ..
-			T.WebHookLang.Desc ..
-			"** `" ..
-			desc ..
-			"`   **" ..
-			T.to ..
-			"**   \n` " ..
-			charname2 ..
-			"` \n**" ..
-			T.WebHookLang.Steamname ..
-			"** ` " .. steamname2 .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`"
-		local info = {
-			source = _source,
-			name = Logs.WebHook.webhookname,
-			title = title,
-			description = description,
-			webhook = Logs.WebHook.webhook,
-			color = Logs.WebHook.colorgiveWep,
-		}
 		TriggerClientEvent("vorp_inventory:transactionCompleted", _source)
-		SvUtils.SendDiscordWebhook(info)
 		SvUtils.Trem(_source)
 	end
 end
@@ -1015,6 +966,10 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local userWeapons = UsersWeapons.default
 	local DefaultAmount = Config.MaxItemsInInventory.Weapons
 	local weaponName = userWeapons[weaponId]:getName()
+	local serialNumber = userWeapons[weaponId]:getSerialNumber()
+	local desc = userWeapons[weaponId]:getDesc()
+	local charname, scourceidentifier, steamname = getSourceInfo(_source)
+	local charname2, scourceidentifier2, steamname2 = getSourceInfo(target)
 	local notListed = false
 
 	if Config.JobsAllowed[job] then
@@ -1068,6 +1023,50 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _target)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _source)
 	TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
+
+	if desc == nil then
+		desc = "Custom Description not set"
+	end
+	if serialNumber == nil then
+		serialNumber = "Serial Number not set"
+	end
+	local title = T.WebHookLang.gavewep
+	local description = "**" ..
+		T.WebHookLang.charname ..
+		":** `" ..
+		charname ..
+		"`\n**" ..
+		T.WebHookLang.Steamname ..
+		"** `" ..
+		steamname ..
+		"` \n**" ..
+		T.WebHookLang.give ..
+		"**  **" ..
+		1 ..
+		"** \n**" ..
+		T.WebHookLang.Weapontype ..
+		":** `" ..
+		weaponName ..
+		"` \n**" ..
+		T.WebHookLang.Desc ..
+		"** `" ..
+		desc ..
+		"`   **" ..
+		T.to ..
+		"**   \n` " ..
+		charname2 ..
+		"` \n**" ..
+		T.WebHookLang.Steamname ..
+		"** ` " .. steamname2 .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`"
+	local info = {
+		source = _source,
+		name = Logs.WebHook.webhookname,
+		title = title,
+		description = description,
+		webhook = Logs.WebHook.webhook,
+		color = Logs.WebHook.colorgiveWep,
+	}
+	SvUtils.SendDiscordWebhook(info)
 	-- notify
 	Core.NotifyRightTip(_target, T.youGaveWeapon, 2000)
 	Core.NotifyRightTip(_source, T.youReceivedWeapon, 2000)
@@ -1165,7 +1164,6 @@ function InventoryService.GiveItem(itemId, amount, target)
 			Log.error("[^2GiveItem^7] ^1Error^7: Item [^3" .. itemName .. "^7] does not exist in DB.")
 		end
 		TriggerClientEvent("vorp_inventory:transactionCompleted", _source)
-		SvUtils.SendDiscordWebhook(info)
 		SvUtils.Trem(_source)
 		return
 	end
@@ -1212,6 +1210,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 					updateClient(targetItem)
 				end)
 			end
+			SvUtils.SendDiscordWebhook(info)
 		else
 			Core.NotifyRightTip(_source, T.fullInventoryGive, 2000)
 			Core.NotifyRightTip(_target, T.fullInventory, 2000)
