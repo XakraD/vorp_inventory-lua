@@ -1,3 +1,15 @@
+<3.3>
+ - fixed items with metadata being removed and then addd back on relog
+ - added some error handling for some functions
+ - added new export to get core object
+ - added new callbacks
+ - added custom description for weapons
+ - added exports for modifying/adding custom label description and serial numbers from weapons
+ - removed dataview file , using vorp core file instead.
+ - refactor opening custom inventories with a notify saying its busy
+ - item trade logs fixed
+ - added config file just for logs
+ - make sure to update all files
 <3.2>
 - added serial numbers for weapons 
 - added custom weapon nick names 

@@ -1,10 +1,6 @@
 ---@diagnostic disable: undefined-global
 
-Core = {}
-TriggerEvent("getCore", function(core)
-    Core = core
-end)
-
+Core = exports.vorp_core:GetCore()
 T = TranslationInv.Langs[Lang]
 
 if Config.DevMode then
@@ -75,7 +71,7 @@ end)
 -- * CUSTOM INVENTORY CHECK IS OPEN * --
 local InventoryBeingUsed = {}
 
-Core.addRpcCallback("vorp_inventory:Server:CanOpenCustom", function(source, cb, id)
+Core.Callback.Register("vorp_inventory:Server:CanOpenCustom", function(source, cb, id)
     local _source = source
     if not InventoryBeingUsed[id] then
         InventoryBeingUsed[id] = _source

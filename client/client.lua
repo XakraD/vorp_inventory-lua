@@ -1,9 +1,6 @@
 ---@diagnostic disable: undefined-global
 T = TranslationInv.Langs[Lang]
-Core = {}
-TriggerEvent("getCore", function(core)
-    Core = core
-end)
+Core = exports.vorp_core:GetCore()
 
 
 RegisterNetEvent('syn:getnuistuff')
