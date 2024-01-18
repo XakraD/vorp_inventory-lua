@@ -562,7 +562,7 @@ function NUIService.NUIUseItem(data)
 	if data.type == "item_standard" then
 		if timerUse <= 0 then
 			TriggerServerEvent("vorp_inventory:useItem", data.item, data.id)
-			timerUse = 4000
+			timerUse = 2000
 		else
 			TriggerEvent('vorp:TipRight', T.slow, 5000)
 		end
@@ -751,7 +751,12 @@ Citizen.CreateThread(function()
 		if not InInventory then
 			sleep = 0
 			if IsControlJustReleased(1, Config.OpenKey) and IsInputDisabled(0) then
-				NUIService.OpenInv()
+				local player = PlayerPedId()
+				local hogtied = Citizen.InvokeNative(0x3AA24CCC0D451379, player)
+				local cuffed = Citizen.InvokeNative(0x74E559B3BC910685, player)
+				if not hogtied and not cuffed then
+					NUIService.OpenInv()
+				end
 			end
 		end
 
