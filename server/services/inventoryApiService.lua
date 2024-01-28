@@ -125,7 +125,12 @@ exports("canCarryItem", InventoryAPI.canCarryItem)
 ---@param cb fun(items: table)? async or sync callback
 function InventoryAPI.getInventory(player, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getInventory: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userInventory = UsersInventories.default[identifier]
 
@@ -204,7 +209,12 @@ exports("getUserWeapon", InventoryAPI.getUserWeapon)
 ---@param cb fun(weapons: table)? async or sync callback
 function InventoryAPI.getUserWeapons(player, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getUserWeapons: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charidentifier = sourceCharacter.charIdentifier
 	local usersWeapons = UsersWeapons.default
@@ -243,7 +253,12 @@ exports("getUserInventoryWeapons", InventoryAPI.getUserWeapons)
 ---@return number
 function InventoryAPI.getWeaponBullets(player, weaponId, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getWeaponBullets: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userWeapons = UsersWeapons.default[weaponId]
 
@@ -280,7 +295,12 @@ exports("removeAllUserAmmo", InventoryAPI.removeAllUserAmmo)
 ---@return boolean
 function InventoryAPI.addBullets(player, bulletType, amount, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.addBullets: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local charidentifier = sourceCharacter.charIdentifier
 	local ammo = allplayersammo[_source].ammo
 
@@ -311,7 +331,12 @@ exports("addBullets", InventoryAPI.addBullets)
 ---@return boolean
 function InventoryAPI.subBullets(weaponId, bulletType, amount, cb)
 	local _source = source
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.subBullets: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userWeapons = UsersWeapons.default[weaponId]
 
@@ -348,7 +373,12 @@ function InventoryAPI.getItemCount(player, cb, itemName, metadata)
 		return respond(cb, 0)
 	end
 
-	local identifier = Core.getUser(_source).getUsedCharacter.identifier
+	local User = Core.getUser(_source)
+	if not User then
+		Log.error("InventoryAPI.getItemCount: user is not logged in")
+		return respond(cb, 0)
+	end
+	local identifier = User.getUsedCharacter.identifier
 	metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
 
 	local userInventory = UsersInventories.default[identifier]
@@ -389,7 +419,12 @@ exports("getItemDB", InventoryAPI.getItemDB)
 ---@return table | nil
 function InventoryAPI.getItemByName(player, itemName, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getItemByName: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
 	if not SvUtils.DoesItemExist(itemName, "getItemByName") then
@@ -415,7 +450,12 @@ exports("getItemByName", InventoryAPI.getItemByName)
 ---@return table | nil
 function InventoryAPI.getItemContainingMetadata(player, itemName, metadata, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getItemContainingMetadata: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
 	if not SvUtils.DoesItemExist(itemName, "getItemContainingMetadata") then
@@ -440,7 +480,12 @@ exports("getItemContainingMetadata", InventoryAPI.getItemContainingMetadata)
 ---@param cb fun(item: table | nil)? async or sync callback
 function InventoryAPI.getItemMatchingMetadata(player, itemName, metadata, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getItemMatchingMetadata: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local svItem = ServerItems[itemName]
 
@@ -478,7 +523,12 @@ function InventoryAPI.addItem(player, name, amount, metadata, cb)
 		return respond(cb, false)
 	end
 
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.addItem: user is not logged in")
+		return respond(cb, false)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charIdentifier = sourceCharacter.charIdentifier
 	local userInventory = UsersInventories.default[identifier]
@@ -531,7 +581,12 @@ exports("addItem", InventoryAPI.addItem)
 ---@return table | nil
 function InventoryAPI.getItemByMainId(player, mainid, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getItemByMainId: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userInventory = UsersInventories.default[identifier]
 
@@ -567,8 +622,12 @@ exports("getItemByMainId", InventoryAPI.getItemByMainId)
 ---@return fun(success: boolean)
 function InventoryAPI.subItemID(player, id, cb)
 	local _source = player
-	local sourceUser = Core.getUser(_source)
-	local sourceCharacter = sourceUser.getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.subItemID: user is not logged in")
+		return respond(cb, false)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charIdentifier = sourceCharacter.charIdentifier
 	local userInventory = UsersInventories.default[identifier]
@@ -604,7 +663,11 @@ exports("subItemID", InventoryAPI.subItemID)
 ---@return boolean
 function InventoryAPI.subItem(player, name, amount, metadata, cb)
 	local _source = player
-	local sourceUser = Core.getUser(_source)
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.subItem: user is not logged in")
+		return respond(cb, false)
+	end
 	local svItem = ServerItems[name]
 
 
@@ -612,7 +675,7 @@ function InventoryAPI.subItem(player, name, amount, metadata, cb)
 		return respond(cb, false)
 	end
 
-	local sourceCharacter = sourceUser.getUsedCharacter
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 
 	metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
@@ -657,7 +720,12 @@ exports("subItem", InventoryAPI.subItem)
 ---@return boolean
 function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.setItemMetadata: user is not logged in")
+		return respond(cb, false)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 	local userInventory = UsersInventories.default[identifier]
@@ -719,15 +787,18 @@ exports("setItemMetadata", InventoryAPI.setItemMetadata)
 ---@return boolean
 function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	local _source = player
-	-- if weapon name is function then its a cb and weapon name is nil
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.canCarryAmountWeapons: user is not logged in")
+		return respond(cb, false)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
 	local job = sourceCharacter.job
 	local DefaultAmount = Config.MaxItemsInInventory.Weapons
 
 	if weaponName then
-		-- if weapon is in the list of not weapons then return true
 		if SharedUtils.IsValueInArray(weaponName:upper(), Config.notweapons) then
 			return respond(cb, true)
 		end
@@ -757,7 +828,12 @@ exports("canCarryWeapons", InventoryAPI.canCarryAmountWeapons)
 ---@return  table | nil
 function InventoryAPI.getItem(player, itemName, cb, metadata)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.getItem: user is not logged in")
+		return respond(cb, nil)
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local svItem = ServerItems[itemName]
 
@@ -784,7 +860,6 @@ exports("getItem", InventoryAPI.getItem)
 ---@param cb fun(success: boolean)? async or sync callback
 ---@return boolean
 function InventoryAPI.setWeaponCustomLabel(weaponId, label, cb)
-	local _source = source
 	local userWeapons = UsersWeapons.default[weaponId]
 
 	if userWeapons then
@@ -805,7 +880,6 @@ exports("setWeaponCustomLabel", InventoryAPI.setWeaponCustomLabel)
 ---@param cb fun(success: boolean)? async or sync callback
 ---@return boolean
 function InventoryAPI.setWeaponSerialNumber(weaponId, serial, cb)
-	local _source = source
 	local userWeapons = UsersWeapons.default[weaponId]
 
 	if userWeapons then
@@ -826,7 +900,6 @@ exports("setWeaponSerialNumber", InventoryAPI.setWeaponSerialNumber)
 ---@param cb fun(success: boolean)? async or sync callback
 ---@return boolean
 function InventoryAPI.setWeaponCustomDesc(weaponId, desc, cb)
-	local _source = source
 	local userWeapons = UsersWeapons.default[weaponId]
 
 	if userWeapons then
@@ -891,6 +964,10 @@ exports("deleteWeapon", InventoryAPI.deleteWeapon)
 function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps, cb, wepId, customSerial, customLabel,
 									 customDesc, status)
 	local targetUser = Core.getUser(_target)
+	if not targetUser then
+		Log.error("InventoryAPI.registerWeapon: user is not logged in")
+		return respond(cb, nil)
+	end
 	local targetCharacter = targetUser.getUsedCharacter
 	local targetIdentifier = targetCharacter.identifier
 	local targetCharId = targetCharacter.charIdentifier
@@ -1065,11 +1142,11 @@ exports("createWeapon", InventoryAPI.registerWeapon)
 ---@return  boolean
 function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 	local _source = player
-
-	if not Core.getUser(_source) then
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
 		return respond(cb, false)
 	end
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharId = sourceCharacter.charIdentifier
 	local job = sourceCharacter.job
@@ -1158,6 +1235,10 @@ exports("giveWeapon", InventoryAPI.giveWeapon)
 function InventoryAPI.subWeapon(player, weaponId, cb)
 	local _source = player
 	local User = Core.getUser(_source)
+	if not User then
+		Log.error("InventoryAPI.subWeapon: user is not logged in")
+		return respond(cb, false)
+	end
 	local charId = User.getUsedCharacter.charIdentifier
 	local userWeapons = UsersWeapons.default[weaponId]
 
@@ -1258,10 +1339,7 @@ function InventoryAPI.AddPermissionMoveToCustom(id, jobName, grade)
 		return
 	end
 
-	local data = {
-		name = jobName,
-		grade = grade
-	}
+	local data = { name = jobName, grade = grade }
 	CustomInventoryInfos[id]:AddPermissionMoveTo(data)
 
 	if Config.Debug then
@@ -1280,10 +1358,7 @@ function InventoryAPI.AddPermissionTakeFromCustom(id, jobName, grade)
 		return
 	end
 
-	local data = {
-		name = jobName,
-		grade = grade
-	}
+	local data = { name = jobName, grade = grade }
 
 	CustomInventoryInfos[id]:AddPermissionTakeFrom(data)
 
@@ -1301,9 +1376,7 @@ function InventoryAPI.BlackListCustom(id, name)
 	if not CustomInventoryInfos[id] then
 		return
 	end
-	local data = {
-		name = name
-	}
+	local data = { name = name }
 	CustomInventoryInfos[id]:BlackList(data)
 
 	if Config.Debug then
@@ -1358,10 +1431,7 @@ function InventoryAPI.setCustomInventoryItemLimit(id, itemName, limit)
 		return
 	end
 
-	local data = {
-		name = itemName:lower(),
-		limit = limit
-	}
+	local data = { name = itemName:lower(), limit = limit }
 
 	CustomInventoryInfos[id]:setCustomItemLimit(data)
 	if Config.Debug then
@@ -1384,10 +1454,7 @@ function InventoryAPI.setCustomInventoryWeaponLimit(id, wepName, limit)
 		return
 	end
 
-	local data = {
-		name = wepName:lower(),
-		limit = limit
-	}
+	local data = { name = wepName:lower(), limit = limit }
 
 	CustomInventoryInfos[id]:setCustomWeaponLimit(data)
 
@@ -1413,7 +1480,12 @@ function InventoryAPI.openInventory(player, id)
 		return
 	end
 
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(_source)
+	if not sourceCharacter then
+		Log.error("InventoryAPI.openInventory: user is not logged in")
+		return
+	end
+	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charid = sourceCharacter.charIdentifier
 	local capacity = CustomInventoryInfos[id]:getLimit() > 0 and tostring(CustomInventoryInfos[id]:getLimit()) or 'oo'

@@ -226,8 +226,16 @@ body {
     margin-left: 590px;
     margin-bottom: 40px;
     margin-top: 690px;
+}
 
-
+#rol {
+    position: absolute;
+    font-family: "crock", crock, serif;
+    font-size: 18px;
+    color: #3abef2;
+    margin-left: 710px;
+    margin-bottom: 40px;
+    margin-top: 690px;
 }
 
 #id {
@@ -237,10 +245,6 @@ body {
     font-size: 20px;
     color: #f8f9fa;
     margin-top: 685px;
-
-
-
-
 }
 
 #secondInventoryElement {

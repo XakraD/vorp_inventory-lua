@@ -4,7 +4,7 @@ Core = exports.vorp_core:GetCore()
 
 
 RegisterNetEvent('syn:getnuistuff')
-AddEventHandler('syn:getnuistuff', function(x, y, mon, gol)
+AddEventHandler('syn:getnuistuff', function(x, y, mon, gol, rol)
     local nuistuff = x
     local player = PlayerPedId()
     SendNUIMessage({
@@ -17,6 +17,7 @@ AddEventHandler('syn:getnuistuff', function(x, y, mon, gol)
         show   = not IsRadarHidden(),
         money  = mon,
         gold   = gol,
+        rol  = rol,
         id     = GetPlayerServerId(NetworkGetEntityOwner(player)),
     })
 end)

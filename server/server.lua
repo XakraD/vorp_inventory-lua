@@ -23,9 +23,10 @@ AddEventHandler("vorpinventory:check_slots", function()
     local charid = User.charIdentifier
     local money = User.money
     local gold = User.gold
+    local rol = User.rol
     local stufftosend = InventoryAPI.getUserTotalCountItems(identifier, charid)
 
-    TriggerClientEvent("syn:getnuistuff", _source, stufftosend, part2, money, gold)
+    TriggerClientEvent("syn:getnuistuff", _source, stufftosend, part2, money, gold, rol)
 end)
 
 
