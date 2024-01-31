@@ -14,6 +14,7 @@ Config = {
 	DoubleClickToUse         = true, -- if toggled to false, items in inventory will right click then left click "use"
 	NewPlayers               = false, --- if you dont want new players to give money or items then set to true. this can avoid cheaters giving stuff on first join
 	-- GOLD ITEM LIKE DOLLARS
+	UseRolItem               = false, -- to show rol in inventory
 	UseGoldItem              = false,
 	AddGoldItem              = false, -- Should there be an item in inventory to represent gold
 	AddDollarItem            = true, -- Should there be an item in inventory to represent dollars
@@ -33,7 +34,7 @@ Config = {
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
 
 
-	UseClearAll     = false,        -- if you want to use the clear item function if false will use DropOnDeath function
+	UseClearAll     = false, -- if you want to use the clear item function if false will use DropOnDeath function
 	OnPlayerRespawn = {
 		Money = {
 			JobLock         = { "police", "doctor" },

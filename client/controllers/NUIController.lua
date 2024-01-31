@@ -1,5 +1,6 @@
 --=========================== NUI CALL BACKS  ===========================--
 RegisterNUICallback('NUIFocusOff', NUIService.NUIFocusOff)
+RegisterNUICallback("OfflineFocusOff", NUIService.OfflineFocusOff)
 RegisterNUICallback('DropItem', NUIService.NUIDropItem)
 RegisterNUICallback('UseItem', NUIService.NUIUseItem)
 RegisterNUICallback('sound', NUIService.NUISound)

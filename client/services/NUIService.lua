@@ -610,6 +610,10 @@ function NUIService.NUIFocusOff()
 	NUIService.CloseInv()
 end
 
+function NUIService.OfflineFocusOff()
+	NUIService.CloseInventory()
+end
+
 function NUIService.LoadInv()
 	local payload = {}
 	local items = {}
@@ -736,7 +740,8 @@ function NUIService.initiateData()
 			AddGoldItem = Config.AddGoldItem,
 			AddDollarItem = Config.AddDollarItem,
 			AddAmmoItem = Config.AddAmmoItem,
-			DoubleClickToUse = Config.DoubleClickToUse
+			DoubleClickToUse = Config.DoubleClickToUse,
+			UseRolItem = Config.UseRolItem
 		}
 	})
 end
