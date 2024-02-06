@@ -1083,7 +1083,12 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			hasCustomDesc()           -- custom desc or existent desc or nil
 		local query = 'INSERT INTO loadout (identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) '..
 		'VALUES (@identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
+		if wepId then
+			query = 'INSERT INTO loadout (id, identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) '..
+			'VALUES (@id, @identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
+		end
 		local params = {
+			id = wepId,
 			identifier = targetIdentifier,
 			charid = targetCharId,
 			name = name,

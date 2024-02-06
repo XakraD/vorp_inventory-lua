@@ -475,10 +475,10 @@ function InventoryService.addWeapon(target, weaponId)
 	local weaponname = userWeapons[weaponId]:getName()
 	local ammo = { ["nothing"] = 0 }
 	local components = { ["nothing"] = 0 }
-	InventoryAPI.registerWeapon(_source, weaponname, ammo, components, weaponcomps, function()
-	end, weaponId, nil, nil, nil, weaponStatus)
 	InventoryAPI.deleteWeapon(_source, weaponId, function()
 	end)
+	InventoryAPI.registerWeapon(_source, weaponname, ammo, components, weaponcomps, function()
+	end, weaponId, nil, nil, nil, weaponStatus)
 end
 
 function InventoryService.subWeapon(target, weaponId)
@@ -1016,10 +1016,10 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	userWeapons[weaponId]:setPropietary('')
 	local ammo = { ["nothing"] = 0 }
 	local components = { ["nothing"] = 0 }
-	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, function()
-	end, weaponId, nil, nil, nil, weaponStatus)
 	InventoryAPI.deleteWeapon(_source, weaponId, function()
 	end)
+	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, function()
+	end, weaponId, nil, nil, nil, weaponStatus)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _target)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _source)
 	TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
