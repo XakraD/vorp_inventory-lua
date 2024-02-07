@@ -944,7 +944,7 @@ function InventoryAPI.deleteWeapon(player, weaponid, cb)
 	userWeapons[weaponid]:setPropietary('')
 	local query = 'DELETE FROM loadout WHERE id = @id'
 	local params = { id = weaponid }
-	DBService.deleteAsync(query, params, function(r) end)
+	local result = DBService.singleAwait(query, params)
 	return respond(cb, true)
 end
 
