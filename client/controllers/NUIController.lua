@@ -15,6 +15,8 @@ RegisterNUICallback("ChangeClothing", NUIService.ChangeClothing)
 RegisterNetEvent("vorp_inventory:CloseInv")
 AddEventHandler("vorp_inventory:CloseInv", NUIService.CloseInventory)
 
+-- client
+AddEventHandler("vorp_inventory:Client:DisableInventory", NUIService.DisableInventory)
 -- server
 RegisterNetEvent("vorp_inventory:ProcessingReady", NUIService.setProcessingPayFalse)
 RegisterNetEvent("vorp_inventory:OpenInv", NUIService.OpenInv)

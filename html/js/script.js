@@ -86,10 +86,11 @@ window.addEventListener('message', function (event) {
             }
         }
         if (Config.UseRolItem) {
-            if (event.data.rol) {
+            if (event.data.rol || event.data.rol === 0) {
                 $("#rol-value").text(event.data.rol.toFixed(2) + " ");
             }
         }
+        
 
         if (event.data.id) {
             $("#id-value").text("ID " + event.data.id);

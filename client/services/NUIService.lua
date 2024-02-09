@@ -7,7 +7,7 @@ local cangive = true
 local storemenu = false
 local geninfo = {}
 local CanOpen = true
-
+local InventoryIsDisabled = false
 -- * GLOBALS * --
 InInventory = false
 NUIService = {}
@@ -52,8 +52,8 @@ function NUIService.ReloadInventory(inventory)
 			if item.desc == nil then
 				local applySerial = Utils.filterWeaponsSerialNumber(item.name)
 				item.desc = applySerial and
-				Utils.GetWeaponDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number or
-				Utils.GetWeaponDesc(item.name)
+					Utils.GetWeaponDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number or
+					Utils.GetWeaponDesc(item.name)
 			end
 		end
 	end
@@ -761,7 +761,7 @@ Citizen.CreateThread(function()
 				local player = PlayerPedId()
 				local hogtied = Citizen.InvokeNative(0x3AA24CCC0D451379, player)
 				local cuffed = Citizen.InvokeNative(0x74E559B3BC910685, player)
-				if not hogtied and not cuffed then
+				if not hogtied and not cuffed and not InventoryIsDisabled then
 					NUIService.OpenInv()
 				end
 			end
@@ -790,4 +790,8 @@ function NUIService.ChangeClothing(item)
 	if item then
 		ExecuteCommand(tostring(item))
 	end
+end
+
+function NUIService.DisableInventory(param)
+	InventoryIsDisabled = param
 end
