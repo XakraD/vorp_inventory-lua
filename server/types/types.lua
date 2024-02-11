@@ -33,7 +33,13 @@ function exports.vorp_inventory:getUserInventoryItems(source, callback) end
 
 ---@param item string item name
 ---@param callback fun(item:table)
+---@return string the callbackId to be used to cancel the callback
 function exports.vorp_inventory:registerUsableItem(item, callback) end
+
+--- remove callback for item
+---@param name string item name
+---@param callbackId string id generated when registering the item callback
+function InventoryAPI.unRegisterUsableItem(name, callbackId) end
 
 --- get user inventory weapon
 ---@param source number player id

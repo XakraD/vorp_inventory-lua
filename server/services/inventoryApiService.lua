@@ -37,7 +37,7 @@ CustomInventoryInfos = {
 	}
 }
 
----@type table<string,function> table of Registered items
+---@type table<string, table<string, function>> table of Registered items
 UsableItemsFunctions = {}
 
 allplayersammo = {}
@@ -160,6 +160,7 @@ exports("getUserInventoryItems", InventoryAPI.getInventory)
 --- register usable item
 ---@param name string item name
 ---@param cb function callback
+---@return string
 function InventoryAPI.registerUsableItem(name, cb)
 	if Config.Debug then
 		SetTimeout(9000, function()
@@ -167,10 +168,37 @@ function InventoryAPI.registerUsableItem(name, cb)
 		end)
 	end
 
-	UsableItemsFunctions[name] = cb
+	local callbackId = SvUtils.GenerateUniqueID()
+
+	if not UsableItemsFunctions[name] then
+		UsableItemsFunctions[name] = {}
+	end
+
+	UsableItemsFunctions[name][callbackId] = cb
+
+	return callbackId
 end
 
 exports("registerUsableItem", InventoryAPI.registerUsableItem)
+
+--- remove callback for item
+---@param name string item name
+---@param cbId string id generated when registering the item callback
+function InventoryAPI.unRegisterUsableItem(name, cbId)
+	if Config.Debug then
+		SetTimeout(9000, function()
+			Log.print("Callback[^3" .. cbId .. "^7] for item[^3" .. name .. "^7] ^2UnRegistered!^7")
+		end)
+	end
+
+	if cbId == nil then
+		return
+	end
+
+	UsableItemsFunctions[name][cbId] = nil
+end
+
+exports("unRegisterUsableItem", InventoryAPI.unRegisterUsableItem)
 
 --- get user weapon
 ---@param player number player source

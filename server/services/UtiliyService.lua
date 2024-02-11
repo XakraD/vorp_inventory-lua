@@ -223,6 +223,14 @@ function SvUtils.filterWeaponsSerialNumber(name)
     return true
 end
 
+--- generate a unique random id
+---@return string
+function SvUtils.GenerateUniqueID()
+	local time = os.time()
+	local randomNum = math.random(1000000, 9999999)
+	return tostring(time) .. tostring(randomNum)
+end
+
 --- generate a unique serial number
 ---@return string
 function SvUtils.GenerateSerialNumber(name)

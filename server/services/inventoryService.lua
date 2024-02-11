@@ -56,9 +56,12 @@ function InventoryService.UseItem(itemName, itemId, args)
 				item = itemArgs,
 				args = args
 			}
-			local success, result = pcall(UsableItemsFunctions[itemName], arguments)
-			if not success then
-				print("Function call failed with error:", result)
+
+			for _, cb in pairs(UsableItemsFunctions[itemName]) do
+				local success, result = pcall(cb, arguments)
+				if not success then
+					print("Function call failed with error:", result)
+				end
 			end
 		end
 	end
@@ -728,14 +731,8 @@ function InventoryService.onPickupGold(obj)
 	end
 end
 
-local function generateUniqueID()
-	local time = os.time()
-	local randomNum = math.random(1000000, 9999999)
-	return tostring(time) .. tostring(randomNum)
-end
-
 local function shareData(data)
-	local uid = generateUniqueID()
+	local uid = SvUtils.GenerateUniqueID()
 	ItemUids[uid] = uid
 
 	ItemPickUps[uid] = {
