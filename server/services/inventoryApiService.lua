@@ -82,6 +82,7 @@ exports("canCarryItems", InventoryAPI.canCarryAmountItem)
 ---@param amount number amount of item
 ---@param cb fun(canCarry: boolean)? async or sync callback
 function InventoryAPI.canCarryItem(player, itemName, amount, cb)
+	
 	local function exceedsItemLimit(identifier, itemName, amount, limit)
 		local items = SvUtils.FindAllItemsByName("default", identifier, itemName)
 		local count = 0

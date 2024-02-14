@@ -1646,66 +1646,65 @@ function InventoryService.MoveToCustom(obj)
 	local IsBlackListed = InventoryService.CheckIsBlackListed(invId, string.lower(item.name)) -- lower so we can checkitems and weapons
 
 	if not IsBlackListed then
-		Core.NotifyObjective(_source, "Item is blackListed", 5000) -- add your own notifications
-		return
+		return Core.NotifyObjective(_source, "Item is blackListed", 5000)
 	end
 
 	if not CanMove then
-		Core.NotifyObjective(_source, "You dont have permision to move into the storage", 5000) -- add your own notifications
-		return
+		return Core.NotifyObjective(_source, "You dont have permision to move into the storage", 5000)
 	end
 
+
 	if item.type == "item_weapon" then
-		if CustomInventoryInfos[invId]:doesAcceptWeapons() then
-			if InventoryService.canStoreWeapon(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount) then
-				local query =
-				"UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
-				local params = {
-					invId = invId,
-					charid = sourceCharIdentifier,
-					weaponId = item.id,
-				}
-				DBService.updateAsync(query, params, function(r) end)
-				UsersWeapons.default[item.id]:setCurrInv(invId)
-				UsersWeapons[invId][item.id] = UsersWeapons.default[item.id]
-				UsersWeapons.default[item.id] = nil
-				TriggerClientEvent("vorpCoreClient:subWeapon", _source, item.id)
-				InventoryService.reloadInventory(_source, invId)
-				InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
-				local text = "you have moved to storage"
-
-				if string.lower(item.name) == "weapon_revolver_lemat" then
-					Icon = "weapon_revolver_doubleaction" -- theres no revolver lemat texture
-				else
-					Icon = item.name
-				end
-				Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
-			else
-				Core.NotifyRightTip(_source, T.fullInventory, 2000)
-			end
-		else
-			Core.NotifyRightTip(_source, "This storage does not accept weapons", 2000)
+		if not CustomInventoryInfos[invId]:doesAcceptWeapons() then
+			return Core.NotifyRightTip(_source, "This storage does not accept weapons", 2000)
 		end
+
+		if not InventoryService.canStoreWeapon(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount) then
+			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
+		end
+
+		local query =
+		"UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
+		local params = {
+			invId = invId,
+			charid = sourceCharIdentifier,
+			weaponId = item.id,
+		}
+		DBService.updateAsync(query, params, function(r) end)
+		UsersWeapons.default[item.id]:setCurrInv(invId)
+		UsersWeapons[invId][item.id] = UsersWeapons.default[item.id]
+		UsersWeapons.default[item.id] = nil
+		TriggerClientEvent("vorpCoreClient:subWeapon", _source, item.id)
+		InventoryService.reloadInventory(_source, invId)
+		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
+		local text = "you have moved to storage"
+
+		if string.lower(item.name) == "weapon_revolver_lemat" then
+			Icon = "weapon_revolver_doubleaction" -- theres no revolver lemat texture
+		else
+			Icon = item.name
+		end
+		Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
 	else
-		if not item.count or not amount then
-			return
+		if item.count and amount and items.count < amount then
+			return print("Error: Amount is greater than item count")
 		end
 
-		if item.count >= amount and InventoryService.canStoreItem(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount) then
-			InventoryService.subItem(_source, "default", item.id, amount)
-			TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
-
-			InventoryService.addItem(_source, invId, item.name, amount, item.metadata, function(itemAdded)
-				if itemAdded == nil then
-					return
-				end
-				Core.NotifyRightTip(_source, "you have Moved " .. amount .. " " .. item.label .. " to storage", 2000)
-				InventoryService.reloadInventory(_source, invId)
-				InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
-			end)
-		else
-			Core.NotifyRightTip(_source, T.fullInventory, 2000)
+		if not InventoryService.canStoreItem(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount) then
+			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
 		end
+
+		InventoryService.subItem(_source, "default", item.id, amount)
+		TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
+		local itemAdded = InventoryService.addItem(_source, invId, item.name, amount, item.metadata)
+
+		if not itemAdded then
+			return print("Error: Could not add item to inventory")
+		end
+
+		Core.NotifyRightTip(_source, "you have Moved " .. amount .. " " .. item.label .. " to storage", 2000)
+		InventoryService.reloadInventory(_source, invId)
+		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
 	end
 end
 
@@ -1725,68 +1724,80 @@ function InventoryService.TakeFromCustom(obj)
 	local CanMove = InventoryService.DoesHavePermission(invId, job, grade, Table)
 
 	if not CanMove then
-		Core.NotifyObjective(_source, "you dont have permmissions to take from this storage", 5000) -- add your own notifications
-		return
+		return Core.NotifyObjective(_source, "you dont have permmissions to take from this storage", 5000) -- add your own notifications
 	end
 
 	if item.type == "item_weapon" then
-		InventoryAPI.canCarryAmountWeapons(_source, 1, function(res)
-			if res then
-				local query =
-				"UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
-				local params = {
-					identifier = sourceIdentifier,
-					weaponId = item.id,
-					charid = sourceCharIdentifier,
-				}
-				DBService.updateAsync(query, params, function(r) end)
-				UsersWeapons[invId][item.id]:setCurrInv("default")
-				UsersWeapons.default[item.id] = UsersWeapons[invId][item.id]
-				UsersWeapons.default[item.id].propietary = sourceIdentifier
-				UsersWeapons.default[item.id].charId = sourceCharIdentifier
-				UsersWeapons[invId][item.id] = nil
-				local weapon = UsersWeapons.default[item.id]
-				local name = weapon:getName()
-				local ammo = weapon:getAllAmmo()
-				local label = weapon:getLabel()
-				local serial = weapon:getSerialNumber()
-				local custom = weapon:getCustomLabel()
-				TriggerClientEvent("vorpInventory:receiveWeapon", _source, item.id, sourceIdentifier, name, ammo, label,
-					serial, custom, _source)
-				InventoryService.reloadInventory(_source, invId)
-				InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
-				local text = " you have Taken From storage "
-				if string.lower(item.name) == "weapon_revolver_lemat" then
-					Icon = "weapon_revolver_doubleaction" -- theres no revolver lemat texture
-				else
-					Icon = item.name
-				end
-				Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
-			else
-				Core.NotifyRightTip(_source, T.fullInventory, 2000)
-			end
-		end, item.name)
+		local canCarryWeapon = InventoryAPI.canCarryAmountWeapons(_source, 1, nil, item.name)
+
+		if not canCarryWeapon then
+			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
+		end
+
+		local query =
+		"UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
+		local params = {
+			identifier = sourceIdentifier,
+			weaponId = item.id,
+			charid = sourceCharIdentifier,
+		}
+		DBService.updateAsync(query, params, function(r) end)
+		UsersWeapons[invId][item.id]:setCurrInv("default")
+		UsersWeapons.default[item.id] = UsersWeapons[invId][item.id]
+		UsersWeapons.default[item.id].propietary = sourceIdentifier
+		UsersWeapons.default[item.id].charId = sourceCharIdentifier
+		UsersWeapons[invId][item.id] = nil
+		local weapon = UsersWeapons.default[item.id]
+		local name = weapon:getName()
+		local ammo = weapon:getAllAmmo()
+		local label = weapon:getLabel()
+		local serial = weapon:getSerialNumber()
+		local custom = weapon:getCustomLabel()
+		TriggerClientEvent("vorpInventory:receiveWeapon", _source, item.id, sourceIdentifier, name, ammo, label, serial,
+			custom, _source)
+		InventoryService.reloadInventory(_source, invId)
+		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
+		local text = " you have Taken From storage "
+
+		if string.lower(item.name) == "weapon_revolver_lemat" then
+			Icon = "weapon_revolver_doubleaction" -- theres no revolver lemat texture
+		else
+			Icon = item.name
+		end
+
+		Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
 	else
-		InventoryAPI.canCarryItem(_source, item.name, amount, function(res)
-			if res then
-				if amount > item.count then
-					return
-				end
-				InventoryService.subItem(_source, invId, item.id, amount)
-				InventoryService.addItem(_source, "default", item.name, amount, item.metadata, function(itemAdded)
-					if itemAdded == nil then
-						return
-					end
-					TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount,
-						itemAdded:getMetadata())
-					InventoryService.reloadInventory(_source, invId)
-					InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
-					Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from storage ",
-						2000)
-				end)
-			else
-				Core.NotifyRightTip(_source, T.fullInventory, 2000)
-			end
-		end)
+		if item.count and amount > item.count then
+			return print("Error: Amount is greater than item count")
+		end
+
+		local canCarryItem = InventoryAPI.canCarryItem(_source, item.name, amount)
+		local invHasSpace = InventoryAPI.canCarryAmountItem(_source, item.name)
+
+		if not canCarryItem then
+			return Core.NotifyRightTip(_source, "Cant carry more of this item stack limit achieved", 2000)
+		end
+
+		if not invHasSpace then
+			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
+		end
+
+		local result = InventoryService.subItem(_source, invId, item.id, amount)
+
+		if not result then
+			return print("Error: Could not remove item from inventory")
+		end
+
+		local itemAdded = InventoryService.addItem(_source, "default", item.name, amount, item.metadata)
+
+		if not itemAdded then
+			return print("Error: Could not add item to inventory")
+		end
+
+		TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount,
+			itemAdded:getMetadata())
+		InventoryService.reloadInventory(_source, invId)
+		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
+		Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from storage ", 2000)
 	end
 end
