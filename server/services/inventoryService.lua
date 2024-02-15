@@ -424,37 +424,38 @@ function InventoryService.addItem(target, invId, name, amount, metadata, cb)
 		userInventory = UsersInventories[invId][identifier]
 	end
 
-	if userInventory ~= nil then
-		local item = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
-		if item then
-			if amount > 0 then
-				item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
-				DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
-				return cb(item)
-			end
-			return cb(nil)
-		else
-			DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, function(craftedItem)
-				item = Item:New({
-					id = craftedItem.id,
-					count = amount,
-					limit = svItem:getLimit(),
-					label = svItem:getLabel(),
-					metadata = SharedUtils.MergeTables(svItem.metadata, metadata),
-					name = name,
-					type = "item_standard",
-					canUse = svItem:getCanUse(),
-					canRemove = svItem:getCanRemove(),
-					owner = charIdentifier,
-					desc = svItem:getDesc(),
-					group = svItem:getGroup()
-				})
-				userInventory[craftedItem.id] = item
-				return cb(item)
-			end, invId)
-		end
+	if not userInventory then
+		return cb(nil)
 	end
-	return cb(nil)
+
+	local item = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
+	if item then
+		if amount > 0 then
+			item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
+			DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
+			return cb(item)
+		end
+		return cb(nil)
+	else
+		DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, function(craftedItem)
+			item = Item:New({
+				id = craftedItem.id,
+				count = amount,
+				limit = svItem:getLimit(),
+				label = svItem:getLabel(),
+				metadata = SharedUtils.MergeTables(svItem.metadata, metadata),
+				name = name,
+				type = "item_standard",
+				canUse = svItem:getCanUse(),
+				canRemove = svItem:getCanRemove(),
+				owner = charIdentifier,
+				desc = svItem:getDesc(),
+				group = svItem:getGroup()
+			})
+			userInventory[craftedItem.id] = item
+			return cb(item)
+		end, invId)
+	end
 end
 
 function InventoryService.addWeapon(target, weaponId)
@@ -1111,9 +1112,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 	if sourceInventory[itemId] == nil then
 		Core.NotifyRightTip(_source, T.itemerror, 2000)
 		if Config.Debug then
-			Log.error("ServerGiveItem: User " ..
-				sourceCharacter.firstname ..
-				' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item ' .. itemName .. ' not found')
+			Log.error("ServerGiveItem: User " .. sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname .. '#' .. _source .. ' ' .. 'inventory item  not found')
 		end
 		TriggerClientEvent("vorp_inventory:transactionCompleted", _source)
 		SvUtils.Trem(_source)
@@ -1128,33 +1127,11 @@ function InventoryService.GiveItem(itemId, amount, target)
 	local charname2, scourceidentifier2, steamname2 = getSourceInfo(_target)
 
 	local title = T.gaveitem
-	local description = "**" ..
-		T.WebHookLang.amount ..
-		"**: `" ..
-		amount ..
-		"`\n **" ..
-		T.WebHookLang.item ..
-		"** : `" ..
-		itemName ..
-		"`" ..
-		"\n**" ..
-		T.WebHookLang.charname ..
-		":** `" ..
-		charname ..
-		"` \n**" ..
-		T.WebHookLang.Steamname ..
-		"** `" ..
-		steamname ..
+	local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** : `" .. itemName .. "`" .. "\n**" ..
+		T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname ..
 		"` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n"
 
-	local info = {
-		source = _source,
-		name = Logs.WebHook.webhookname,
-		title = title,
-		description = description,
-		webhook = Logs.WebHook.webhook,
-		color = Logs.WebHook.colorgiveitem,
-	}
+	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveitem }
 
 	if not svItem then
 		if Config.Debug then
@@ -1176,7 +1153,6 @@ function InventoryService.GiveItem(itemId, amount, target)
 			DBService.SetItemAmount(sourceCharIdentifier, item:getId(), item:getCount())
 		end
 		local ItemsLabel = svItem:getLabel()
-		--NOTIFY
 		Core.NotifyRightTip(_source, T.yougive .. amount .. T.of .. ItemsLabel .. "", 2000)
 		Core.NotifyRightTip(_target, T.youreceive .. amount .. T.of .. ItemsLabel .. "", 2000)
 	end
@@ -1663,13 +1639,8 @@ function InventoryService.MoveToCustom(obj)
 			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
 		end
 
-		local query =
-		"UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
-		local params = {
-			invId = invId,
-			charid = sourceCharIdentifier,
-			weaponId = item.id,
-		}
+		local query = "UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
+		local params = { invId = invId, charid = sourceCharIdentifier, weaponId = item.id }
 		DBService.updateAsync(query, params, function(r) end)
 		UsersWeapons.default[item.id]:setCurrInv(invId)
 		UsersWeapons[invId][item.id] = UsersWeapons.default[item.id]
@@ -1686,7 +1657,7 @@ function InventoryService.MoveToCustom(obj)
 		end
 		Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
 	else
-		if item.count and amount and items.count < amount then
+		if item.count and amount and item.count < amount then
 			return print("Error: Amount is greater than item count")
 		end
 
@@ -1694,17 +1665,17 @@ function InventoryService.MoveToCustom(obj)
 			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
 		end
 
-		InventoryService.subItem(_source, "default", item.id, amount)
-		TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
-		local itemAdded = InventoryService.addItem(_source, invId, item.name, amount, item.metadata)
+		InventoryService.addItem(_source, invId, item.name, amount, item.metadata, function(itemAdded)
+			if not itemAdded then
+				return print("Error: Could not add item to inventory")
+			end
 
-		if not itemAdded then
-			return print("Error: Could not add item to inventory")
-		end
-
-		Core.NotifyRightTip(_source, "you have Moved " .. amount .. " " .. item.label .. " to storage", 2000)
-		InventoryService.reloadInventory(_source, invId)
-		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
+			InventoryService.subItem(_source, "default", item.id, amount)
+			TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
+			Core.NotifyRightTip(_source, "you have Moved " .. amount .. " " .. item.label .. " to storage", 2000)
+			InventoryService.reloadInventory(_source, invId)
+			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
+		end)
 	end
 end
 
@@ -1753,8 +1724,7 @@ function InventoryService.TakeFromCustom(obj)
 		local label = weapon:getLabel()
 		local serial = weapon:getSerialNumber()
 		local custom = weapon:getCustomLabel()
-		TriggerClientEvent("vorpInventory:receiveWeapon", _source, item.id, sourceIdentifier, name, ammo, label, serial,
-			custom, _source)
+		TriggerClientEvent("vorpInventory:receiveWeapon", _source, item.id, sourceIdentifier, name, ammo, label, serial, custom, _source)
 		InventoryService.reloadInventory(_source, invId)
 		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 		local text = " you have Taken From storage "
@@ -1772,7 +1742,7 @@ function InventoryService.TakeFromCustom(obj)
 		end
 
 		local canCarryItem = InventoryAPI.canCarryItem(_source, item.name, amount)
-		local invHasSpace = InventoryAPI.canCarryAmountItem(_source, item.name)
+		local invHasSpace = InventoryAPI.canCarryAmountItem(_source, amount)
 
 		if not canCarryItem then
 			return Core.NotifyRightTip(_source, "Cant carry more of this item stack limit achieved", 2000)
@@ -1782,22 +1752,20 @@ function InventoryService.TakeFromCustom(obj)
 			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
 		end
 
-		local result = InventoryService.subItem(_source, invId, item.id, amount)
+		InventoryService.addItem(_source, "default", item.name, amount, item.metadata, function(itemAdded)
+			if not itemAdded then
+				return print("Error: Could not add item to inventory")
+			end
+			local result = InventoryService.subItem(_source, invId, item.id, amount)
 
-		if not result then
-			return print("Error: Could not remove item from inventory")
-		end
+			if not result then
+				return print("Error: Could not remove item from inventory")
+			end
 
-		local itemAdded = InventoryService.addItem(_source, "default", item.name, amount, item.metadata)
-
-		if not itemAdded then
-			return print("Error: Could not add item to inventory")
-		end
-
-		TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount,
-			itemAdded:getMetadata())
-		InventoryService.reloadInventory(_source, invId)
-		InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
-		Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from storage ", 2000)
+			TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount, itemAdded:getMetadata())
+			InventoryService.reloadInventory(_source, invId)
+			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
+			Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from storage ", 2000)
+		end)
 	end
 end
