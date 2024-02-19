@@ -82,7 +82,6 @@ exports("canCarryItems", InventoryAPI.canCarryAmountItem)
 ---@param amount number amount of item
 ---@param cb fun(canCarry: boolean)? async or sync callback
 function InventoryAPI.canCarryItem(player, itemName, amount, cb)
-	
 	local function exceedsItemLimit(identifier, itemName, amount, limit)
 		local items = SvUtils.FindAllItemsByName("default", identifier, itemName)
 		local count = 0
@@ -661,6 +660,9 @@ function InventoryAPI.subItemID(player, id, cb)
 	local charIdentifier = sourceCharacter.charIdentifier
 	local userInventory = UsersInventories.default[identifier]
 	local item = userInventory[id]
+	if not item then
+		return respond(cb, false)
+	end
 	local itemid = item:getId()
 	local itemCount = item:getCount()
 
@@ -1303,7 +1305,8 @@ exports("subWeapon", InventoryAPI.subWeapon)
 function InventoryAPI.getUserTotalCountItems(identifier, charid)
 	local userTotalItemCount = 0
 	local userInventory = UsersInventories.default[identifier]
-	for _, item in pairs(userInventory) do
+
+	for _, item in pairs(userInventory or {}) do
 		if item:getCount() == nil then
 			userInventory[item:getId()] = nil
 			DBService.DeleteItem(charid, item:getId())
