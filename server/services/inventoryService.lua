@@ -8,9 +8,6 @@ ItemUids = {}
 local newchar = {} -- new
 local timer = 120  -- in minutes
 
---- check if player is new
----@param _source number source player
----@param charid number character id
 function InventoryService.CheckNewPlayer(_source, charid)
 	if Config.NewPlayers then
 		if SharedUtils.IsValueInArray(charid, newchar) then
@@ -51,11 +48,7 @@ function InventoryService.UseItem(itemName, itemId, args)
 			local itemArgs = json.decode(json.encode(svItem))
 			itemArgs.metadata = item:getMetadata()
 			itemArgs.mainid = itemId
-			local arguments = {
-				source = _source,
-				item = itemArgs,
-				args = args
-			}
+			local arguments = { source = _source, item = itemArgs, args = args }
 
 			for _, cb in pairs(UsableItemsFunctions[itemName]) do
 				local success, result = pcall(cb, arguments)
@@ -92,26 +85,13 @@ function InventoryService.DropMoney(amount)
 			end
 			local charname, scourceidentifier, steamname = getSourceInfo(_source)
 			local title = T.dropmoney
-			local description = "**" ..
-				T.WebHookLang.money ..
-				":** `" ..
-				amount ..
-				"` `$` \n**" ..
-				T.WebHookLang.charname ..
-				":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+			local description = "**" .. T.WebHookLang.money .. ":** `" .. amount .. "` `$` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
 
 			if amount < amount then
 				return
 			end
 
-			local info = {
-				source = _source,
-				name = Logs.WebHook.webhookname,
-				title = title,
-				description = description,
-				webhook = Logs.WebHook.webhook,
-				color = Logs.WebHook.colorDropMoney,
-			}
+			local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorDropMoney, }
 			SvUtils.SendDiscordWebhook(info)
 		end
 		SvUtils.Trem(_source)
@@ -194,27 +174,8 @@ function InventoryService.giveMoneyToPlayer(target, amount)
 			local charname, identifier, steamname = getSourceInfo(_source)
 			local charname2, identifier2, steamname2 = getSourceInfo(_target)
 			local title = T.givemoney
-			local description = "**" ..
-				T.WebHookLang.amount ..
-				"**: `" ..
-				amount ..
-				"`\n **" ..
-				T.WebHookLang.charname ..
-				":** `" ..
-				charname ..
-				"` \n**" ..
-				T.WebHookLang.Steamname ..
-				"** `" .. steamname .. "` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.
-				Steamname .. "** `" .. steamname2 .. "` \n"
-
-			local info = {
-				source = _source,
-				name = Logs.WebHook.webhookname,
-				title = title,
-				description = description,
-				webhook = Logs.WebHook.webhook,
-				color = Logs.WebHook.colorgiveMoney,
-			}
+			local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n"
+			local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveMoney, }
 			SvUtils.SendDiscordWebhook(info)
 		end
 
@@ -244,21 +205,8 @@ function InventoryService.DropGold(amount)
 		end
 		local charname, scourceidentifier, steamname = getSourceInfo(_source)
 		local title = T.dropgold
-		local description = "**" ..
-			T.WebHookLang.gold ..
-			":** `" ..
-			amount ..
-			"` \n**" ..
-			T.WebHookLang.charname ..
-			":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
-		local info = {
-			source = _source,
-			name = Logs.WebHook.webhookname,
-			title = title,
-			description = description,
-			webhook = Logs.WebHook.webhook,
-			color = Logs.WebHook.colorDropGold,
-		}
+		local description = "**" .. T.WebHookLang.gold .. ":** `" .. amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+		local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorDropGold, }
 		SvUtils.SendDiscordWebhook(info)
 	end
 	SvUtils.Trem(_source)
@@ -315,29 +263,9 @@ function InventoryService.giveGoldToPlayer(target, amount)
 		local charname, scourceidentifier, steamname = getSourceInfo(_source)
 		local charname2, scourceidentifier2, steamname2 = getSourceInfo(_source)
 		local title = T.givegold
-		local description = "**" ..
-			T.WebHookLang.amount ..
-			"**: `" ..
-			amount ..
-			"`\n **" ..
-			T.WebHookLang.charname ..
-			":** `" ..
-			charname ..
-			"` \n**" ..
-			T.WebHookLang.Steamname ..
-			"** `" ..
-			steamname ..
-			"` \n**" ..
-			T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. " `" .. steamname2 .. "` \n**"
+		local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. " `" .. steamname2 .. "` \n**"
 
-		local info = {
-			source = _source,
-			name = Logs.WebHook.webhookname,
-			title = title,
-			description = description,
-			webhook = Logs.WebHook.webhook,
-			color = Logs.WebHook.colorgiveGold,
-		}
+		local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveGold, }
 		SvUtils.SendDiscordWebhook(info)
 
 		Wait(3000)
@@ -552,30 +480,11 @@ function InventoryService.onPickup(data)
 								}
 								local charname, scourceidentifier, steamname = getSourceInfo(_source)
 								local title = T.itempickup
-								local description = "**" ..
-									T.WebHookLang.amount ..
-									"** `" ..
-									amount ..
-									"`\n **" ..
-									T.WebHookLang.item ..
-									"** `" ..
-									name ..
-									"` \n**" ..
-									T.WebHookLang.charname ..
-									":** `" ..
-									charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
-								local info = {
-									source = _source,
-									name = Logs.WebHook.webhookname,
-									title = title,
-									description = description,
-									webhook = Logs.WebHook.webhook,
-									color = Logs.WebHook.coloritempickup,
-								}
+								local description = "**" .. T.WebHookLang.amount .. "** `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** `" .. name .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
+								local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.coloritempickup, }
 								TriggerClientEvent("vorpInventory:sharePickupClient", -1, dataItem, 2)
 								TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
-								TriggerClientEvent("vorpInventory:receiveItem", _source, name, item:getId(), amount,
-									metadata)
+								TriggerClientEvent("vorpInventory:receiveItem", _source, name, item:getId(), amount, metadata)
 								TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
 								ItemPickUps[obj] = nil
 								ItemUids[uid] = nil
@@ -637,29 +546,8 @@ function InventoryService.onPickup(data)
 					end
 					local charname, scourceidentifier, steamname = getSourceInfo(_source)
 					local title = T.weppickup
-					local description = "**" ..
-						T.WebHookLang.Weapontype ..
-						":** `" ..
-						wepname ..
-						"`\n**" ..
-						T.WebHookLang.charname ..
-						":** `" ..
-						charname ..
-						"`\n**" ..
-						T.WebHookLang.serialnumber ..
-						"** `" ..
-						serialNumber ..
-						"`\n **" ..
-						T.WebHookLang.Desc ..
-						"** `" .. weaponCustomDesc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
-					local info = {
-						source = _source,
-						name = Logs.WebHook.webhookname,
-						title = title,
-						description = description,
-						webhook = Logs.WebHook.webhook,
-						color = Logs.WebHook.colorweppickupd,
-					}
+					local description = "**" .. T.WebHookLang.Weapontype .. ":** `" .. wepname .. "`\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.WebHookLang.Desc .. "** `" .. weaponCustomDesc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
+					local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorweppickupd }
 					TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
 					TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
 					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
@@ -687,21 +575,8 @@ function InventoryService.onPickupMoney(obj)
 			local moneyAmount = MoneyPickUps[obj].amount
 			local moneyCoords = MoneyPickUps[obj].coords
 			local title = T.WebHookLang.moneypickup
-			local description = "**" ..
-				T.WebHookLang.money ..
-				":** `" ..
-				moneyAmount ..
-				"` `$` \n**" ..
-				T.WebHookLang.charname ..
-				":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
-			local info = {
-				source = _source,
-				name = Logs.WebHook.webhookname,
-				title = title,
-				description = description,
-				webhook = Logs.WebHook.webhook,
-				color = Logs.WebHook.colorDropGold,
-			}
+			local description = "**" .. T.WebHookLang.money .. ":** `" .. moneyAmount .. "` `$` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+			local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorDropGold }
 			SvUtils.SendDiscordWebhook(info)
 			TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, moneyObj, moneyAmount, moneyCoords, 2)
 			TriggerClientEvent("vorpInventory:removePickupClient", -1, moneyObj)
@@ -769,28 +644,13 @@ function InventoryService.sharePickupServerWeapon(data)
 	local desc = weapon:getCustomDesc()
 	local charname, scourceidentifier, steamname = getSourceInfo(_source)
 	local title = T.WebHookLang.dropedwep
-	if desc == nil then
+	if not desc or desc == "" then
 		desc = "Custom Description not set"
 	end
-	if serialNumber == nil then
+	if not serialNumber or serialNumber == "" then
 		serialNumber = "Serial Number not set"
 	end
-	local description = "**" ..
-		T.WebHookLang.Weapontype ..
-		":** `" ..
-		wepname ..
-		"`\n**" ..
-		T.WebHookLang.charname ..
-		":** `" ..
-		charname ..
-		"`\n**" ..
-		T.WebHookLang.serialnumber ..
-		"** ` " ..
-		serialNumber ..
-		" ` \n **" ..
-		T.WebHookLang.Desc .. "** `" .. desc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
-
-
+	local description = "**" .. T.WebHookLang.Weapontype .. ":** `" .. wepname .. "`\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.serialnumber .. "** ` " .. serialNumber .. " ` \n **" .. T.WebHookLang.Desc .. "** `" .. desc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 	local info = {
 		source = _source,
 		name = Logs.WebHook.webhookname,
@@ -818,17 +678,7 @@ function InventoryService.sharePickupServerItem(data)
 	end
 	local charname, scourceidentifier, steamname = getSourceInfo(_source)
 	local title = T.WebHookLang.itemDrop
-	local description = "**" ..
-		T.WebHookLang.amount ..
-		"** `" ..
-		data.amount ..
-		"`\n **" ..
-		T.WebHookLang.itemDrop ..
-		"**: `" ..
-		data.name ..
-		"`" ..
-		"\n**" ..
-		T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
+	local description = "**" .. T.WebHookLang.amount .. "** `" .. data.amount .. "`\n **" .. T.WebHookLang.itemDrop .. "**: `" .. data.name .. "`" .. "\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 	local info = {
 		source = _source,
 		name = Logs.WebHook.webhookname,
@@ -870,35 +720,16 @@ function InventoryService.shareGoldPickupServer(obj, amount, position)
 	if gold < amount then
 		return
 	end
-	local charname, scourceidentifier, steamname = getSourceInfo(_source)
 
+	local charname, scourceidentifier, steamname = getSourceInfo(_source)
 	local title = T.WebHookLang.pickedgold
-	local description = "**" ..
-		T.WebHookLang.gold ..
-		":** `" ..
-		amount ..
-		"` \n**" ..
-		T.WebHookLang.charname ..
-		":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
-	local info = {
-		source = _source,
-		name = Logs.WebHook.webhookname,
-		title = title,
-		description = description,
-		webhook = Logs.WebHook.webhook,
-		color = Logs.WebHook.colorpickedgold
-	}
+	local description = "**" .. T.WebHookLang.gold .. ":** `" .. amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorpickedgold }
 
 	Character.removeCurrency(1, amount)
 	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, obj, amount, position, 1)
 	SvUtils.SendDiscordWebhook(info)
-	GoldPickUps[obj] = {
-		name = T.inventorygoldlabel,
-		obj = obj,
-		amount = amount,
-		inRange = false,
-		coords = position
-	}
+	GoldPickUps[obj] = { name = T.inventorygoldlabel, obj = obj, amount = amount, inRange = false, coords = position }
 end
 
 function InventoryService.DropWeapon(weaponId)
@@ -976,7 +807,6 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 
 	if DefaultAmount ~= 0 then
 		if weaponName then
-			-- does weapon given matches the list of weapons that do not count as weapons
 			if SharedUtils.IsValueInArray(string.upper(weaponName), Config.notweapons) then
 				notListed = true
 			end
@@ -988,8 +818,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 			if sourceTotalWeaponCount > DefaultAmount then
 				Core.NotifyRightTip(_source, T.cantweapons, 2000)
 				if Config.Debug then
-					Log.print(sourceCharacter.firstname ..
-						" " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
+					Log.print(sourceCharacter.firstname .. " " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
 				end
 				return
 			end
@@ -1022,48 +851,15 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _source)
 	TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
 
-	if desc == nil then
+	if not desc or desc == "" then
 		desc = "Custom Description not set"
 	end
-	if serialNumber == nil then
+	if not serialNumber or serialNumber == "" then
 		serialNumber = "Serial Number not set"
 	end
 	local title = T.WebHookLang.gavewep
-	local description = "**" ..
-		T.WebHookLang.charname ..
-		":** `" ..
-		charname ..
-		"`\n**" ..
-		T.WebHookLang.Steamname ..
-		"** `" ..
-		steamname ..
-		"` \n**" ..
-		T.WebHookLang.give ..
-		"**  **" ..
-		1 ..
-		"** \n**" ..
-		T.WebHookLang.Weapontype ..
-		":** `" ..
-		weaponName ..
-		"` \n**" ..
-		T.WebHookLang.Desc ..
-		"** `" ..
-		desc ..
-		"`   **" ..
-		T.to ..
-		"**   \n` " ..
-		charname2 ..
-		"` \n**" ..
-		T.WebHookLang.Steamname ..
-		"** ` " .. steamname2 .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`"
-	local info = {
-		source = _source,
-		name = Logs.WebHook.webhookname,
-		title = title,
-		description = description,
-		webhook = Logs.WebHook.webhook,
-		color = Logs.WebHook.colorgiveWep,
-	}
+	local description = "**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "` \n**" .. T.WebHookLang.give .. "**  **" .. 1 .. "** \n**" .. T.WebHookLang.Weapontype .. ":** `" .. weaponName .. "` \n**" .. T.WebHookLang.Desc .. "** `" .. desc .. "`   **" .. T.to .. "**   \n` " .. charname2 .. "` \n**" .. T.WebHookLang.Steamname .. "** ` " .. steamname2 .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`"
+	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveWep }
 	SvUtils.SendDiscordWebhook(info)
 	-- notify
 	Core.NotifyRightTip(_target, T.youGaveWeapon, 2000)
@@ -1127,10 +923,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 	local charname2, scourceidentifier2, steamname2 = getSourceInfo(_target)
 
 	local title = T.gaveitem
-	local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** : `" .. itemName .. "`" .. "\n**" ..
-		T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname ..
-		"` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n"
-
+	local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** : `" .. itemName .. "`" .. "\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n"
 	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveitem }
 
 	if not svItem then
@@ -1156,6 +949,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 		Core.NotifyRightTip(_source, T.yougive .. amount .. T.of .. ItemsLabel .. "", 2000)
 		Core.NotifyRightTip(_target, T.youreceive .. amount .. T.of .. ItemsLabel .. "", 2000)
 	end
+
 	InventoryAPI.canCarryItem(_target, itemName, amount, function(canGive)
 		if canGive then
 			local targetItem = SvUtils.FindItemByNameAndMetadata("default", targetIdentifier, itemName, itemMetadata)
@@ -1588,19 +1382,13 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 
 	if type == "Move" then
 		local webhook = Logs.WebHook.CustomInventoryMoveTo
-		local description = "**Player:**`" ..
-			playerName ..
-			"`\n **Moved to:** `" .. inventory .. "` \n**Weapon** `" ..
-			itemName .. "`\n **Count:** `" .. amount .. "`"
+		local description = "**Player:**`" .. playerName .. "`\n **Moved to:** `" .. inventory .. "` \n**Weapon** `" .. itemName .. "`\n **Count:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end
 
 	if type == "Take" then
 		local webhook = Logs.WebHook.CustomInventoryTakeFrom
-		local description = "**Player:**`" ..
-			playerName ..
-			"`\n **Took from:** `" .. inventory .. "`\n **item** `" ..
-			itemName .. "`\n **amount:** `" .. amount .. "`"
+		local description = "**Player:**`" .. playerName .. "`\n **Took from:** `" .. inventory .. "`\n **item** `" .. itemName .. "`\n **amount:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end
 end
@@ -1705,13 +1493,8 @@ function InventoryService.TakeFromCustom(obj)
 			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
 		end
 
-		local query =
-		"UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
-		local params = {
-			identifier = sourceIdentifier,
-			weaponId = item.id,
-			charid = sourceCharIdentifier,
-		}
+		local query = "UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
+		local params = { identifier = sourceIdentifier, weaponId = item.id, charid = sourceCharIdentifier, }
 		DBService.updateAsync(query, params, function(r) end)
 		UsersWeapons[invId][item.id]:setCurrInv("default")
 		UsersWeapons.default[item.id] = UsersWeapons[invId][item.id]
