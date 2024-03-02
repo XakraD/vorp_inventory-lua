@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-global
+-- Credits to OX team for the types idea
 ---@meta
 
 
