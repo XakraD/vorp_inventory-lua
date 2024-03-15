@@ -160,12 +160,16 @@ exports("getUserInventoryItems", InventoryAPI.getInventory)
 --- register usable item
 ---@param name string item name
 ---@param cb function callback
----@return string
+---@return string | nil
 function InventoryAPI.registerUsableItem(name, cb)
 	if Config.Debug then
 		SetTimeout(9000, function()
 			Log.print("Callback for item[^3" .. name .. "^7] ^2Registered!^7")
 		end)
+	end
+
+	if not name then
+		return print("InventoryAPI.registerUsableItem: name is required")
 	end
 
 	local callbackId = SvUtils.GenerateUniqueID()

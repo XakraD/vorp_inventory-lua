@@ -50,9 +50,13 @@ function InventoryService.UseItem(itemName, itemId, args)
 			itemArgs.mainid = itemId
 			local arguments = { source = _source, item = itemArgs, args = args }
 
-			for _, cb in pairs(UsableItemsFunctions[itemName]) do
+			for cbId, cb in pairs(UsableItemsFunctions[itemName]) do
 				local success, result = pcall(cb, arguments)
 				if not success then
+					if not result then
+						UsableItemsFunctions[itemName][cbId] = nil
+						return
+					end
 					print("Function call failed with error:", result)
 				end
 			end
