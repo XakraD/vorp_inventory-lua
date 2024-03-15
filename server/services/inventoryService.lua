@@ -31,38 +31,45 @@ local function getSourceInfo(_source)
 	return charname, sourceIdentifier, steamname
 end
 
-function InventoryService.UseItem(itemName, itemId, args)
+function InventoryService.UseItem(data)
 	local _source = source
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local identifier = sourceCharacter.identifier
+	local sourceCharacter = Core.getUser(_source)
+	local itemId = data.id
+	local itemName = data.item
+
+	if not sourceCharacter then
+		return
+	end
+
+	local identifier = sourceCharacter.getUsedCharacter.identifier
 	local userInventory = UsersInventories.default[identifier]
 	local svItem = ServerItems[itemName]
 
 	if not SvUtils.DoesItemExist(itemName, "UseItem") then
-		return false
+		return
 	end
 
-	if UsableItemsFunctions[itemName] and userInventory[itemId] then
-		local item = userInventory[itemId]
-		if item then
-			local itemArgs = json.decode(json.encode(svItem))
-			itemArgs.metadata = item:getMetadata()
-			itemArgs.mainid = itemId
-			local arguments = { source = _source, item = itemArgs, args = args }
-
-			for cbId, cb in pairs(UsableItemsFunctions[itemName]) do
-				local success, result = pcall(cb, arguments)
-				if not success then
-					if not result then
-						UsableItemsFunctions[itemName][cbId] = nil
-						return
-					end
-					print("Function call failed with error:", result)
-				end
-			end
-		end
+	if not UsableItemsFunctions[itemName] and not userInventory[itemId] then
+		return
 	end
-	return false
+
+	local item = userInventory[itemId]
+	if not item then
+		return
+	end
+
+	local itemArgs = json.decode(json.encode(svItem))
+	itemArgs.metadata = item:getMetadata()
+	itemArgs.mainid = itemId
+	local arguments = { source = _source, item = itemArgs }
+
+	TriggerEvent("vorp_inventory:Server:OnItemUse", arguments)
+
+	local success, result = pcall(UsableItemsFunctions[itemName], arguments)
+
+	if not success then
+		return print("Function call failed with error:", result, "a usable item have an error in the callback function")
+	end
 end
 
 function InventoryService.DropMoney(amount)

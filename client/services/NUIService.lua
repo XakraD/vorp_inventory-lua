@@ -564,7 +564,7 @@ end
 function NUIService.NUIUseItem(data)
 	if data.type == "item_standard" then
 		if timerUse <= 0 then
-			TriggerServerEvent("vorp_inventory:useItem", data.item, data.id)
+			TriggerServerEvent("vorp_inventory:useItem", data)
 			timerUse = 2000
 		else
 			TriggerEvent('vorp:TipRight', T.slow, 5000)
@@ -600,6 +600,10 @@ function NUIService.NUIUseItem(data)
 			UserWeapons[weaponId]:loadComponents()
 			UserWeapons[weaponId]:setUsed(true)
 			TriggerServerEvent("syn_weapons:weaponused", data)
+		end
+		if UserWeapons[weaponId]:getUsed() then
+			local serial = UserWeapons[weaponId]:getSerialNumber()
+			LocalPlayer.state:set("GetEquippedWeaponData", { weaponId = weaponId, serialNumber = serial }, false)
 		end
 		NUIService.LoadInv()
 	end
