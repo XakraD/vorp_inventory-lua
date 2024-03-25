@@ -79,6 +79,25 @@ function NUIService.OpenCustomInventory(name, id, capacity)
 	end
 end
 
+function NUIService.OpenPlayerInventory(name, id)
+	SetNuiFocus(true, true)
+	SendNUIMessage({
+		action = "display",
+		type = "player",
+		title = name,
+		id = id,
+	})
+	InInventory = true
+end
+
+function NUIService.NUIMoveToPlayer(obj)
+	TriggerServerEvent("vorp_inventory:MoveToPlayer", json.encode(obj))
+end
+
+function NUIService.NUITakeFromPlayer(obj)
+	TriggerServerEvent("vorp_inventory:TakeFromPlayer", json.encode(obj))
+end
+
 function NUIService.NUIMoveToCustom(obj)
 	TriggerServerEvent("vorp_inventory:MoveToCustom", json.encode(obj))
 end
@@ -617,9 +636,6 @@ function NUIService.NUIFocusOff()
 	NUIService.CloseInv()
 end
 
-function NUIService.OfflineFocusOff()
-	NUIService.CloseInventory()
-end
 
 function NUIService.LoadInv()
 	local payload = {}

@@ -15,6 +15,8 @@ $("document").ready(function () {
                 $('#disabler').hide();
             } else {
                 closeInventory();
+                document.querySelectorAll('.dropdownButton[data-type="itemtype"], .dropdownButton1[data-type="itemtype"]').forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`.dropdownButton[data-param="all"][data-type="itemtype"], .dropdownButton1[data-param="all"][data-type="itemtype"]`)?.classList.add('active');
             }
         }
     });
@@ -90,7 +92,7 @@ window.addEventListener('message', function (event) {
                 $("#rol-value").text(event.data.rol.toFixed(2) + " ");
             }
         }
-        
+
 
         if (event.data.id) {
             $("#id-value").text("ID " + event.data.id);
@@ -138,6 +140,11 @@ window.addEventListener('message', function (event) {
         });
 
         type = event.data.type
+
+        if (event.data.type == "player") {
+            playerId = event.data.id;
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
+        }
 
         if (event.data.type == "custom") {
             customId = event.data.id;
@@ -248,7 +255,7 @@ window.addEventListener('message', function (event) {
         }
 
     } else if (event.data.action == "setSecondInventoryItems") {
-        secondInventorySetup(event.data.itemList);
+        secondInventorySetup(event.data.itemList, event.data.info);
         if (secondaryCapacityAvailable == true) {
             // Get how many items are in inventory
             let l = event.data.itemList.length
@@ -270,7 +277,7 @@ window.addEventListener('message', function (event) {
 });
 
 window.addEventListener("offline", function () {
-    $.post(`https://${GetParentResourceName()}/OfflineFocusOff`)
+    closeInventory()
 });
 
 //for gold cash and ID

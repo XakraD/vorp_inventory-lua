@@ -1180,20 +1180,57 @@ function InventoryService.onNewCharacter(source)
 	end
 end
 
-function InventoryService.reloadInventory(player, id)
-	local _source = player
+function InventoryService.reloadInventory(player, id, type, source)
 	local invData = CustomInventoryInfos[id]
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceCharacter = Core.getUser(player).getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharIdentifier = sourceCharacter.charIdentifier
 
 	local userInventory = {}
 	local itemList = {}
+	if type == "custom" then
+		if invData:isShared() then
+			userInventory = UsersInventories[id]
+		else
+			userInventory = UsersInventories[id][sourceIdentifier]
+		end
 
-	if invData:isShared() then
-		userInventory = UsersInventories[id]
-	else
-		userInventory = UsersInventories[id][sourceIdentifier]
+		for weaponId, weapon in pairs(UsersWeapons[id]) do
+			if invData:isShared() or weapon.charId == sourceCharIdentifier then
+				itemList[#itemList + 1] = Item:New({
+					id            = weaponId,
+					count         = 1,
+					name          = weapon.name,
+					label         = weapon.custom_label or weapon.name,
+					limit         = 1,
+					type          = "item_weapon",
+					desc          = weapon.desc,
+					group         = 5,
+					serial_number = weapon.serial_number,
+					custom_label  = weapon.custom_label,
+					custom_desc   = weapon.custom_desc,
+				})
+			end
+		end
+	elseif type == "player" then
+		userInventory = UsersInventories.default[sourceIdentifier]
+		for weaponId, weapon in pairs(UsersWeapons[id]) do
+			if weapon.charId == sourceCharIdentifier then
+				itemList[#itemList + 1] = Item:New({
+					id            = weaponId,
+					count         = 1,
+					name          = weapon.name,
+					label         = weapon.custom_label or weapon.name,
+					limit         = 1,
+					type          = "item_weapon",
+					desc          = weapon.desc,
+					group         = 5,
+					serial_number = weapon.serial_number,
+					custom_label  = weapon.custom_label,
+					custom_desc   = weapon.custom_desc,
+				})
+			end
+		end
 	end
 
 	-- arrange userInventory as a list
@@ -1201,31 +1238,16 @@ function InventoryService.reloadInventory(player, id)
 		itemList[#itemList + 1] = value
 	end
 
-	-- Add weapons as Item to inventory
-	for weaponId, weapon in pairs(UsersWeapons[id]) do
-		if invData:isShared() or weapon.charId == sourceCharIdentifier then
-			itemList[#itemList + 1] = Item:New({
-				id            = weaponId,
-				count         = 1,
-				name          = weapon.name,
-				label         = weapon.custom_label or weapon.name,
-				limit         = 1,
-				type          = "item_weapon",
-				desc          = weapon.desc,
-				group         = 5,
-				serial_number = weapon.serial_number,
-				custom_label  = weapon.custom_label,
-				custom_desc   = weapon.custom_desc,
-			})
-		end
-	end
-
 	local payload = {
 		itemList = itemList,
-		action = "setSecondInventoryItems"
+		action = "setSecondInventoryItems",
+		info = {
+			target = player,
+			source = source,
+		},
 	}
 
-	TriggerClientEvent("vorp_inventory:ReloadCustomInventory", _source, json.encode(payload))
+	TriggerClientEvent("vorp_inventory:ReloadCustomInventory", source or player, json.encode(payload))
 end
 
 function InventoryService.getInventoryTotalCount(identifier, charIdentifier, invId)
@@ -1596,6 +1618,175 @@ function InventoryService.TakeFromCustom(obj)
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 			Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from storage ", 2000)
+		end)
+	end
+end
+
+local function HandleLimits(item, amount, target, _source, messages)
+	local label = item.type == "item_weapon" and "weapons" or "items"
+	if PlayerItemsLimit[target] and PlayerItemsLimit[target][item.type] then
+		if PlayerItemsLimit[target][item.type].limit >= amount then
+			if PlayerItemsLimit[target][item.type].limit - amount <= 0 then
+				Core.NotifyObjective(_source, "You're about to reach your limit for " .. label .. ".", 2000)
+				if PlayerItemsLimit[target][item.type].timeout and not CoolDownStarted[_source][item.type] then
+					CoolDownStarted[_source][item.type] = os.time() + PlayerItemsLimit[target][item.type].timeout
+				end
+			end
+
+			PlayerItemsLimit[target][item.type].limit = PlayerItemsLimit[target][item.type].limit - amount
+
+			return true
+		else
+			Core.NotifyObjective(_source, messages[label], 2000)
+			return false
+		end
+	elseif CoolDownStarted[_source] and CoolDownStarted[_source][item.type] and os.time() < CoolDownStarted[_source][item.type] then
+		Core.NotifyObjective(_source, messages.cooldown .. label, 2000)
+		return false
+	else
+		return true
+	end
+end
+
+function InventoryService.MoveToPlayer(obj)
+	local _source = source
+
+	local data = json.decode(obj)
+	local item = data.item
+	local amount = tonumber(data.number)
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceName = sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname
+	local invId = "default"
+	local target = data.info.target
+	local messages = {
+		weapons = "You cannot give this amount of weapons to this player. Limit exceeded.",
+		items = "You cannot give this amount of items to this player. Limit exceeded.",
+		cooldown = "In cooldown, Player cant accept more "
+	}
+	local IsBlackListed = PlayerBlackListedItems[string.lower(item.name)]
+
+	if IsBlackListed then
+		Core.NotifyObjective(_source, "blackListed", 5000) -- add your own notifications
+		return
+	end
+
+	if not HandleLimits(item, amount, target, _source, messages) then
+		return
+	end
+
+	if item.type == "item_weapon" then
+		InventoryAPI.canCarryAmountWeapons(target, 1, function(res)
+			if res then
+				InventoryAPI.giveWeapon(target, item.id, _source, function(result)
+					if result then
+						InventoryService.reloadInventory(target, "default", "player", _source)
+						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Move")
+					end
+				end)
+			else
+				return Core.NotifyObjective(_source, "Can't cary more weapons", 2000)
+			end
+		end, item.name)
+	else
+		if not item.count or not amount then
+			return
+		end
+
+		local res = InventoryAPI.canCarryAmountItem(target, amount)
+		if not res then
+			return Core.NotifyObjective(_source, T.fullInventory, 2000)
+		end
+
+		res = InventoryAPI.canCarryItem(target, item.name, amount)
+		if not res then
+			return Core.NotifyObjective(_source, "Cant carry more of this item", 2000)
+		end
+
+		if amount > item.count then
+			return Core.NotifyObjective(_source, " dont have that amount of items", 2000)
+		end
+
+		InventoryAPI.addItem(target, item.name, amount, item.metadata, function(res)
+			if res then
+				InventoryAPI.subItem(_source, item.name, amount, item.metadata, function(result)
+					if result then
+						SetTimeout(400, function()
+							InventoryService.reloadInventory(target, "default", "player", _source)
+							InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
+							Core.NotifyRightTip(_source, "you have Moved" .. amount .. " " .. item.label .. " to player", 2000)
+							Core.NotifyRightTip(target, "Item" .. item.label .. " was given to you", 2000)
+						end)
+					end
+				end)
+			end
+		end)
+	end
+end
+
+function InventoryService.TakeFromPlayer(obj)
+	local _source = source
+	local data = json.decode(obj)
+	local item = data.item
+	local amount = tonumber(data.number)
+	local sourceCharacter = Core.getUser(_source).getUsedCharacter
+	local sourceName = sourceCharacter.firstname .. ' ' .. sourceCharacter.lastname
+	local invId = "default"
+	local target = data.info.target -- needs to remove from this target the items that are taken to source
+	local IsBlackListed = PlayerBlackListedItems[string.lower(item.name)]
+	local messages = {
+		weapons = "You cannot remove this amount of weapons from this player. Limit exceeded.",
+		items = "You cannot remove this amount of items from this player. Limit exceeded.",
+		cooldown = "In cooldown, Player cant accept more "
+	}
+
+	if IsBlackListed then
+		Core.NotifyObjective(_source, "BlackListed", 5000) -- add your own notifications
+		return
+	end
+
+	if not HandleLimits(item, amount, target, _source, messages) then
+		return
+	end
+
+	if item.type == "item_weapon" then
+		InventoryAPI.canCarryAmountWeapons(_source, 1, function(res)
+			if res then
+				InventoryAPI.giveWeapon(_source, item.id, target, function(result)
+					if result then
+						InventoryService.reloadInventory(target, "default", "player", source)
+						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Take")
+					end
+				end)
+			else
+				Core.NotifyObjective(_source, "You Can't cary more weapons", 2000)
+			end
+		end, item.name)
+	else
+		local res = InventoryAPI.canCarryAmountItem(_source, amount)
+		if not res then
+			return Core.NotifyObjective(_source, T.fullInventory, 2000)
+		end
+
+		res = InventoryAPI.canCarryItem(_source, item.name, amount)
+		if not res then
+			return Core.NotifyObjective(_source, "Cant carry more of this item", 2000)
+		end
+
+		if amount > item.count then
+			return Core.NotifyObjective(_source, "You dont have that amount of items", 2000)
+		end
+
+		InventoryAPI.addItem(_source, item.name, amount, item.metadata, function(res)
+			if res then
+				InventoryAPI.subItem(target, item.name, amount, item.metadata, function(result)
+					if result then
+						InventoryService.reloadInventory(target, "default", "player", source)
+						InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
+						Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from player", 2000)
+						Core.NotifyRightTip(target, "Item" .. item.label .. " was taken from you", 2000)
+					end
+				end)
+			end
 		end)
 	end
 end

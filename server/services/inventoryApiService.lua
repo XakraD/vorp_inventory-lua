@@ -1616,3 +1616,65 @@ function InventoryAPI.updateCustomInventoryData(id, data, callback)
 end
 
 exports("updateCustomInventoryData", InventoryAPI.updateCustomInventoryData)
+
+---comment
+---@param data table
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.openPlayerInventory(data, callback)
+	local title = data.title or "Steal Inventory"
+	local target = data.target
+	local source = data.source
+	local charid = Core.getUser(target).getUsedCharacter.charIdentifier
+
+	PlayerBlackListedItems = data.blacklist or {}
+
+	if not CoolDownStarted[source] then
+		CoolDownStarted[source] = {}
+	end
+
+	local function isInCooldown(itemType)
+		return CoolDownStarted[source][itemType] and os.time() < CoolDownStarted[source][itemType]
+	end
+
+	local function HandleLimits(limitType)
+		if not data.itemsLimit then return true, false end
+		local itemType = data.itemsLimit[limitType].itemType
+		local limit = data.itemsLimit[limitType].limit
+
+		if not PlayerItemsLimit[target] then
+			PlayerItemsLimit[target] = {}
+		end
+
+		if not PlayerItemsLimit[target][itemType] then
+			PlayerItemsLimit[target][itemType] = { limit = limit, timeout = data.timeout or nil }
+		end
+
+		local cooldownActive = isInCooldown(itemType)
+
+		if PlayerItemsLimit[target][itemType].limit <= 0 and cooldownActive then
+			return false, true
+		elseif not cooldownActive and data.timeout then
+			PlayerItemsLimit[target][itemType].limit = limit
+		end
+
+		return true, cooldownActive
+	end
+
+	local allowWeapons, cooldownWeapons = HandleLimits("weapons")
+	local allowItems, cooldownItems = HandleLimits("items")
+
+	if cooldownWeapons and cooldownItems then
+		Core.NotifyObjective(source, "You can't open the inventory due to cooldown on both weapons and items.", 5000)
+		return respond(callback, false)
+	end
+
+	if allowWeapons or allowItems then
+		InventoryService.reloadInventory(target, "default", "player", source)
+		TriggerClientEvent("vorp_inventory:OpenPlayerInventory", source, title, charid, "player")
+	end
+
+	return respond(callback, true)
+end
+
+exports("openPlayerInventory", InventoryAPI.openPlayerInventory)
