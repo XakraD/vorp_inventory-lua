@@ -471,34 +471,27 @@ function InventoryService.onPickup(data)
 	local userWeapons = UsersWeapons.default
 
 	if ItemPickUps[uid] ~= nil then
-		local obj = uid
-		local name = ItemPickUps[obj].name
-		local amount = ItemPickUps[obj].amount
-		local metadata = ItemPickUps[obj].metadata
-		if ItemPickUps[obj].weaponid == 1 then
+		local name = ItemPickUps[uid].name
+		local amount = ItemPickUps[uid].amount
+		local metadata = ItemPickUps[uid].metadata
+
+		if ItemPickUps[uid].weaponid == 1 then
 			if userInventory ~= nil then
 				InventoryAPI.canCarryItem(_source, name, amount, function(canAdd)
-					if canAdd then
+					if canAdd and ItemPickUps[uid] then
 						InventoryService.addItem(_source, "default", name, amount, metadata, function(item)
 							if item ~= nil then
-								local dataItem = {
-									name = name,
-									obj = ItemPickUps[obj].obj,
-									amount = amount,
-									metadata = metadata,
-									position = ItemPickUps[obj].coords,
-									id = ItemPickUps[obj].id
-								}
+								local dataItem = { name = name, obj = ItemPickUps[uid].obj, amount = amount, metadata = metadata, position = ItemPickUps[uid].coords, id = ItemPickUps[uid].id }
+								ItemPickUps[uid] = nil
+								ItemUids[uid] = nil
 								local charname, scourceidentifier, steamname = getSourceInfo(_source)
 								local title = T.itempickup
 								local description = "**" .. T.WebHookLang.amount .. "** `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** `" .. name .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 								local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.coloritempickup, }
 								TriggerClientEvent("vorpInventory:sharePickupClient", -1, dataItem, 2)
-								TriggerClientEvent("vorpInventory:removePickupClient", -1, ItemPickUps[obj].obj)
+								TriggerClientEvent("vorpInventory:removePickupClient", -1, dataItem.obj)
 								TriggerClientEvent("vorpInventory:receiveItem", _source, name, item:getId(), amount, metadata)
-								TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
-								ItemPickUps[obj] = nil
-								ItemUids[uid] = nil
+								TriggerClientEvent("vorpInventory:playerAnim", _source, uid)
 								SvUtils.SendDiscordWebhook(info)
 							end
 						end)
@@ -513,7 +506,7 @@ function InventoryService.onPickup(data)
 			local notListed = false
 			local sourceInventoryWeaponCount = 0
 			local DefaultAmount = Config.MaxItemsInInventory.Weapons
-			local weaponId = ItemPickUps[obj].weaponid
+			local weaponId = ItemPickUps[uid].weaponid
 			local weapon = userWeapons[weaponId]
 			local wepname = weapon:getName()
 			local weaponCustomLabel = weapon:getCustomLabel()
@@ -534,21 +527,11 @@ function InventoryService.onPickup(data)
 					sourceInventoryWeaponCount = InventoryAPI.getUserTotalCountWeapons(identifier, charId) + 1
 				end
 				if sourceInventoryWeaponCount <= DefaultAmount then
-					local weaponObj = ItemPickUps[obj].obj
+					local weaponObj = ItemPickUps[uid].obj
 					weapon:setDropped(0)
 
-					local data = {
-						name = wepname,
-						obj = weaponObj,
-						amount = amount,
-						metadata = metadata,
-						weaponId = weaponId,
-						position = ItemPickUps[obj].coords,
-						custom_label = weaponCustomLabel,
-						serial_number = serialNumber,
-						custom_desc = weaponCustomDesc,
-						id = nil
-					}
+					local dataweapon = { name = wepname, obj = weaponObj, amount = amount, metadata = metadata, weaponId = weaponId, position = ItemPickUps[uid].coords, custom_label = weaponCustomLabel, serial_number = serialNumber, custom_desc = weaponCustomDesc, id = nil }
+					ItemPickUps[uid] = nil
 					if weaponCustomDesc == nil then
 						weaponCustomDesc = "Custom Description not set"
 					end
@@ -559,13 +542,11 @@ function InventoryService.onPickup(data)
 					local title = T.weppickup
 					local description = "**" .. T.WebHookLang.Weapontype .. ":** `" .. wepname .. "`\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.WebHookLang.Desc .. "** `" .. weaponCustomDesc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 					local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorweppickupd }
-					TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
+					TriggerClientEvent("vorpInventory:sharePickupClient", -1, dataweapon, 2)
 					TriggerClientEvent("vorpInventory:removePickupClient", -1, weaponObj)
-					TriggerClientEvent("vorpInventory:playerAnim", _source, obj)
+					TriggerClientEvent("vorpInventory:playerAnim", _source, uid)
 					InventoryService.addWeapon(_source, weaponId)
 					SvUtils.SendDiscordWebhook(info)
-
-					ItemPickUps[obj] = nil
 				end
 			else
 				Core.NotifyRightTip(_source, T.fullInventoryWeapon, 2000)
@@ -811,7 +792,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local charname, scourceidentifier, steamname = getSourceInfo(_source)
 	local charname2, scourceidentifier2, steamname2 = getSourceInfo(target)
 	local notListed = false
-	if not desc then  
+	if not desc then
 		desc = userWeapons[weaponId]:getDesc()
 	end
 	if Config.JobsAllowed[job] then
@@ -864,12 +845,12 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	TriggerClientEvent("vorpinventory:updateinventorystuff", _source)
 	TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
 
-	
+
 	if not serialNumber or serialNumber == "" then
 		serialNumber = "Serial Number not set"
 	end
 	local title = T.WebHookLang.gavewep
-	local description = "**" .. T.WebHookLang.charname .. ":** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n**" .. T.WebHookLang.give .. "**  **" .. 1 .. "** \n**" .. T.WebHookLang.Weapontype .. ":** `" .. weaponName .. "` \n**" .. T.WebHookLang.Desc .. "** `" .. desc .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.to .. ":** ` " .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** ` " .. steamname .. "` "
+	local description = "**" .. T.WebHookLang.charname .. ":** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n**" .. T.WebHookLang.give .. "**  **" .. 1 .. "** \n**" .. T.WebHookLang.Weapontype .. ":** `" .. weaponName .. "` \n**" .. T.WebHookLang.Desc .. "** `" .. (desc or "") .. "`\n **" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.to .. ":** ` " .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** ` " .. steamname .. "` "
 	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveWep }
 	SvUtils.SendDiscordWebhook(info)
 	-- notify
@@ -1185,7 +1166,7 @@ function InventoryService.reloadInventory(player, id, type, source)
 	local sourceCharacter = Core.getUser(player).getUsedCharacter
 	local sourceIdentifier = sourceCharacter.identifier
 	local sourceCharIdentifier = sourceCharacter.charIdentifier
-
+	type = type or "custom"
 	local userInventory = {}
 	local itemList = {}
 	if type == "custom" then

@@ -39,7 +39,7 @@ CustomInventoryInfos = {
 
 ---@type table<string,function> table of Registered items
 UsableItemsFunctions = {}
-
+CoolDownStarted = {}
 allplayersammo = {}
 
 ---@type table<string, table<number, table<number, Item>>> contain users inventory items

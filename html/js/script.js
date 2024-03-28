@@ -148,48 +148,49 @@ window.addEventListener('message', function (event) {
 
         if (event.data.type == "custom") {
             customId = event.data.id;
-            initiateSecondaryInventory(id, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
 
         if (event.data.type == "horse") {
             horseid = event.data.horseid;
-            initiateSecondaryInventory(horseid, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
 
         if (event.data.type == "cart") {
             wagonid = event.data.wagonid;
-            initiateSecondaryInventory(wagonid, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
 
         if (event.data.type == "house") {
             houseId = event.data.houseId;
-            initiateSecondaryInventory(houseId, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "hideout") {
             hideoutId = event.data.hideoutId;
-            initiateSecondaryInventory(hideoutId, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "bank") {
             bankId = event.data.bankId;
-            initiateSecondaryInventory(bankId, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "clan") {
             clanid = event.data.clanid;
-            initiateSecondaryInventory(clanid, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "store") {
             StoreId = event.data.StoreId;
             geninfo = event.data.geninfo;
-            initiateSecondaryInventory(StoreId, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "steal") {
             stealid = event.data.stealId;
-            initiateSecondaryInventory(stealid, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
         if (event.data.type == "Container") {
             Containerid = event.data.Containerid;
-            initiateSecondaryInventory(Containerid, event.data.title, event.data.capacity)
+            initiateSecondaryInventory(event.data.title, event.data.capacity)
         }
+
 
         disabled = false;
 
