@@ -585,6 +585,9 @@ local function useWeapon(data)
 	local ped = PlayerPedId()
 	local _, weaponHash = GetCurrentPedWeapon(ped, false, 0, false)
 	local weaponId = tonumber(data.id)
+	if weaponId and not UserWeapons[weaponId] then
+		return print("Weapon not found")
+	end
 	local weapName = joaat(UserWeapons[weaponId]:getName())
 	local isWeaponAGun = Citizen.InvokeNative(0x705BE297EEBDB95D, weapName)
 	local isWeaponOneHanded = Citizen.InvokeNative(0xD955FEE4B87AFA07, weapName)
