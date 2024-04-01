@@ -168,12 +168,22 @@ function InventoryAPI.registerUsableItem(name, cb)
 	end
 
 	if not name then
-		return print("InventoryAPI.registerUsableItem: name is required")
+		return Log.error("InventoryAPI.registerUsableItem: specify a name must be a string")
 	end
 
 	if UsableItemsFunctions[name] then
-		print("item ", name, " already registered, cant register the same item twice")
+		Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " is being registered twice")
 	end
+
+	SetTimeout(4000, function()
+		if not ServerItems[name] then
+			Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " does not exist in database")
+		end
+
+		if ServerItems[name] and not ServerItems[name].canUse then
+			Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " is not set to usable in database")
+		end
+	end)
 
 	UsableItemsFunctions[name] = cb
 end
@@ -1406,7 +1416,7 @@ exports("BlackListCustomAny", InventoryAPI.BlackListCustom)
 ---Remove inventory by id from server
 ---@param id string inventory id
 function InventoryAPI.removeInventory(id)
-	if CustomInventoryInfos[id] == nil then
+	if not CustomInventoryInfos[id] then
 		return
 	end
 	CustomInventoryInfos[id]:removeCustomInventory()
@@ -1423,6 +1433,11 @@ exports("removeInventory", InventoryAPI.removeInventory)
 ---@param slots number inventory slots
 function InventoryAPI.updateCustomInventorySlots(id, slots)
 	if not CustomInventoryInfos[id] or not slots then
+		return
+	end
+
+	if type(slots) ~= "number" then
+		Log.error("InventoryAPI.updateCustomInventorySlots: slots is not a number")
 		return
 	end
 
@@ -1445,6 +1460,11 @@ function InventoryAPI.setCustomInventoryItemLimit(id, itemName, limit)
 	end
 
 	if not itemName and not limit then
+		return
+	end
+
+	if type(limit) ~= "number" then
+		Log.error("InventoryAPI.setCustomInventoryItemLimit: limit is not a number")
 		return
 	end
 
@@ -1471,6 +1491,11 @@ function InventoryAPI.setCustomInventoryWeaponLimit(id, wepName, limit)
 		return
 	end
 
+	if type(limit) ~= "number" then
+		Log.error("InventoryAPI.setCustomInventoryWeaponLimit: limit is not a number")
+		return
+	end
+
 	local data = { name = wepName:lower(), limit = limit }
 
 	CustomInventoryInfos[id]:setCustomWeaponLimit(data)
@@ -1494,6 +1519,11 @@ function InventoryAPI.openInventory(player, id)
 
 
 	if not CustomInventoryInfos[id] or not UsersInventories[id] then
+		return
+	end
+
+	if type(CustomInventoryInfos[id]:getLimit() ~= "number") then
+		Log.error("InventoryAPI.openInventory: limit is not a number")
 		return
 	end
 
