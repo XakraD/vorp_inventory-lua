@@ -31,6 +31,7 @@ local function getSourceInfo(_source)
 	return charname, sourceIdentifier, steamname
 end
 
+
 function InventoryService.UseItem(data)
 	local _source = source
 	local sourceCharacter = Core.getUser(_source)
@@ -43,13 +44,13 @@ function InventoryService.UseItem(data)
 
 	local identifier = sourceCharacter.getUsedCharacter.identifier
 	local userInventory = UsersInventories.default[identifier]
-	local svItem = ServerItems[itemName]
+
 
 	if not SvUtils.DoesItemExist(itemName, "UseItem") then
 		return
 	end
 
-	if not UsableItemsFunctions[itemName] and not userInventory[itemId] then
+	if not UsableItemsFunctions[itemName] then
 		return
 	end
 
@@ -58,6 +59,7 @@ function InventoryService.UseItem(data)
 		return
 	end
 
+	local svItem = ServerItems[itemName]
 	local itemArgs = json.decode(json.encode(svItem))
 	itemArgs.metadata = item:getMetadata()
 	itemArgs.mainid = itemId
@@ -68,7 +70,7 @@ function InventoryService.UseItem(data)
 	local success, result = pcall(UsableItemsFunctions[itemName], arguments)
 
 	if not success then
-		return print("Function call failed with error:", result, "a usable item have an error in the callback function")
+		return print("Function call failed with error:", result, "a usable item :", itemName, " have an error in the callback function")
 	end
 end
 

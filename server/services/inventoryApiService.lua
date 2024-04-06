@@ -157,34 +157,35 @@ end
 
 exports("getUserInventoryItems", InventoryAPI.getInventory)
 
+
 --- register usable item
 ---@param name string item name
 ---@param cb function callback
 function InventoryAPI.registerUsableItem(name, cb)
 	if Config.Debug then
 		SetTimeout(9000, function()
-			Log.print("Callback for item[^3" .. name .. "^7] ^2Registered!^7")
+			print("Callback for item[^3" .. name .. "^7] ^2Registered!^7")
 		end)
 	end
 
 	if not name then
-		return Log.error("InventoryAPI.registerUsableItem: specify a name must be a string")
+		return print("InventoryAPI.registerUsableItem: name is required")
 	end
-
-	if UsableItemsFunctions[name] then
-		Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " is being registered twice")
-	end
-
-	SetTimeout(4000, function()
+	-- this is just to help users see whats wrong with their items and to fix them
+	SetTimeout(20000, function()
 		if not ServerItems[name] then
-			Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " does not exist in database")
+			print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7")
 		end
 
 		if ServerItems[name] and not ServerItems[name].canUse then
-			Log.Warning("InventoryAPI.registerUsableItem: item " .. name .. " is not set to usable in database")
+			print("^3Warning^7: item", name, " is not usable in database , ^1 you need to set usable to 1 in database ^7")
 		end
 	end)
 
+	if UsableItemsFunctions[name] then
+		print("^3Warning^7: item ", name, " is already registered, ^1 cant register the same item twice ^7")
+		print("^5Info:^7 if you restarting a script this is normal and you can ignore it!.^7")
+	end
 	UsableItemsFunctions[name] = cb
 end
 
@@ -1522,14 +1523,9 @@ function InventoryAPI.openInventory(player, id)
 		return
 	end
 
-	if type(CustomInventoryInfos[id]:getLimit() ~= "number") then
-		Log.error("InventoryAPI.openInventory: limit is not a number")
-		return
-	end
-
 	local sourceCharacter = Core.getUser(_source)
 	if not sourceCharacter then
-		Log.error("InventoryAPI.openInventory: user is not logged in")
+		print("InventoryAPI.openInventory: user is not logged in")
 		return
 	end
 	sourceCharacter = sourceCharacter.getUsedCharacter
