@@ -616,12 +616,16 @@ local function useWeapon(data)
 	end
 	if UserWeapons[weaponId]:getUsed() then
 		local serial = UserWeapons[weaponId]:getSerialNumber()
-		LocalPlayer.state:set("GetEquippedWeaponData", { weaponId = weaponId, serialNumber = serial }, false)
+		local info = { weaponId = weaponId, serialNumber = serial }
+		local key = string.format("GetEquippedWeaponData_%d", weapName)
+		LocalPlayer.state:set(key, info, false)
 	end
 	NUIService.LoadInv()
 end
 
 exports("useWeapon", useWeapon)
+
+
 
 local function useItem(data)
 	if timerUse <= 0 then
