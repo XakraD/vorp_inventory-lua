@@ -51,9 +51,7 @@ function NUIService.ReloadInventory(inventory)
 
 			if item.desc == nil then
 				local applySerial = Utils.filterWeaponsSerialNumber(item.name)
-				item.desc = applySerial and
-					Utils.GetWeaponDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number or
-					Utils.GetWeaponDesc(item.name)
+				item.desc = applySerial and Utils.GetWeaponDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number or Utils.GetWeaponDesc(item.name)
 			end
 		end
 	end
@@ -786,6 +784,7 @@ end
 Citizen.CreateThread(function()
 	Wait(5000)
 	NUIService.initiateData()
+	repeat Wait(0) until LocalPlayer.state.IsInSession
 
 	while true do
 		local sleep = 1000

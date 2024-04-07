@@ -22,7 +22,7 @@ CustomInventoryInfos = {
 	default = {
 		id = "default",
 		name = "Satchel",
-		limit = Config.MaxItemsInInventory.Items,
+		limit = 0,
 		shared = false,
 		limitedItems = {},
 		ignoreItemStackLimit = false,
@@ -62,6 +62,7 @@ function InventoryAPI.canCarryAmountItem(player, amount, cb)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charid = sourceCharacter.charIdentifier
+	local invCapacity = sourceCharacter.invCapacity
 	local userInventory = UsersInventories.default[identifier]
 
 	local function cancarryammount(identifier, charid, amount, limit)
@@ -69,7 +70,7 @@ function InventoryAPI.canCarryAmountItem(player, amount, cb)
 		return limit ~= -1 and totalAmount + amount <= limit and userInventory ~= nil
 	end
 
-	local canCarry = cancarryammount(identifier, charid, amount, Config.MaxItemsInInventory.Items)
+	local canCarry = cancarryammount(identifier, charid, amount, invCapacity)
 	return respond(cb, canCarry)
 end
 
@@ -91,15 +92,16 @@ function InventoryAPI.canCarryItem(player, itemName, amount, cb)
 		return count + amount > limit
 	end
 
-	local function exceedsInventoryLimit(identifier, charid, amount)
+	local function exceedsInventoryLimit(identifier, charid, amount, invCapacity)
 		local totalAmount = InventoryAPI.getUserTotalCountItems(identifier, charid)
-		return Config.MaxItemsInInventory.Items ~= -1 and totalAmount + amount > Config.MaxItemsInInventory.Items
+		return invCapacity ~= -1 and totalAmount + amount > invCapacity
 	end
 
 	local _source = player
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charid = sourceCharacter.charIdentifier
+	local invCapacity = sourceCharacter.invCapacity
 	local svItem = ServerItems[itemName]
 	local canCarry = false
 
@@ -110,9 +112,9 @@ function InventoryAPI.canCarryItem(player, itemName, amount, cb)
 	local limit = svItem.limit
 
 	if limit ~= -1 and not exceedsItemLimit(identifier, itemName, amount, limit) then
-		canCarry = not exceedsInventoryLimit(identifier, charid, amount)
+		canCarry = not exceedsInventoryLimit(identifier, charid, amount, invCapacity)
 	elseif limit == -1 then
-		canCarry = not exceedsInventoryLimit(identifier, charid, amount)
+		canCarry = not exceedsInventoryLimit(identifier, charid, amount, invCapacity)
 	end
 
 	return respond(cb, canCarry)
@@ -1200,8 +1202,7 @@ function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 			if sourceTotalWeaponCount > DefaultAmount then
 				TriggerClientEvent("vorp:TipRight", _source, T.cantweapons, 2000)
 				if Config.Debug then
-					Log.print(sourceCharacter.firstname ..
-						" " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
+					Log.print(sourceCharacter.firstname .. " " .. sourceCharacter.lastname .. " ^1Can't carry more weapons^7")
 				end
 				return respond(cb, false)
 			end
@@ -1229,16 +1230,13 @@ function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 			if _target and _target > 0 then
 				if Core.getUser(_target) then
 					weapon:setSource(_target)
-					TriggerClientEvent('vorp:ShowAdvancedRightNotification', _target, T.youGaveWeapon, "inventory_items",
-						weaponName, "COLOR_PURE_WHITE", 4000)
+					TriggerClientEvent('vorp:ShowAdvancedRightNotification', _target, T.youGaveWeapon, "inventory_items", weaponName, "COLOR_PURE_WHITE", 4000)
 					TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
 				end
 			end
-			TriggerClientEvent('vorp:ShowAdvancedRightNotification', _source, T.youReceivedWeapon, "inventory_items",
-				weaponName, "COLOR_PURE_WHITE", 4000)
+			TriggerClientEvent('vorp:ShowAdvancedRightNotification', _source, T.youReceivedWeapon, "inventory_items", weaponName, "COLOR_PURE_WHITE", 4000)
 
-			TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, weaponPropietary, weaponName,
-				weaponAmmo, label, serialNumber, customLabel, _source, customDesc)
+			TriggerClientEvent("vorpInventory:receiveWeapon", _source, weaponId, weaponPropietary, weaponName, weaponAmmo, label, serialNumber, customLabel, _source, customDesc)
 		end)
 	end
 	return respond(cb, true)

@@ -6,17 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.dropdownButton[data-type="clothing"], .dropdownButton1[data-type="clothing"]').forEach(button => {
         button.classList.add('active');
     });
-
-   
 });
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.dropdownButton[data-type="itemtype"]').forEach(button => {
-        button.addEventListener('mouseenter', function() {
+        button.addEventListener('mouseenter', function () {
             OverSetTitle(this.getAttribute('data-param'));
             OverSetDesc(this.getAttribute('data-desc'));
         });
-        button.addEventListener('mouseleave', function() {
+        button.addEventListener('mouseleave', function () {
             OverSetTitle(" ");
             OverSetDesc(" ");
         });
@@ -24,22 +22,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // For the second inventory buttons
     document.querySelectorAll('.dropdownButton1[data-type="itemtype"]').forEach(button => {
-        button.addEventListener('mouseenter', function() {
+        button.addEventListener('mouseenter', function () {
             OverSetTitleSecond(this.getAttribute('data-param'));
             OverSetDescSecond(this.getAttribute('data-desc'));
         });
-        button.addEventListener('mouseleave', function() {
+        button.addEventListener('mouseleave', function () {
             OverSetTitleSecond(" ");
             OverSetDescSecond(" ");
         });
     });
 
     document.querySelectorAll('.dropdownButton[data-type="clothing"]').forEach(button => {
-        button.addEventListener('mouseenter', function() {
+        button.addEventListener('mouseenter', function () {
             OverSetTitle(this.getAttribute('data-param'));
             OverSetDesc(this.getAttribute('data-desc'));
         });
-        button.addEventListener('mouseleave', function() {
+        button.addEventListener('mouseleave', function () {
             OverSetTitle(" ");
             OverSetDesc(" ");
         });
@@ -68,20 +66,20 @@ function toggleDropdown(mainButton) {
 
     const dropdownContainers = document.querySelectorAll('.dropdownButtonContainer');
     dropdownContainers.forEach(container => {
-        container.addEventListener('wheel', function(event) {
+        container.addEventListener('wheel', function (event) {
             event.preventDefault();
-            this.scrollLeft += event.deltaY; 
-        }, { passive: false }); 
+            this.scrollLeft += event.deltaY;
+        }, { passive: false });
     });
 }
 
 function initializeStaticCarousel() {
 
     const staticCarouselControls = document.querySelectorAll('.carouselWrapper1 .carousel-control1');
-    staticCarouselControls.forEach(control => control.style.visibility = 'visible'); 
+    staticCarouselControls.forEach(control => control.style.visibility = 'visible');
     const staticDropdownContainer = document.querySelector('#staticCarousel');
     if (staticDropdownContainer) {
-        staticDropdownContainer.addEventListener('wheel', function(event) {
+        staticDropdownContainer.addEventListener('wheel', function (event) {
             event.preventDefault();
             this.scrollLeft += event.deltaY;
         }, { passive: false });
@@ -92,7 +90,7 @@ document.addEventListener('DOMContentLoaded', initializeStaticCarousel);
 
 function scrollCarousel(carouselId, direction) {
     const container = document.getElementById(carouselId);
-    const scrollAmount = 200; 
+    const scrollAmount = 200;
     let newScrollPosition = container.scrollLeft + (scrollAmount * direction);
     container.scrollTo({
         top: 0,
@@ -101,7 +99,7 @@ function scrollCarousel(carouselId, direction) {
     });
     container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
 }
-/* 0 is empty divs 1  is fixed divs like money and ammo */
+/* 0 is empty divs 1 is fixed divs like money and ammo */
 const Actions = {
     all: { types: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
     medical: { types: [0, 2] },
