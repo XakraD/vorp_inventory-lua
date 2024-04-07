@@ -983,11 +983,10 @@ exports("deleteWeapon", InventoryAPI.deleteWeapon)
 ---@param customSerial string | nil? custom serial number
 ---@param customLabel string | nil? custom label
 ---@return nil | boolean
-function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps, cb, wepId, customSerial, customLabel,
-									 customDesc, status)
+function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps, cb, wepId, customSerial, customLabel, customDesc, status)
 	local targetUser = Core.getUser(_target)
 	if not targetUser then
-		Log.error("InventoryAPI.registerWeapon: user is not logged in")
+		print("InventoryAPI.registerWeapon: user is not logged in")
 		return respond(cb, nil)
 	end
 	local targetCharacter = targetUser.getUsedCharacter
@@ -1042,26 +1041,25 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			if targetTotalWeaponCount > DefaultAmount then
 				TriggerClientEvent("vorp:TipRight", _target, T.cantweapons2, 2000)
 				if Config.Debug then
-					Log.Warning(targetCharacter.firstname ..
-						" " .. targetCharacter.lastname .. " ^1Can't carry more weapons^7")
+					Log.Warning(targetCharacter.firstname .. " " .. targetCharacter.lastname .. " ^1Can't carry more weapons^7")
 				end
 				return respond(cb, nil)
 			end
 		end
 	end
 
-	-- if ammos then
-	-- 	for key, value in pairs(ammos) do
-	-- 		ammo[key] = value
-	-- 	end
-	-- end
+	if ammos then
+		for key, value in pairs(ammos) do
+			ammo[key] = value
+		end
+	end
 
-	-- -- components are not being used? comps table is and yet is by default to empty table ?
-	-- if components then
-	-- 	for key, _ in pairs(components) do
-	-- 		component[#component + 1] = key
-	-- 	end
-	-- end
+	-- components are not being used? comps table is and yet is by default to empty table ?
+	if components then
+		for key, _ in pairs(components) do
+			component[#component + 1] = key
+		end
+	end
 
 	if canGive then
 		local function hasSerialNumber() -- on add weapon, weapons already have a serial number
@@ -1097,17 +1095,12 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			return nil
 		end
 
-		local serialNumber = customSerial or hasSerialNumber() or
-			SvUtils.GenerateSerialNumber(name) -- custom serial number or existent serial number or generate new one
-		local label = customLabel or hasCustomLabel() or
-			SvUtils.GenerateWeaponLabel(name) --custom label or existent label or generate new one
-		local desc = customDesc or
-			hasCustomDesc()           -- custom desc or existent desc or nil
-		local query = 'INSERT INTO loadout (identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) '..
-		'VALUES (@identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
+		local serialNumber = customSerial or hasSerialNumber() or SvUtils.GenerateSerialNumber(name) -- custom serial number or existent serial number or generate new one
+		local label = customLabel or hasCustomLabel() or SvUtils.GenerateWeaponLabel(name)     --custom label or existent label or generate new one
+		local desc = customDesc or hasCustomDesc()                                             -- custom desc or existent desc or nil
+		local query = 'INSERT INTO loadout (identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) VALUES (@identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
 		if wepId then
-			query = 'INSERT INTO loadout (id, identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) '..
-			'VALUES (@id, @identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
+			query = 'INSERT INTO loadout (id, identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) VALUES (@id, @identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
 		end
 		local params = {
 			id = wepId,
@@ -1147,13 +1140,12 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 			})
 			UsersWeapons.default[weaponId] = newWeapon
 			TriggerEvent("syn_weapons:registerWeapon", weaponId)
-			TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo, label,
-				serialNumber, label, _target, desc)
+			TriggerClientEvent("vorpInventory:receiveWeapon", _target, weaponId, targetIdentifier, name, ammo, label, serialNumber, label, _target, desc)
 		end)
 		return respond(cb, true)
 	end
 
-	Log.Warning("Weapon: [^2" .. name .. "^7] ^1 do not exist on the config or its a WRONG HASH")
+	print("Weapon: [^2" .. name .. "^7] ^1 do not exist on the config or its a WRONG HASH")
 
 	return respond(cb, nil)
 end
