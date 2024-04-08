@@ -174,9 +174,9 @@ function InventoryAPI.registerUsableItem(name, cb)
 		return print("InventoryAPI.registerUsableItem: name is required")
 	end
 	-- this is just to help users see whats wrong with their items and to fix them
-	SetTimeout(20000, function()
+	SetTimeout(25000, function()
 		if not ServerItems[name] then
-			print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7")
+			print("^3Warning^7: item ", name, " was registered as usabled but ^1 does not exist in database ^7")
 		end
 
 		if ServerItems[name] and not ServerItems[name].canUse then
