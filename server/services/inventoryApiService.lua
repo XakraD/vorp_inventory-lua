@@ -1335,7 +1335,7 @@ end
 
 exports("registerInventory", InventoryAPI.registerInventory)
 
-local function canContinue(id)
+local function canContinue(id, jobName, grade)
 	if not CustomInventoryInfos[id] then
 		return false
 	end
@@ -1347,13 +1347,14 @@ local function canContinue(id)
 	if not jobName and not grade then
 		return false
 	end
+	return true
 end
 --- add permissions to move items to custom inventory
 ---@param id string inventory id
 ---@param jobName string job name
 ---@param grade number job grade
 function InventoryAPI.AddPermissionMoveToCustom(id, jobName, grade)
-	if not canContinue(id) then
+	if not canContinue(id, jobName, grade) then
 		return
 	end
 
@@ -1372,7 +1373,7 @@ exports("AddPermissionMoveToCustom", InventoryAPI.AddPermissionMoveToCustom)
 ---@param jobName string job name
 ---@param grade number job grade
 function InventoryAPI.AddPermissionTakeFromCustom(id, jobName, grade)
-	if not canContinue(id) then
+	if not canContinue(id, jobName, grade) then
 		return
 	end
 
