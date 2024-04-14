@@ -3,13 +3,13 @@
 
 RegisterNetEvent("vorp:PlayerForceRespawn", function()
     local _source = source
-    local User = Core.getUser(_source).getUsedCharacter
-    local _value = Config.OnPlayerRespawn
-    local job = User.job
-
+    local User = Core.getUser(_source)
     if not User then
         return
     end
+    User = User.getUsedCharacter
+    local _value = Config.OnPlayerRespawn
+    local job = User.job
 
     if not Config.UseClearAll then
         return

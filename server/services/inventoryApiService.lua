@@ -40,6 +40,7 @@ CustomInventoryInfos = {
 ---@type table<string,function> table of Registered items
 UsableItemsFunctions = {}
 CoolDownStarted = {}
+PlayerItemsLimit = {}
 allplayersammo = {}
 
 ---@type table<string, table<number, table<number, Item>>> contain users inventory items
@@ -806,16 +807,26 @@ exports("setItemMetadata", InventoryAPI.setItemMetadata)
 --- can carry ammount of weapons
 ---@param player number source
 ---@param amount number amount to check
----@param weaponName string? weapon name not neccesary but allows to check if weapon is in the list of not weapons
+---@param weaponName string|number? weapon name or hash not neccesary but allows to check if weapon is in the list of not weapons
 ---@param cb fun(success: boolean)?   async or sync callback
 ---@return boolean
 function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source)
 	if not sourceCharacter then
-		Log.error("InventoryAPI.canCarryAmountWeapons: user is not logged in")
 		return respond(cb, false)
 	end
+	local function getWeaponNameFromHash()
+		if weaponName and type(weaponName) == "number" then
+			for name, value in ipairs(SharedData.Weapons) do
+				if joaat(value.HashName) == weaponName then
+					return value.HashName
+				end
+			end
+		end
+	end
+
+	weaponName = getWeaponNameFromHash()
 	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local charId = sourceCharacter.charIdentifier
