@@ -125,11 +125,6 @@ function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, cb
         end)
 end
 
-MySQL.ready(function()
-    local query = "DELETE FROM items_crafted WHERE NOT EXISTS (SELECT 1 FROM characters WHERE characters.charidentifier = items_crafted.character_id);"
-    DBService.deleteAsync(query)
-end)
-
 --- update asynchronously
 ---@param query string @SQL query
 ---@param params table @SQL params
@@ -179,3 +174,8 @@ function DBService.singleAwait(query, params)
     local res = MySQL.single.await(query, params)
     return res
 end
+
+MySQL.ready(function()
+    local query = "DELETE FROM items_crafted WHERE NOT EXISTS (SELECT 1 FROM characters WHERE characters.charidentifier = items_crafted.character_id);"
+    DBService.deleteAsync(query)
+end)
