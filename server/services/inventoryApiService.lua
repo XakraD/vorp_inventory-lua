@@ -111,6 +111,7 @@ function InventoryAPI.canCarryItem(target, itemName, amount, cb)
 	end
 
 	local character = user.getUsedCharacter
+	local invLimit = character.invCapacity
 	local svItem = ServerItems[itemName]
 	local canCarry = false
 
@@ -119,7 +120,7 @@ function InventoryAPI.canCarryItem(target, itemName, amount, cb)
 	end
 
 	if svItem.limit ~= -1 and not exceedsItemLimit(character.identifier, svItem.limit) then
-		canCarry = not exceedsInvLimit(character.identifier, character.charIdentifier, svItem.limit, svItem.weight)
+		canCarry = not exceedsInvLimit(character.identifier, character.charIdentifier, invLimit, svItem.weight)
 	elseif svItem.limit == -1 then
 		canCarry = true
 	end
