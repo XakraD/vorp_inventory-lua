@@ -333,7 +333,7 @@ function InventoryService.subItem(target, invId, itemId, amount)
 				if item:getCount() == 0 then
 					if invId == "default" then
 						local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
-						TriggerEvent("vorp_inventory:Server:OnItemRemoved", data)
+						TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 					end
 					userInventory[itemId] = nil
 					DBService.DeleteItem(item:getOwner(), itemId)
@@ -401,7 +401,7 @@ function InventoryService.addItem(target, invId, name, amount, metadata, cb)
 			})
 			userInventory[craftedItem.id] = item
 			if invId == "default" then
-				TriggerEvent("vorp_inventory:Server:OnItemCreated", item)
+				TriggerEvent("vorp_inventory:Server:OnItemCreated", item, _source)
 			end
 			return cb(item)
 		end, invId)
