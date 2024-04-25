@@ -125,30 +125,6 @@ function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, cb
         end)
 end
 
---- update asynchronously
----@param query string @SQL query
----@param params table @SQL params
----@param cb function? @Callback function
-function DBService.updateAsync(query, params, cb)
-    MySQL.update(query, params, cb)
-end
-
---- insert asynchronously
----@param query string @SQL query
----@param params table @SQL params
----@param cb function? @Callback function
-function DBService.insertAsync(query, params, cb)
-    MySQL.insert(query, params, cb)
-end
-
---- query asynchronously
----@param query string @SQL query
----@param params table @SQL params
----@param cb function? @Callback function
-function DBService.queryAsync(query, params, cb)
-    MySQL.query(query, params, cb)
-end
-
 ---delete asynchronously
 ---@param query string @SQL query
 ---@param params table? @SQL params
@@ -156,6 +132,31 @@ end
 function DBService.deleteAsync(query, params, cb)
     MySQL.query(query, params or {}, cb)
 end
+
+--- update asynchronously
+---@param query string @SQL query
+---@param params table @SQL params
+---@param cb function @Callback function
+function DBService.updateAsync(query, params, cb)
+    MySQL.update(query, params, cb)
+end
+
+--- insert asynchronously
+---@param query string @SQL query
+---@param params table @SQL params
+---@param cb function @Callback function
+function DBService.insertAsync(query, params, cb)
+    MySQL.insert(query, params, cb)
+end
+
+--- query asynchronously
+---@param query string @SQL query
+---@param params table @SQL params
+---@param cb function @Callback function
+function DBService.queryAsync(query, params, cb)
+    MySQL.query(query, params, cb)
+end
+
 
 --- query asynchronously
 ---@param query string @SQL query

@@ -34,9 +34,6 @@ function Utils.useWeapon(id)
 
 		for _, ammo in pairs(UserWeapons[id]:getAllAmmo()) do
 			SetPedAmmoByType(PlayerPedId, joaat(_), ammo)
-			if Config.Debug then
-				print(joaat(_) .. ": " .. _ .. " " .. ammo)
-			end
 		end
 	else
 		Utils.oldUseWeapon(id)
@@ -52,9 +49,6 @@ function Utils.oldUseWeapon(id)
 	SetPedAmmo(PlayerPedId, weaponHash, 0)
 	for type, amount in pairs(UserWeapons[id]:getAllAmmo()) do
 		SetPedAmmoByType(PlayerPedId, joaat(type), amount)
-		if Config.Debug then
-			print(joaat(type) .. ": " .. type .. " " .. amount)
-		end
 	end
 
 	UserWeapons[id]:setUsed(true)
@@ -76,6 +70,7 @@ function Utils.addItems(name, id, amount)
 			canRemove = svItems[name].can_remove,
 			desc = svItems[name].desc,
 			group = svItems[name].group or 1,
+			weight = svItems[name].weight or 0.25,
 		})
 	end
 end

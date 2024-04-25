@@ -1,7 +1,7 @@
 local getammoinfo = false
 local playerammoinfo = {}
 local updatedAmmoCache = {}
-InvLoaded = false
+
 
 local function addAmmoToPed(ammoData)
     for ammoType, ammo in pairs(ammoData) do
@@ -40,7 +40,6 @@ AddEventHandler("vorpinventory:loaded", function()
         action = "updateammo",
         ammo   = playerammoinfo.ammo
     })
-    InvLoaded = true
 end)
 
 RegisterNetEvent("vorpinventory:updateuiammocount", function(ammo)
@@ -58,7 +57,7 @@ RegisterNetEvent("vorpinventory:setammotoped", function(ammoData)
     addAmmoToPed(ammoData)
 end)
 
-RegisterNetEvent("vorpinventory:updateinventorystuff", function() -- new
+RegisterNetEvent("vorpinventory:updateinventory", function() -- new
     NUIService.LoadInv()
 end)
 
@@ -69,9 +68,11 @@ end)
 
 -- AMMO SAVING THREAD
 Citizen.CreateThread(function()
+    repeat Wait(1000) until LocalPlayer.state.IsInSession
+
     while true do
         local sleep = 1000
-        if InvLoaded and not InInventory then
+        if not InInventory then
             local PlayerPedId = PlayerPedId()
             local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId, 4)
             local wephash = Citizen.InvokeNative(0x8425C5F057012DAB, PlayerPedId)
@@ -106,7 +107,7 @@ end)
 
 local ammoupdate = true
 RegisterNetEvent("vorpinventory:ammoUpdateToggle", function(state)
-    if not ammoupdate and state then 
+    if not ammoupdate and state then
         getammoinfo = true
         TriggerServerEvent("vorpinventory:getammoinfo")
         while getammoinfo do
@@ -123,13 +124,14 @@ end)
 
 -- AMMO UPDATE THREAD
 Citizen.CreateThread(function()
+    repeat Wait(1000) until LocalPlayer.state.IsInSession
     while true do
-        if ammoupdate then 
+        if ammoupdate then
             if next(updatedAmmoCache) ~= nil then
                 TriggerServerEvent("vorpinventory:updateammo", playerammoinfo)
                 updatedAmmoCache = {}
             end
         end
-        Wait(10000) -- every 10 seconds
+        Wait(10000)
     end
 end)

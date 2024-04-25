@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global
----@class  InventoryService @ InventoryService
+---@class svItems @ InventoryService
 ---@class Weapon @Weapon
 ---@class Item @Item
 ---@field PullAllInventory fun():table
@@ -40,6 +40,7 @@ function InventoryService.receiveItem(name, id, amount, metadata)
 			canRemove = svItems[name].canRemove,
 			desc = svItems[name].desc,
 			group = svItems[name].group or 1,
+			weight = svItems[name].weight or 0.25
 		})
 	end
 	NUIService.LoadInv()
@@ -53,9 +54,6 @@ function InventoryService.removeItem(name, id, count)
 	local item = UserInventory[id]
 
 	if item ~= nil then
-		if Config.Debug then
-			print("[^2removeItem^7] ^1Debug^7: Going to call Item:quitCount with amount = ^3" .. tonumber(count) .. "^7.")
-		end
 		item:quitCount(count)
 
 		if item:getCount() <= 0 then
@@ -66,7 +64,7 @@ function InventoryService.removeItem(name, id, count)
 	end
 end
 
-function InventoryService.receiveWeapon(id, propietary, name, ammos, label, serial_number, custom_label, source, custom_desc)
+function InventoryService.receiveWeapon(id, propietary, name, ammos, label, serial_number, custom_label, source, custom_desc, weight)
 	local weaponAmmo = {}
 	local desc = ""
 
@@ -85,7 +83,6 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 	else
 		desc = custom_desc or Utils.GetWeaponDesc(name)
 	end
-
 	if UserWeapons[id] == nil then
 		local newWeapon = Weapon:New({
 			id = id,
@@ -101,15 +98,15 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 			serial_number = serial_number,
 			custom_label = custom_label,
 			custom_desc = custom_desc,
+			weight = weight
 
 		})
-
 		UserWeapons[newWeapon:getId()] = newWeapon
 		NUIService.LoadInv()
 	end
 end
 
-function InventoryService.onSelectedCharacter(charId)
+function InventoryService.onSelectedCharacter()
 	SetNuiFocus(false, false)
 	SendNUIMessage({ action = "hide" })
 	print("Loading Inventory")
@@ -173,8 +170,8 @@ function InventoryService.getLoadout(loadout)
 				custom_label = weapon.custom_label,
 				serial_number = weapon.serial_number,
 				custom_desc = custom_desc,
+				weight = weapon.weight,
 			})
-
 			UserWeapons[newWeapon:getId()] = newWeapon
 
 			if newWeapon:getUsed() then
@@ -205,6 +202,7 @@ function InventoryService.getInventory(inventory)
 					canRemove = dbItem.canRemove,
 					desc = dbItem.desc,
 					group = dbItem.group or 1,
+					weight = dbItem.weight or 0.25
 				})
 
 				UserInventory[item.id] = newItem

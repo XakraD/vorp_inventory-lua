@@ -20,7 +20,7 @@ function exports.vorp_inventory:canCarryItem(source, item, amount, callback) end
 --- can carry weapons
 ---@param source number player id
 ---@param amount number amount of weapons
----@param weaponName string| number? weapon name or hash not neccesary but allows to check if weapon is in the list of not weapons
+---@param weaponName string | number? weapon name or hash not neccesary but allows to check if weapon is in the list of not weapons
 ---@param callback fun(canCarry: boolean)? callback function async or sync leave nil
 ---@return boolean
 function exports.vorp_inventory:canCarryWeapons(source, amount, callback, weaponName) end
@@ -208,7 +208,8 @@ function exports.vorp_inventory:deleteWeapon(source, weaponId, callback) end
 ---@param custom_label string? weapon custom label
 ---@param custom_desc? string? weapon custom description
 ---@param callback fun(boolean:boolean)? callback function async or sync leave nil
-function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback, custom_serial, custom_label, custom_desc)
+function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback, custom_serial,
+                                             custom_label, custom_desc)
 end
 
 --- give weapon

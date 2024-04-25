@@ -309,7 +309,8 @@ CreateThread(function()
 	end
 
 	repeat Wait(0) until LocalPlayer.state.IsInSession
-
+	
+	local pressed = false
 	while true do
 		local sleep = 1000
 		if not InInventory then
@@ -339,16 +340,21 @@ CreateThread(function()
 
 						if pickup.prompt:HasHoldModeCompleted() then
 							if isAnyPlayerNear() == 0 then
-								if pickup.isMoney then
-									TriggerServerEvent("vorpinventory:onPickupMoney", pickup.entityId)
-								elseif Config.UseGoldItem and pickup.isGold then
-									TriggerServerEvent("vorpinventory:onPickupGold", pickup.entityId)
-								else
-									local data = { data = pickupsInRange, key = key }
-									TriggerServerEvent("vorpinventory:onPickup", data)
+								if not pressed then
+									pressed = true
+									if pickup.isMoney then
+										TriggerServerEvent("vorpinventory:onPickupMoney", pickup.entityId)
+									elseif Config.UseGoldItem and pickup.isGold then
+										TriggerServerEvent("vorpinventory:onPickupGold", pickup.entityId)
+									else
+										local data = { data = pickupsInRange, key = key }
+										TriggerServerEvent("vorpinventory:onPickup", data)
+									end
 								end
 							end
-							Wait(1000)
+							SetTimeout(4000, function()
+								pressed = false
+							end)
 						end
 					else
 						if pickup.prompt:GetEnabled() then

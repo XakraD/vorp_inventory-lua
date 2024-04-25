@@ -13,6 +13,7 @@
 ---@field canUse boolean  @Item can use
 ---@field canRemove boolean @Item can remove
 ---@field desc string @Item description
+---@field weight number @Item weight
 Item = {}
 
 Item.id = nil
@@ -167,6 +168,14 @@ end
 
 function Item:getDropOnDeath()
 	return self.dropOnDeath
+end
+
+function Item:getWeight()
+	return self.weight
+end
+
+function Item:setWeight(weight)
+	self.weight = weight
 end
 
 ---@return Item Item class

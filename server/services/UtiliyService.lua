@@ -246,3 +246,12 @@ end
 function SvUtils.SendDiscordWebhook(data)
     Core.AddWebhook(data.title, data.webhook, data.description, data.color, data.name)
 end
+
+function SvUtils.GetWeaponWeight(name)
+    for _, weapon in ipairs(SharedData.Weapons) do
+        if weapon.HashName == name:upper() then
+            return weapon.Weight
+        end
+    end
+    return 1
+end

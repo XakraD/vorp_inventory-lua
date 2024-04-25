@@ -3,22 +3,15 @@ T = TranslationInv.Langs[Lang]
 Core = exports.vorp_core:GetCore()
 
 
-RegisterNetEvent('syn:getnuistuff')
-AddEventHandler('syn:getnuistuff', function(x, y, mon, gol, rol)
-    local nuistuff = x
-    local player = PlayerPedId()
-    SendNUIMessage({
-        action = "changecheck",
-        check = nuistuff,
-        info = y,
-    })
+RegisterNetEvent('vorpinventory:send_slots', function(itemTotal, slots, mon, gol, rol)
+    SendNUIMessage({ action = "changecheck", check = string.format("%.1f", itemTotal), info = string.format("%.1f", slots) })
     SendNUIMessage({
         action = "updateStatusHud",
         show   = not IsRadarHidden(),
         money  = mon,
         gold   = gol,
         rol    = rol,
-        id     = GetPlayerServerId(NetworkGetEntityOwner(player)),
+        id     = GetPlayerServerId(PlayerId()),
     })
 end)
 
@@ -35,12 +28,11 @@ if Config.DevMode then
         TriggerServerEvent("vorpinventory:getItemsTable")
         Wait(1000)
         TriggerServerEvent("vorpinventory:getInventory")
-        Wait(2000)
+        Wait(1000)
         TriggerServerEvent("vorpCore:LoadAllAmmo")
         print("inventory loaded")
         Wait(100)
         TriggerEvent("vorpinventory:loaded")
-        InvLoaded = true
     end)
 end
 
@@ -64,7 +56,7 @@ CreateThread(function()
 
     while true do
         local weaponHeld = GetPedCurrentHeldWeapon(PlayerPedId())
-        local isLantern = IsWeaponLantern(weaponHeld) == 1
+        local isLantern = IsWeaponLantern(weaponHeld) == 1 or IsWeaponLantern(weaponHeld) == true
         if isLantern then
             lastLantern = weaponHeld
         end

@@ -11,6 +11,7 @@ lua54 'yes'
 
 shared_scripts {
   "config/config.lua",
+  "config/groups.lua",
   "config/weapons.lua",
   "config/ammo.lua",
   "config/logs.lua",

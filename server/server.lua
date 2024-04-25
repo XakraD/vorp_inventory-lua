@@ -30,26 +30,12 @@ AddEventHandler("vorpinventory:check_slots", function()
     local money = User.money
     local gold = User.gold
     local rol = User.rol
-    local stufftosend = InventoryAPI.getUserTotalCountItems(identifier, charid)
-
-    TriggerClientEvent("syn:getnuistuff", _source, stufftosend, slots, money, gold, rol)
+    local totalItems = InventoryAPI.getUserTotalCountItems(identifier, charid)
+    local totalWeapons = InventoryAPI.getUserTotalCountWeapons(identifier, charid, true)
+    local totalInvWeight = (totalItems + totalWeapons)
+    TriggerClientEvent("vorpinventory:send_slots", _source, totalInvWeight, slots, money, gold, rol)
 end)
 
-
-RegisterServerEvent("vorpinventory:getLabelFromId")
-AddEventHandler("vorpinventory:getLabelFromId", function(id, item2, cb)
-    local _source = id
-    InventoryAPI.getInventory(_source, function(inventory)
-        local label = "not found"
-        for i, item in ipairs(inventory) do
-            if item.name == item2 then
-                label = item.label
-                break
-            end
-        end
-        cb(label)
-    end)
-end)
 
 RegisterServerEvent("vorpinventory:netduplog")
 AddEventHandler("vorpinventory:netduplog", function()
@@ -103,26 +89,25 @@ end)
 AddEventHandler('playerDropped', function()
     local _source = source
     -- clear ammo
-    allplayersammo[_source] = nil
+    if _source then
+        local char = Core.getUser(_source)
+        local weapons = UsersWeapons.default
+        allplayersammo[_source] = nil
 
-    -- if player is stil in inventory check and remove
-    for i, value in pairs(InventoryBeingUsed) do
-        if value == _source then
-            InventoryBeingUsed[i] = nil
-            break
-        end
-    end
-
-    -- remove weapons from cache on player leave
-    local weapons = UsersWeapons.default
-    local char = Core.getUser(_source)
-
-    if char then
-        local charid = char.getUsedCharacter.charIdentifier
-        for key, value in pairs(weapons) do
-            if value.charId == charid then
-                UsersWeapons.default[key] = nil
+        for i, value in pairs(InventoryBeingUsed) do
+            if value == _source then
+                InventoryBeingUsed[i] = nil
                 break
+            end
+        end
+
+        if char then
+            local charid = char.getUsedCharacter.charIdentifier
+            for key, value in pairs(weapons) do
+                if value.charId == charid then
+                    UsersWeapons.default[key] = nil
+                    break
+                end
             end
         end
     end

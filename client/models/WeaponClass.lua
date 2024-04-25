@@ -16,6 +16,7 @@ Weapon.custom_label = nil
 Weapon.serial_number = nil
 Weapon.source = nil
 Weapon.custom_desc = nil
+Weapon.weight = nil
 
 local equippedWeapons = {}
 
@@ -367,4 +368,8 @@ end
 
 function Weapon:getCustomDesc()
 	return self.custom_desc
+end
+
+function Weapon:getWeight()
+	return self.weight
 end
