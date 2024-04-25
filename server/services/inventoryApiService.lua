@@ -119,7 +119,7 @@ function InventoryAPI.canCarryItem(target, itemName, amount, cb)
 	end
 
 	if svItem.limit ~= -1 and not exceedsItemLimit(character.identifier, svItem.limit) then
-		canCarry = exceedsInvLimit(character.identifier, character.charIdentifier, svItem.limit, svItem.weight)
+		canCarry = not exceedsInvLimit(character.identifier, character.charIdentifier, svItem.limit, svItem.weight)
 	elseif svItem.limit == -1 then
 		canCarry = true
 	end
