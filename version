@@ -1,5 +1,20 @@
+<3.6>
+- inventory weight based 
+- weapons now count towards inventory weight
+- UI changes 
+- see weapons used marked
+- added new file to make item groups easily
+- fixed permissions for secondary inventories
+- deprecated canCarryItems
+- WIP items decay, is only for display at the moment (coming on next updates)
+- new export to openPlayerInventories
+- new export client side to use weapon without having to open inventory
+- new event listeners (check documentation) and extra parameters added to current ones
+- this update requires database changes and vorp_core to be updated
+- function to clean up items_crafted
+- canCarryWeapons extra param now supports weapon name or hash
 <3.5>
-- exploit fixed when using devtools to insert items no custom inventories
+- exploit fixed when using devtools to insert items to custom inventories
 - added ItemOnUse event hook ( useful when you dont have acces to a script)
 - added statebag for getting current serial number of a weapon
 - other minor improvements and optimisation
