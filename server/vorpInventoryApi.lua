@@ -18,8 +18,7 @@ exports('vorp_inventoryApi', function()
     end
 
     -- * CUSTOM INVENTORY * --
-    INV.registerInventory = function(id, name, limit, acceptWeapons, shared, ignoreItemStackLimit, whitelistItems,
-                                     UsePermissions, UseBlackList, whitelistWeapons)
+    INV.registerInventory = function(id, name, limit, acceptWeapons, shared, ignoreItemStackLimit, whitelistItems, UsePermissions, UseBlackList, whitelistWeapons)
         local data = {
             id = id,
             name = name,

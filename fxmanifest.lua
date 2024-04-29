@@ -31,12 +31,13 @@ client_scripts {
 }
 
 server_scripts {
+
   '@oxmysql/lib/MySQL.lua',
+  'server/vorpInventoryApi.lua',
   'server/server.lua',
   'server/models/*.lua',
   'server/services/*.lua',
   'server/controllers/*.lua',
-  'vorpInventoryApi.lua',
   'server/respawn.lua',
 
 }
