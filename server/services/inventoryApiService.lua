@@ -361,8 +361,9 @@ exports("getItemMatchingMetadata", InventoryAPI.getItemMatchingMetadata)
 ---@param name string item name
 ---@param amount number
 ---@param metadata table metadata
+---@param allow boolean? allow to detect item creation false means allow true meand dont allow
 ---@param cb fun(success: boolean)? async or sync callback
-function InventoryAPI.addItem(player, name, amount, metadata, cb)
+function InventoryAPI.addItem(player, name, amount, metadata, cb, allow)
 	local _source = player
 	local svItem = ServerItems[name]
 
@@ -421,6 +422,9 @@ function InventoryAPI.addItem(player, name, amount, metadata, cb)
 		})
 		userInventory[craftedItem.id] = item
 		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+		if not allow then
+			TriggerEvent("vorp_inventory:Server:OnItemCreated", item, _source)
+		end
 	end)
 
 	return respond(cb, true)
@@ -475,8 +479,9 @@ exports("getItemByMainId", InventoryAPI.getItemByMainId)
 ---@param player number source
 ---@param id number item id
 ---@param cb fun(success: boolean)? async or sync callback
+---@param allow boolean? allow to detect item removal false means allow true meand dont allow
 ---@return fun(success: boolean)
-function InventoryAPI.subItemID(player, id, cb)
+function InventoryAPI.subItemID(player, id, cb, allow)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source)
 
@@ -510,6 +515,11 @@ function InventoryAPI.subItemID(player, id, cb)
 	else
 		DBService.SetItemAmount(charIdentifier, itemid, item:getCount())
 	end
+
+	if not allow then
+		local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
+		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
+	end
 	return respond(cb, true)
 end
 
@@ -522,8 +532,9 @@ exports("subItemID", InventoryAPI.subItemID)
 ---@param amount number amount to sub
 ---@param metadata table metadata
 ---@param cb fun(success: boolean)? async or sync callback
+---@param allow boolean? allow to detect item removal false means allow true meand dont allow
 ---@return boolean
-function InventoryAPI.subItem(player, name, amount, metadata, cb)
+function InventoryAPI.subItem(player, name, amount, metadata, cb, allow)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source)
 
@@ -566,6 +577,11 @@ function InventoryAPI.subItem(player, name, amount, metadata, cb)
 		DBService.DeleteItem(sourceCharacter.charIdentifier, item:getId())
 	else
 		DBService.SetItemAmount(sourceCharacter.charIdentifier, item:getId(), item:getCount())
+	end
+
+	if not allow then
+		local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
+		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 	end
 
 	return respond(cb, true)

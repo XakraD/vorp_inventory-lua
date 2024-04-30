@@ -1134,11 +1134,11 @@ function InventoryService.onNewCharacter(source)
 	local player = Core.getUser(source)
 
 	for key, value in pairs(Config.startItems) do
-		InventoryAPI.addItem(source, tostring(key), value, {}, function() end)
+		InventoryAPI.addItem(source, tostring(key), value, {})
 	end
 
 	for _, value in ipairs(Config.startWeapons) do
-		InventoryAPI.registerWeapon(source, value, {}, {}, {}, function() end)
+		InventoryAPI.registerWeapon(source, value, {}, {}, {})
 	end
 
 	if Config.NewPlayers then
@@ -1690,9 +1690,9 @@ function InventoryService.MoveToPlayer(obj)
 							Core.NotifyRightTip(target, "Item" .. item.label .. " was given to you", 2000)
 						end)
 					end
-				end)
+				end, true)
 			end
-		end)
+		end, true)
 	end
 end
 
@@ -1758,8 +1758,8 @@ function InventoryService.TakeFromPlayer(obj)
 						Core.NotifyRightTip(_source, "you have Taken " .. amount .. " " .. item.label .. " from player", 2000)
 						Core.NotifyRightTip(target, "Item" .. item.label .. " was taken from you", 2000)
 					end
-				end)
+				end, true)
 			end
-		end)
+		end, true)
 	end
 end

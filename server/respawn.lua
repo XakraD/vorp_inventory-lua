@@ -47,8 +47,7 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
                         if next(_value.Items.itemWhiteList) then
                             for index, value in ipairs(_value.Items.itemWhiteList) do
                                 if item.name ~= value then
-                                    InventoryAPI.subItem(_source, item.name, item.count, item.metadata, function()
-                                    end)
+                                    InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
                                 end
                             end
                         else
