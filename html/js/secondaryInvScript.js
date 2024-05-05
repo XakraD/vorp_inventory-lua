@@ -312,7 +312,8 @@ function secondInventorySetup(items, info) {
         count = item.count;
         const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
         if (item.type !== "item_weapon") {
-            const custom = item.metadata.tooltip ? "<br>" + item.metadata.tooltip : "";
+
+            const custom = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
             const degradation = item.degradation ? "<br>" + "Decay  " + item.degradation + "%" : "";
             const weight = item.weight ? "Weight   " + (item.weight * item.count) + " Kg" : "Weight " + item.count / 4 + " Kg";
             const groupKey = Object.keys(window.Actions).find(key =>
