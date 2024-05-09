@@ -50,7 +50,7 @@ end
 function DBService.SetItemMetadata(sourceCharIdentifier, itemCraftedId, metadata)
     MySQL.update("UPDATE items_crafted SET metadata = @metadata WHERE character_id = @charid AND id = @itemid;"
     , {
-        ['metadata'] = json.encode(metadata),     -- Check if need to json.encode().
+        ['metadata'] = json.encode(metadata), -- Check if need to json.encode().
         ['charid'] = tonumber(sourceCharIdentifier),
         ['itemid'] = tonumber(itemCraftedId)
     })
@@ -130,7 +130,7 @@ end
 --- update asynchronously
 ---@param query string @SQL query
 ---@param params table @SQL params
----@param cb function @Callback function
+---@param cb function? @Callback function
 function DBService.updateAsync(query, params, cb)
     MySQL.update(query, params, cb)
 end

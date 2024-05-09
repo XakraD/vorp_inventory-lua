@@ -91,6 +91,7 @@ function NUIService.OpenPlayerInventory(name, id)
 	local result = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
 	CanOpen = result
 	if CanOpen then
+		CanOpen = false
 		applyPosfx()
 		DisplayRadar(false)
 		SetNuiFocus(true, true)
@@ -821,11 +822,9 @@ function NUIService.initiateData()
 end
 
 -- Main loop
-Citizen.CreateThread(function()
-	Wait(5000)
+CreateThread(function()
+	repeat Wait(1000) until LocalPlayer.state.IsInSession
 	NUIService.initiateData()
-	repeat Wait(0) until LocalPlayer.state.IsInSession
-
 	while true do
 		local sleep = 1000
 		if not InInventory then
@@ -851,7 +850,8 @@ Citizen.CreateThread(function()
 end)
 
 -- Prevent Spam
-Citizen.CreateThread(function()
+CreateThread(function()
+	repeat Wait(1000) until LocalPlayer.state.IsInSession
 	while true do
 		Wait(1000)
 		if timerUse > 0 then

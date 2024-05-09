@@ -66,6 +66,7 @@ local InventoryBeingUsed = {}
 
 Core.Callback.Register("vorp_inventory:Server:CanOpenCustom", function(source, cb, id)
     local _source = source
+    id = tostring(id)
     if not InventoryBeingUsed[id] then
         InventoryBeingUsed[id] = _source
         return cb(true)
@@ -88,7 +89,6 @@ end)
 
 AddEventHandler('playerDropped', function()
     local _source = source
-    -- clear ammo
     if _source then
         local char = Core.getUser(_source)
         local weapons = UsersWeapons.default
