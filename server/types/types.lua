@@ -130,11 +130,11 @@ function exports.vorp_inventory:getItemContainingMetadata(source, item, metadata
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get item matching metdata
 ---@param source integer player id
----@param slot number slot id
+---@param item string item name
 ---@param metadata table item metadata
 ---@param callback fun(item:table)? callback function async or sync leave nil
 ---@return table item data
-function exports.vorp_inventory:getItemMatchingMetadata(source, slot, metadata, callback) end
+function exports.vorp_inventory:getItemMatchingMetadata(source, item, metadata, callback) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get DB item
@@ -285,7 +285,7 @@ function exports.vorp_inventory:AddPermissionTakeFromCustom(invId, jobName, jobg
 --- black list items or weapons
 ---@param invId string inventory id
 ---@param item string item name | weapon name
-function exports.vorp_inventory:blackListCustomAny(invId, item) end
+function exports.vorp_inventory:BlackListCustomAny(invId, item) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- remove inventory from session
