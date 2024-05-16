@@ -947,7 +947,7 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 
 	weaponName = getWeaponNameFromHash()
 
-	local function isInventryFull(identifier, charId, invCapacity)
+	local function isInventoryFull(identifier, charId, invCapacity)
 		local weaponWeight = SvUtils.GetWeaponWeight(weaponName)
 		local itemsTotalWeight = InventoryAPI.getUserTotalCountItems(identifier, charId)
 		local weaponsTotalWeight = InventoryAPI.getUserTotalCountWeapons(identifier, charId, true)
@@ -965,7 +965,7 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	local job = sourceCharacter.job
 	local DefaultAmount = Config.MaxItemsInInventory.Weapons
 
-	if weaponName and isInventryFull(identifier, charId, invCapacity) then
+	if weaponName and isInventoryFull(identifier, charId, invCapacity) then
 		return respond(cb, false)
 	end
 
@@ -1002,9 +1002,8 @@ function InventoryAPI.setWeaponCustomLabel(weaponId, label, cb)
 
 	if userWeapons then
 		userWeapons:setCustomLabel(label)
-		DBService.updateAsync('UPDATE loadout SET custom_label = @custom_label WHERE id = @id',
-			{ id = weaponId, custom_label = label }, function(r)
-			end)
+		TriggerClientEvent("vorpInventory:setWeaponCustomLabel", -1, weaponId, label)
+		DBService.updateAsync('UPDATE loadout SET custom_label = @custom_label WHERE id = @id', { id = weaponId, custom_label = label })
 		return respond(cb, true)
 	end
 	return respond(cb, false)
@@ -1022,9 +1021,8 @@ function InventoryAPI.setWeaponSerialNumber(weaponId, serial, cb)
 
 	if userWeapons then
 		userWeapons:setSerialNumber(serial)
-		DBService.updateAsync('UPDATE loadout SET serial_number = @serial_number WHERE id = @id',
-			{ id = weaponId, serial_number = serial }, function(r)
-			end)
+		TriggerClientEvent("vorpInventory:setWeaponSerialNumber", -1, weaponId, serial)
+		DBService.updateAsync('UPDATE loadout SET serial_number = @serial_number WHERE id = @id', { id = weaponId, serial_number = serial })
 		return respond(cb, true)
 	end
 	return respond(cb, false)
@@ -1039,15 +1037,13 @@ exports("setWeaponSerialNumber", InventoryAPI.setWeaponSerialNumber)
 ---@return boolean
 function InventoryAPI.setWeaponCustomDesc(weaponId, desc, cb)
 	local userWeapons = UsersWeapons.default[weaponId]
-
-	if userWeapons then
-		userWeapons:setCustomDesc(desc)
-		DBService.updateAsync('UPDATE loadout SET custom_desc = @custom_desc WHERE id = @id',
-			{ id = weaponId, custom_desc = desc }, function(r)
-			end)
-		return respond(cb, true)
+	if not userWeapons then
+		return respond(cb, false)
 	end
-	return respond(cb, false)
+	TriggerClientEvent("vorpInventory:setWeaponCustomDesc", -1, weaponId, desc)
+	userWeapons:setCustomDesc(desc)
+	DBService.updateAsync('UPDATE loadout SET custom_desc = @custom_desc WHERE id = @id', { id = weaponId, custom_desc = desc })
+	return respond(cb, true)
 end
 
 exports("setWeaponCustomDesc", InventoryAPI.setWeaponCustomDesc)
@@ -1103,10 +1099,7 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		return respond(cb, nil)
 	end
 
-	local isValid = Citizen.InvokeNative(0x937C71165CF334B3, joaat(wepname))
-	if not isValid then
-		return respond(cb, nil)
-	end
+
 
 	local function isWeaponInConfig()
 		for index, value in ipairs(SharedData.Weapons) do

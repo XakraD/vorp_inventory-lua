@@ -106,6 +106,24 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 	end
 end
 
+function InventoryService.setWeaponCustomLabel(id, label)
+	if UserWeapons[id] then
+		UserWeapons[id]:setLabel(label)
+	end
+end
+
+function InventoryService.setWeaponCustomDesc(id, desc)
+	if UserWeapons[id] then
+		UserWeapons[id]:setDesc(desc)
+	end
+end
+
+function InventoryService.setWeaponSerialNumber(id, serial_number)
+	if UserWeapons[id] then
+		UserWeapons[id]:setSerialNumber(serial_number)
+	end
+end
+
 function InventoryService.onSelectedCharacter()
 	SetNuiFocus(false, false)
 	SendNUIMessage({ action = "hide" })

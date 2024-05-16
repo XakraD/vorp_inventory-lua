@@ -358,7 +358,7 @@ function Weapon:getSerialNumber()
 	return self.serial_number
 end
 
-function Weapon:setSerialNumber()
+function Weapon:setSerialNumber(serial_number)
 	self.serial_number = serial_number
 end
 

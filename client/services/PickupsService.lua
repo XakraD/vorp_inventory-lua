@@ -270,7 +270,7 @@ PickupsService.dropAllPlease = function()
 		for index, weapon in pairs(UserWeapons) do
 			TriggerServerEvent("vorpinventory:serverDropWeapon", index)
 
-			if next(UserWeapons[index]) ~= nil then
+			if next(UserWeapons[index]) then
 				local currentWeapon = UserWeapons[index]
 
 				if currentWeapon:getUsed() then
@@ -309,7 +309,7 @@ CreateThread(function()
 	end
 
 	repeat Wait(0) until LocalPlayer.state.IsInSession
-	
+
 	local pressed = false
 	while true do
 		local sleep = 1000
