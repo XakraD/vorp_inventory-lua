@@ -314,8 +314,8 @@ function secondInventorySetup(items, info) {
         if (item.type !== "item_weapon") {
 
             const custom = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
-            const degradation = item.degradation ? "<br>" + "Decay  " + item.degradation + "%" : "";
-            const weight = item.weight ? "Weight   " + (item.weight * item.count) + " Kg" : "Weight " + item.count / 4 + " Kg";
+            const degradation = item.degradation ? "<br>" + LANGUAGE.labels.decay + item.degradation + "%" : "";
+            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + item.count / 4 + " " + Config.WeightMeasure;
             const groupKey = Object.keys(window.Actions).find(key =>
                 key !== "all" && window.Actions[key].types.includes(group)
             );
@@ -325,8 +325,8 @@ function secondInventorySetup(items, info) {
             $("#secondInventoryElement").append(` <div data-label='${item.label}' data-group ='${group}' style='background-image: url(\"img/items/${item.name ? item.name.toLowerCase() : ""}.png\"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id="item-${index}"  class='item' class='item' data-tooltip='${tooltipContent}'> ${count > 0 ? `<div class='count'>${count}</div>` : ``}<div class='text'></div></div> `);
         } else {
 
-            const info = item.serial_number ? "<br>Ammo " + item.count + "<br>Serial No " + item.serial_number : "";
-            const weight = item.weight ? "Weight   " + (item.weight * item.count) + " Kg" : "Weight " + item.count / 4 + " Kg";
+            const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
+            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + item.count / 4 + " " + Config.WeightMeasure;
             $("#secondInventoryElement").append(`
             <div data-label='${item.label}' data-group ='${group}'
             style='background-image: url("img/items/${item.name.toLowerCase()}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">

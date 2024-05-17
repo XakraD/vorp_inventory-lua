@@ -39,7 +39,7 @@ function secondarySetCurrentCapacity(cap) {
 //capacty of inventory
 function secondarySetCapacity(cap, weight) {
     $(".capacity").show();
-    document.getElementById("capacity-value").innerHTML = weight ? weight + " Kg" : cap;
+    document.getElementById("capacity-value").innerHTML = weight ? weight + " " + Config.WeightMeasure : cap;
 }
 
 

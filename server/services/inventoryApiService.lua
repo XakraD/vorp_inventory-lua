@@ -945,6 +945,7 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 				end
 			end
 		end
+		return weaponName
 	end
 
 	weaponName = getWeaponNameFromHash()

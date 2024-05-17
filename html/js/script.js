@@ -40,6 +40,7 @@ window.addEventListener('message', function (event) {
         Config.AddAmmoItem = LuaConfig.AddAmmoItem;
         Config.DoubleClickToUse = LuaConfig.DoubleClickToUse;
         Config.UseRolItem = LuaConfig.UseRolItem;
+        Config.WeightMeasure = LuaConfig.WeightMeasure;
         // Fetch the Actions configuration from Lua
         loadActionsConfig().then(actionsConfig => {
             generateActionButtons(actionsConfig, 'carousel1', 'inventoryElement', 'dropdownButton');
@@ -103,7 +104,7 @@ window.addEventListener('message', function (event) {
         infoxy = event.data.info
 
         $('#check').html('')
-        $("#check").append(`<button id='check'>${checkxy}/${infoxy + " Kg"}</button>`);
+        $("#check").append(`<button id='check'>${checkxy}/${infoxy + " " + Config.WeightMeasure}</button>`);
     }
 
     //main inv
@@ -116,7 +117,7 @@ window.addEventListener('message', function (event) {
         $("#inventoryHud").fadeIn();
         $(".controls").remove();
         $("#inventoryHud").append(
-            `<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='${LANGUAGE.inventorysearch}'/input><button id='check'>${checkxy}/${infoxy + " Kg"}</button></div><button id='close'>${LANGUAGE.inventoryclose}</button></div></div>`
+            `<div class='controls'><div class='controls-center'><input type='text' id='search' placeholder='${LANGUAGE.inventorysearch}'/input><button id='check'>${checkxy}/${infoxy + " " + Config.WeightMeasure}</button></div><button id='close'>${LANGUAGE.inventoryclose}</button></div></div>`
         );
 
         $("#search").bind("input", function () {

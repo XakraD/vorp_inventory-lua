@@ -295,13 +295,13 @@ function inventorySetup(items) {
 
         if (item.type != "item_weapon") {
             const custom = item.metadata.tooltip ? "<br>" + item.metadata.tooltip : "";
-            const degradation = item.degradation ? `<br>Decay <span style="color: ${getColorForDegradation(item.degradation)}">${item.degradation}%</span>` : "";
-            const weight = item.weight ? "<br>Weight   " + (item.weight * count) + " Kg" : "<br>Weight " + count / 4 + " Kg";
+            const degradation = item.degradation ? `<br>${LANGUAGE.labels.decay}<span style="color: ${getColorForDegradation(item.degradation)}">${item.degradation}%</span>` : "";
+            const weight = item.weight ? "<br>" + LANGUAGE.labels.weight + (item.weight * count) + " " + Config.WeightMeasure : "<br>" + LANGUAGE.labels.weight + count / 4 + " " + Config.WeightMeasure;
             const groupKey = Object.keys(window.Actions).find(key =>
                 key !== "all" && window.Actions[key].types.includes(group)
             );
             const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
-            const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${"Limit " + limit + custom + weight + degradation}` : `Limit ${limit}${custom}${weight}${degradation}`;
+            const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${LANGUAGE.labels.limit + limit + custom + weight + degradation}` : `${LANGUAGE.labels.limit} ${limit}${custom}${weight}${degradation}`;
 
             $("#inventoryElement").append(`
                 <div data-group='${group}' data-label='${item.label}' style='background-image: url("img/items/${item.name.toLowerCase()}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip='${tooltipContent}'> 
@@ -311,8 +311,8 @@ function inventorySetup(items) {
                     <div class='text'></div>
                 </div>`);
         } else {
-            const weight = item.weight ? "Weight   " + item.weight + " Kg" : "Weight " + count / 4 + " Kg";
-            const info = item.serial_number ? "<br>Ammo " + item.count + "<br>Serial No " + item.serial_number : "";
+            const weight = item.weight ? LANGUAGE.labels.weight + item.weight + " " + Config.WeightMeasure : LANGUAGE.labels.weight + count / 4 + " " + Config.WeightMeasure;
+            const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
             $("#inventoryElement").append(`
                 <div data-label='${item.label}' data-group='${group}' style='background-image: url("img/items/${item.name.toLowerCase()}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
                     <div class='equipped-icon' style='display: ${!item.used && !item.used2 ? "none" : "block"};'></div>

@@ -581,7 +581,8 @@ function NUIService.initiateData()
 			equip = T.equip,
 			use = T.use,
 			give = T.give,
-			drop = T.drop
+			drop = T.drop,
+			labels = T.labels
 		},
 		config = {
 			UseGoldItem = Config.UseGoldItem,
@@ -589,7 +590,9 @@ function NUIService.initiateData()
 			AddDollarItem = Config.AddDollarItem,
 			AddAmmoItem = Config.AddAmmoItem,
 			DoubleClickToUse = Config.DoubleClickToUse,
-			UseRolItem = Config.UseRolItem
+			UseRolItem = Config.UseRolItem,
+			WeightMeasure = Config.WeightMeasure or "Kg",
+
 		}
 	})
 end
