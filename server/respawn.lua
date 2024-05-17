@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-global
+local Core = exports.vorp_core:GetCore()
 -- * CLEAR ITEMS WEAPONS AND MONEY * --
-
 RegisterNetEvent("vorp:PlayerForceRespawn", function()
     local _source = source
     local User = Core.getUser(_source).getUsedCharacter

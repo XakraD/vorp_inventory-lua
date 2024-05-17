@@ -1,6 +1,8 @@
 ---@diagnostic disable: undefined-field
 ---@class InventoryAPI @Inventory API
 InventoryAPI = {}
+local T = TranslationInv.Langs[Lang]
+local Core = exports.vorp_core:GetCore()
 
 ---@class CustomInventoryInfos @Custom Inventory Infos
 ---@field id string

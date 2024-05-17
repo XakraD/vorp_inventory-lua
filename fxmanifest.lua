@@ -23,6 +23,7 @@ shared_scripts {
 }
 
 client_scripts {
+  'client/exports.lua',
   'client/client.lua',
   'client/models/*.lua',
   'client/services/*.lua',

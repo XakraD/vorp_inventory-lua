@@ -1,12 +1,17 @@
 ---@diagnostic disable: undefined-global
+local T = TranslationInv.Langs[Lang]
+local Core = exports.vorp_core:GetCore()
+local newchar = {}
+local timer = 120 -- in minutes --!needs a config
+
+
 InventoryService = {}
 ItemPickUps = {}
 MoneyPickUps = {}
 GoldPickUps = {}
 math.randomseed(GetGameTimer())
 ItemUids = {}
-local newchar = {} -- new
-local timer = 120  -- in minutes
+
 
 function InventoryService.CheckNewPlayer(_source, charid)
 	if Config.NewPlayers then
@@ -1036,12 +1041,13 @@ function InventoryService.getInventory()
 	end
 end
 
-function InventoryService.getAmmoInfo()
-	local _source = source
-	if allplayersammo[_source] then
-		TriggerClientEvent("vorpinventory:recammo", _source, allplayersammo[_source])
+Core.Callback.Register("vorpinventory:getammoinfo", function(source, cb)
+	if not allplayersammo[_source] then
+		return cb(false)
 	end
-end
+
+	cb(allplayersammo[source])
+end)
 
 -- give ammo to player
 function InventoryService.serverGiveAmmo(ammotype, amount, target, maxcount)

@@ -3,29 +3,22 @@ local promptGroup = GetRandomIntInRange(0, 0xffffff)
 local WorldPickups = {}
 local dropAll = false
 local lastCoords = {}
+local T = TranslationInv.Langs[Lang]
 
-PickupsService.CreateObject = function(model, position)
-	local objectHash = joaat(model)
-
+PickupsService.CreateObject = function(objectHash, position)
 	if not HasModelLoaded(objectHash) then
 		RequestModel(objectHash, false)
+		repeat Wait(0) until HasModelLoaded(objectHash)
 	end
 
-	while not HasModelLoaded(objectHash) do
-		Wait(0)
-	end
-
-	local entityHandle = CreateObject(objectHash, position.x, position.y, position.z, true, true, true)
-	while not DoesEntityExist(entityHandle) do
-		Wait(20)
-	end
-	Citizen.InvokeNative(0x58A850EAEE20FAA3, entityHandle)           -- PlaceObjectOnGroundProperly
-	Citizen.InvokeNative(0xDC19C288082E586E, entityHandle, true, false) -- SetEntityAsMissionEntity
-	Citizen.InvokeNative(0x7D9EFB7AD6B19754, entityHandle, true)     -- FreezeEntityPosition
-	Citizen.InvokeNative(0x7DFB49BCDB73089A, entityHandle, true)     -- SetPickupLight
-	Citizen.InvokeNative(0xF66F820909453B8C, entityHandle, false, true) -- SetEntityCollision
+	local entityHandle = CreateObject(joaat(objectHash), position.x, position.y, position.z, true, false, false, false)
+	repeat Wait(0) until DoesEntityExist(entityHandle)
+	PlaceObjectOnGroundProperly(entityHandle, false)
+	SetEntityAsMissionEntity(entityHandle, true, false)
+	FreezeEntityPosition(entityHandle, true)
+	SetPickupLight(entityHandle, true)
+	SetEntityCollision(entityHandle, false, true)
 	SetModelAsNoLongerNeeded(objectHash)
-
 	return entityHandle
 end
 
@@ -43,16 +36,8 @@ PickupsService.createPickup = function(name, amount, metadata, weaponId, id)
 	end
 
 	local entityHandle = PickupsService.CreateObject(pickupModel, position)
+	local data = { name = name, obj = entityHandle, amount = amount, metadata = metadata, weaponId = weaponId, position = position, id = id }
 
-	local data = {
-		name = name,
-		obj = entityHandle,
-		amount = amount,
-		metadata = metadata,
-		weaponId = weaponId,
-		position = position,
-		id = id,
-	}
 	if weaponId == 1 then
 		TriggerServerEvent("vorpinventory:sharePickupServerItem", data)
 	else
@@ -108,7 +93,7 @@ end
 PickupsService.sharePickupClient = function(data, value)
 	if value == 1 then
 		if WorldPickups[data.obj] == nil then
-			local label = Utils.GetHashreadableLabel(data.name, data.weaponId)
+			local label = Utils.GetLabel(data.name, data.weaponId)
 
 			local pickup = Pickup:New({
 				name     = (data.amount > 1) and label .. " x " .. tostring(data.amount) or label,
@@ -139,7 +124,7 @@ PickupsService.shareMoneyPickupClient = function(entityHandle, amount, position,
 	if value == 1 then
 		if WorldPickups[entityHandle] == nil then
 			local pickup = Pickup:New({
-				name = "Money (" .. tostring(amount) .. ")",
+				name = "Money ($" .. tostring(amount) .. ")",
 				entityId = entityHandle,
 				amount = amount,
 				isMoney = true,
@@ -191,32 +176,26 @@ PickupsService.shareGoldPickupClient = function(entityHandle, amount, position, 
 end
 
 PickupsService.removePickupClient = function(entityHandle)
-	Citizen.InvokeNative(0xDC19C288082E586E, entityHandle, false, true) -- SetEntityAsMissionEntity
+	SetEntityAsMissionEntity(entityHandle, false, true)
 	NetworkRequestControlOfEntity(entityHandle)
-	local timeout = 0
 
+	local timeout = 0
 	while not NetworkHasControlOfEntity(entityHandle) and timeout < 5000 do
 		timeout = timeout + 100
 		if timeout == 5000 then
-			if Config.Debug then
-				print("Failed to get Control of the Entity")
-			end
+			print("Failed to get Control of the Entity")
 		end
 		Wait(100)
 	end
-
-	FreezeEntityPosition(entityHandle, false)
-	Citizen.InvokeNative(0x7DFB49BCDB73089A, entityHandle, false) -- SetPickupLight
 	DeleteObject(entityHandle)
 end
 
-PickupsService.playerAnim = function(obj)
+PickupsService.playerAnim = function()
 	local playerPed = PlayerPedId()
 	local animDict = "amb_work@world_human_box_pickup@1@male_a@stand_exit_withprop"
-	RequestAnimDict(animDict)
-
-	while not HasAnimDictLoaded(animDict) do
-		Wait(10)
+	if not HasAnimDictLoaded(animDict) then
+		RequestAnimDict(animDict)
+		repeat Wait(0) until HasAnimDictLoaded(animDict)
 	end
 
 	TaskPlayAnim(playerPed, animDict, "exit_front", 1.0, 8.0, -1, 1, 0, false, false, false)
@@ -234,25 +213,20 @@ PickupsService.DeadActions = function()
 end
 
 PickupsService.dropAllPlease = function()
-	Wait(200)
-
 	if Config.UseClearAll then
 		return
 	end
 
 	if Config.DropOnRespawn.AllMoney then
 		TriggerServerEvent("vorpinventory:serverDropAllMoney")
-		Wait(200)
 	end
 
 	if Config.DropOnRespawn.PartMoney then
 		TriggerServerEvent("vorpinventory:serverDropPartMoney")
-		Wait(200)
 	end
 
 	if Config.UseGoldItem and Config.DropOnRespawn.Gold then
 		TriggerServerEvent("vorpinventory:serverDropAllGold")
-		Wait(200)
 	end
 
 	if Config.DropOnRespawn.Items then
@@ -262,7 +236,6 @@ PickupsService.dropAllPlease = function()
 			local itemMetadata = item:getMetadata()
 
 			TriggerServerEvent("vorpinventory:serverDropItem", itemName, item.id, itemCount, itemMetadata)
-			Wait(200)
 		end
 	end
 
@@ -279,13 +252,13 @@ PickupsService.dropAllPlease = function()
 				end
 
 				UserWeapons[index] = nil
-				Wait(200)
 			end
 		end
 	end
 
-	Wait(200)
-	dropAll = false
+	SetTimeout(500, function()
+		dropAll = false
+	end)
 end
 
 CreateThread(function()
@@ -331,12 +304,13 @@ CreateThread(function()
 				for key, pickup in pairs(pickupsInRange) do
 					if pickup:Distance() <= 1.2 then
 						sleep = 0
-						Citizen.InvokeNative(0x69F4BE8C8CC4796C, playerPed, pickup.entityId, 3000, 2048, 3) -- TaskLookAtEntity
+
+						TaskLookAtEntity(playerPed, pickup.entityId, 1500, 2048, 3, 0)
 						local isDead = IsEntityDead(playerPed)
 						pickup.prompt:SetVisible(not isDead)
 
 						local promptSubLabel = CreateVarString(10, "LITERAL_STRING", pickup.name)
-						PromptSetActiveGroupThisFrame(promptGroup, promptSubLabel, 1)
+						UiPromptSetActiveGroupThisFrame(promptGroup, promptSubLabel, 0, 0, 0, 0)
 
 						if pickup.prompt:HasHoldModeCompleted() then
 							if isAnyPlayerNear() == 0 then

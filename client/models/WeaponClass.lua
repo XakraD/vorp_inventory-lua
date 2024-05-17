@@ -180,10 +180,8 @@ function Weapon:equipwep()
 				addWeapon(self.name, 1, self.id)
 			else
 				local _, weaponHash = GetCurrentPedWeapon(playerPedId, false, 0, false)
-				Citizen.InvokeNative(0x5E3BDDBCB83F3D84, playerPedId, weaponHash, 1, 1, 1, 2, false, 0.5, 1.0,
-					752097756, 0, true, 0.0)
-				Citizen.InvokeNative(0x5E3BDDBCB83F3D84, playerPedId, joaat(self.name), 1, 1, 1, 3, false, 0.5,
-					1.0, 752097756, 0, true, 0.0)
+				Citizen.InvokeNative(0x5E3BDDBCB83F3D84, playerPedId, weaponHash, 1, 1, 1, 2, false, 0.5, 1.0, 752097756, 0, true, 0.0)
+				Citizen.InvokeNative(0x5E3BDDBCB83F3D84, playerPedId, joaat(self.name), 1, 1, 1, 3, false, 0.5, 1.0, 752097756, 0, true, 0.0)
 				Citizen.InvokeNative(0xADF692B254977C0C, playerPedId, weaponHash, 0, 1, 0, 0)
 				Citizen.InvokeNative(0xADF692B254977C0C, playerPedId, joaat(self.name), 0, 0, 0, 0)
 			end
@@ -301,7 +299,6 @@ function Weapon:subAmmo(type, amount)
 
 		if self.ammo[type] <= 0 then
 			Utils.TableRemoveByKey(self.ammo, type)
-			--self.ammo[type] = nil
 		end
 	end
 end

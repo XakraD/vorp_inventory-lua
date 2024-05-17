@@ -1,6 +1,5 @@
----@type table<string, Item> contains Database Server items
+local Core = exports.vorp_core:GetCore()
 ServerItems = {}
----@type table<string, table<number, Weapon>> contain users weapons
 UsersWeapons = { default = {} }
 
 MySQL.ready(function()
@@ -20,7 +19,6 @@ MySQL.ready(function()
 			end
 		end)
 end)
-
 
 
 --- load all player weapons

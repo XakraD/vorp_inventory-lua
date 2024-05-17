@@ -1,19 +1,3 @@
----@diagnostic disable: undefined-global
-T = TranslationInv.Langs[Lang]
-Core = exports.vorp_core:GetCore()
-
-RegisterNetEvent('vorpinventory:send_slots', function(itemTotal, slots, mon, gol, rol)
-    SendNUIMessage({ action = "changecheck", check = string.format("%.1f", itemTotal), info = string.format("%.1f", slots) })
-    SendNUIMessage({
-        action = "updateStatusHud",
-        show   = not IsRadarHidden(),
-        money  = mon,
-        gold   = gol,
-        rol    = rol,
-        id     = GetPlayerServerId(PlayerId()),
-    })
-end)
-
 if Config.DevMode then
     AddEventHandler('onClientResourceStart', function(resourceName)
         if (GetCurrentResourceName() ~= resourceName) then

@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-global
----@class svItems @ InventoryService
+---@class ClientItems @ InventoryService
 ---@class Weapon @Weapon
 ---@class Item @Item
 ---@field PullAllInventory fun():table
@@ -11,17 +11,21 @@
 ---@field getLoadout fun(loadout:table)
 ---@field getWeapons fun():table
 ---@field getInventory fun(table:table)
----@field svItems table<string,Item>
+---@field ClientItems table<string,Item>
 ---@field UserWeapons table<string,Weapon>
 ---@field UserInventory table<number,Item>
-svItems = {}
-
+ClientItems = {}
 InventoryService = {}
 UserWeapons = {}
 UserInventory = {}
+local T = TranslationInv.Langs[Lang]
 
 function InventoryService.PullAllInventory()
 	return UserInventory
+end
+
+function InventoryService.getWeapons()
+	return UserWeapons
 end
 
 function InventoryService.receiveItem(name, id, amount, metadata)
@@ -31,16 +35,16 @@ function InventoryService.receiveItem(name, id, amount, metadata)
 		UserInventory[id] = Item:New({
 			id = id,
 			count = amount,
-			limit = svItems[name].limit,
-			label = svItems[name].label,
+			limit = ClientItems[name].limit,
+			label = ClientItems[name].label,
 			name = name,
-			metadata = SharedUtils.MergeTables(svItems[name].metadata, metadata),
+			metadata = SharedUtils.MergeTables(ClientItems[name].metadata, metadata),
 			type = "item_standard",
 			canUse = true,
-			canRemove = svItems[name].canRemove,
-			desc = svItems[name].desc,
-			group = svItems[name].group or 1,
-			weight = svItems[name].weight or 0.25
+			canRemove = ClientItems[name].canRemove,
+			desc = ClientItems[name].desc,
+			group = ClientItems[name].group or 1,
+			weight = ClientItems[name].weight or 0.25
 		})
 	end
 	NUIService.LoadInv()
@@ -139,9 +143,9 @@ function InventoryService.onSelectedCharacter()
 end
 
 function InventoryService.processItems(items)
-	svItems = {}
+	ClientItems = {}
 	for _, item in pairs(items) do
-		svItems[item.item] = Item:New(item)
+		ClientItems[item.item] = Item:New(item)
 	end
 end
 
@@ -205,8 +209,8 @@ function InventoryService.getInventory(inventory)
 		local inventoryItems = json.decode(inventory)
 
 		for _, item in pairs(inventoryItems) do
-			if svItems[item.item] then
-				local dbItem = svItems[item.item]
+			if ClientItems[item.item] then
+				local dbItem = ClientItems[item.item]
 
 				local newItem = Item:New({
 					id = item.id,
