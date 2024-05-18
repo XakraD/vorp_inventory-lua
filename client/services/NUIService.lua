@@ -378,9 +378,9 @@ local function useWeapon(data)
 		return print("Weapon not found")
 	end
 	local weapName = joaat(UserWeapons[weaponId]:getName())
-	local isWeaponAGun = IsWeaponAGun(weapName)
-	local isWeaponOneHanded = IsWeaponOneHanded(weapName)
-	local isArmed = IsPedArmed(ped, 4)
+	local isWeaponAGun = Citizen.InvokeNative(0x705BE297EEBDB95D, weapName)
+	local isWeaponOneHanded = Citizen.InvokeNative(0xD955FEE4B87AFA07, weapName)
+	local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, ped, 4)
 	local notdual = false
 
 	if (isWeaponAGun and isWeaponOneHanded) and isArmed then
@@ -395,7 +395,7 @@ local function useWeapon(data)
 		UserWeapons[weaponId]:loadComponents()
 		UserWeapons[weaponId]:setUsed(true)
 		TriggerServerEvent("syn_weapons:weaponused", data)
-	elseif not UserWeapons[weaponId]:getUsed() and not HasPedGotWeapon(ped, weapName, 0, true) or IsWeaponThrowable(joaat(weapName)) then
+	elseif not UserWeapons[weaponId]:getUsed() and not Citizen.InvokeNative(0x8DECB02F88F428BC, ped, weapName, 0, true) or Citizen.InvokeNative(0x30E7C16B12DA8211, joaat(weapName)) then
 		notdual = true
 	end
 
@@ -592,7 +592,6 @@ function NUIService.initiateData()
 			DoubleClickToUse = Config.DoubleClickToUse,
 			UseRolItem = Config.UseRolItem,
 			WeightMeasure = Config.WeightMeasure or "Kg",
-
 		}
 	})
 end

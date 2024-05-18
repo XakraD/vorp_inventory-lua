@@ -73,7 +73,7 @@ InventoryApiService.addComponent = function(weaponId, component)
 
         UserWeapons[weaponId]:setComponent(component)
         if UserWeapons[weaponId]:getUsed() then
-            RemoveWeaponFromPed(PlayerPedId(), joaat(UserWeapons[weaponId]:getName()), true, 0)
+            RemoveWeaponFromPed(PlayerPedId(), joaat(UserWeapons[weaponId]:getName()), true, 0) 
             UserWeapons[weaponId]:equipwep()
             UserWeapons[weaponId]:loadComponents()
         end
