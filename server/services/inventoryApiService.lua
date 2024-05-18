@@ -1102,14 +1102,13 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		return respond(cb, nil)
 	end
 
-
-
 	local function isWeaponInConfig()
 		for index, value in ipairs(SharedData.Weapons) do
-			if value.HashName == wepname then
+			if value.HashName == wepname:upper() then
 				return true
 			end
 		end
+		return false
 	end
 
 	if not isWeaponInConfig() then
