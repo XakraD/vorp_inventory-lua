@@ -315,7 +315,7 @@ function secondInventorySetup(items, info) {
 
             const custom = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
             const degradation = item.degradation ? "<br>" + LANGUAGE.labels.decay + item.degradation + "%" : "";
-            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + item.count / 4 + " " + Config.WeightMeasure;
+            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count).toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (item.count / 4).toFixed(2) + " " + Config.WeightMeasure;
             const groupKey = Object.keys(window.Actions).find(key =>
                 key !== "all" && window.Actions[key].types.includes(group)
             );
@@ -326,7 +326,7 @@ function secondInventorySetup(items, info) {
         } else {
 
             const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
-            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + item.count / 4 + " " + Config.WeightMeasure;
+            const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count).toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (item.count / 4).toFixed(2) + " " + Config.WeightMeasure;
             $("#secondInventoryElement").append(`
             <div data-label='${item.label}' data-group ='${group}'
             style='background-image: url("img/items/${item.name.toLowerCase()}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
