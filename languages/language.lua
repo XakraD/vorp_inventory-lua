@@ -70,9 +70,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Weight ",
             serial = "Serial no ",
-            Ammo = "Ammo ",
-            Limit = "Limit ",
-            Decay = "Decay ",
+            ammo = "Ammo ",
+            limit = "Limit ",
+            decay = "Decay ",
         },
 
 
@@ -167,9 +167,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Peso ",
             serial = "Número de Série ",
-            Ammo = "Munição ",
-            Limit = "Limite ",
-            Decay = "Decadência ",
+            ammo = "Munição ",
+            limit = "Limite ",
+            decay = "Decadência ",
         },
 
 
@@ -270,9 +270,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Peso ",
             serial = "Número de Série ",
-            Ammo = "Munição ",
-            Limit = "Limite ",
-            Decay = "Decadência ",
+            ammo = "Munição ",
+            limit = "Limite ",
+            decay = "Decadência ",
         },
 
 
@@ -368,9 +368,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Poids ",
             serial = "Numéro de série ",
-            Ammo = "Munition ",
-            Limit = "Limite ",
-            Decay = "Déclin ",
+            ammo = "Munition ",
+            limit = "Limite ",
+            decay = "Déclin ",
         },
 
 
@@ -464,9 +464,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Gewicht ",
             serial = "Seriennummer ",
-            Ammo = "Munition ",
-            Limit = "Limit ",
-            Decay = "Verfall ",
+            ammo = "Munition ",
+            limit = "Limit ",
+            decay = "Verfall ",
         },
 
 
@@ -563,9 +563,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Peso ",
             serial = "Número de serie ",
-            Ammo = "Munición ",
-            Limit = "Límite ",
-            Decay = "Decadencia ",
+            ammo = "Munición ",
+            limit = "Límite ",
+            decay = "Decadencia ",
         },
 
 
@@ -660,9 +660,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Peso ",
             serial = "Numero seriale ",
-            Ammo = "Munizioni ",
-            Limit = "Limite ",
-            Decay = "Decadimento ",
+            ammo = "Munizioni ",
+            limit = "Limite ",
+            decay = "Decadimento ",
         },
 
         --Web hook Language
@@ -761,9 +761,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Gewicht ",
             serial = "Serienummer ",
-            Ammo = "Munitie ",
-            Limit = "Limiet ",
-            Decay = "Verval ",
+            ammo = "Munitie ",
+            limit = "Limiet ",
+            decay = "Verval ",
         },
 
 
@@ -858,9 +858,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Vekt ",
             serial = "Serienummer ",
-            Ammo = "Ammunisjon ",
-            Limit = "Grense ",
-            Decay = "Forfall ",
+            ammo = "Ammunisjon ",
+            limit = "Grense ",
+            decay = "Forfall ",
         },
 
         --Web hook Language
@@ -953,9 +953,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Ağırlık ",
             serial = "Seri numarası ",
-            Ammo = "Cephane ",
-            Limit = "Limit ",
-            Decay = "Çürüme ",
+            ammo = "Cephane ",
+            limit = "Limit ",
+            decay = "Çürüme ",
         },
         --Web hook Language
         WebHookLang               = {
@@ -1051,9 +1051,9 @@ TranslationInv.Langs = {
         labels                    = {
             weight = "Greutate ",
             serial = "Numar de serie ",
-            Ammo = "Munitie ",
-            Limit = "Limita ",
-            Decay = "Decadere ",
+            ammo = "Munitie ",
+            limit = "Limita ",
+            decay = "Decadere ",
         },
 
         --Web hook Language
