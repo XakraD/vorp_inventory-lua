@@ -801,7 +801,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local sourceCharId = sourceCharacter.charIdentifier
 	local invCapacity = sourceCharacter.invCapacity
 	local job = sourceCharacter.job
-	local _target = tonumber(target)
+	local _target = target
 	local userWeapons = UsersWeapons.default
 	local DefaultAmount = Config.MaxItemsInInventory.Weapons
 	local weaponName = userWeapons[weaponId]:getName()
@@ -809,7 +809,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local desc = userWeapons[weaponId]:getCustomDesc()
 	local newWeight = userWeapons[weaponId]:getWeight()
 	local charname, scourceidentifier, steamname = getSourceInfo(_source)
-	local charname2, scourceidentifier2, steamname2 = getSourceInfo(target)
+	local charname2, scourceidentifier2, steamname2 = getSourceInfo(_target)
 	local notListed = false
 
 	if not desc then
@@ -828,16 +828,28 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 		end
 
 		if not notListed then
-			local itemsTotalWeight = InventoryAPI.getUserTotalCountItems(identifier, charId)
-			local sourceTotalWeaponsWeight = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId, true)
 			local sourceTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId) + 1
-			local totalInvWeight = itemsTotalWeight + sourceTotalWeaponsWeight + newWeight
-			if totalInvWeight > invCapacity or sourceTotalWeaponCount > DefaultAmount then
+			if sourceTotalWeaponCount > DefaultAmount then
 				Core.NotifyRightTip(_source, T.cantweapons, 2000)
 				return
 			end
 		end
 	end
+
+	local function canCarryWeapons()
+		local itemsTotalWeight = InventoryAPI.getUserTotalCountItems(sourceIdentifier, sourceCharId)
+		local sourceTotalWeaponsWeight = InventoryAPI.getUserTotalCountWeapons(sourceIdentifier, sourceCharId, true)
+		local totalInvWeight = itemsTotalWeight + sourceTotalWeaponsWeight + newWeight
+		if totalInvWeight > invCapacity then
+			return false
+		end
+		return true
+	end
+
+	if not canCarryWeapons() then
+		return Core.NotifyRightTip(_source, "player can carry more weapons", 2000)
+	end
+
 
 	local weaponcomps = {}
 	local weaponStatus
@@ -859,8 +871,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local components = { ["nothing"] = 0 }
 	InventoryAPI.deleteWeapon(_source, weaponId, function()
 	end)
-	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, function()
-	end, weaponId, nil, nil, nil, weaponStatus)
+	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, nil, weaponId, nil, nil, nil, weaponStatus)
 	TriggerClientEvent("vorpinventory:updateinventory", _target)
 	TriggerClientEvent("vorpinventory:updateinventory", _source)
 	TriggerClientEvent("vorpCoreClient:subWeapon", _target, weaponId)
