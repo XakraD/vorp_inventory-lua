@@ -869,8 +869,7 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	userWeapons[weaponId]:setPropietary('')
 	local ammo = { ["nothing"] = 0 }
 	local components = { ["nothing"] = 0 }
-	InventoryAPI.deleteWeapon(_source, weaponId, function()
-	end)
+	InventoryAPI.deleteWeapon(_source, weaponId)
 	InventoryAPI.registerWeapon(_source, weaponName, ammo, components, weaponcomps, nil, weaponId, nil, nil, nil, weaponStatus)
 	TriggerClientEvent("vorpinventory:updateinventory", _target)
 	TriggerClientEvent("vorpinventory:updateinventory", _source)
