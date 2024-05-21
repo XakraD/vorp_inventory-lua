@@ -1052,7 +1052,7 @@ function InventoryService.getInventory()
 end
 
 Core.Callback.Register("vorpinventory:getammoinfo", function(source, cb)
-	if not allplayersammo[_source] then
+	if not allplayersammo[source] then
 		return cb(false)
 	end
 
