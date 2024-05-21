@@ -66,9 +66,9 @@ Citizen.CreateThread(function()
         local sleep = 1000
         if not InInventory then
             local PlayerPedId = PlayerPedId()
-            local isArmed = IsPedArmed(PlayerPedId, 4)
+            local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, PlayerPedId, 4)
             local wephash = GetPedCurrentHeldWeapon(PlayerPedId)
-            local ismelee = IsWeaponMeleeWeapon(wephash)
+            local ismelee = Citizen.InvokeNative(0x959383DCD42040DA, wephash)
             if (isArmed or GetWeapontypeGroup(wephash) == 1548507267) and not ismelee then
                 local wepgroup = GetWeapontypeGroup(wephash)
                 local ammotypes = SharedData.AmmoTypes[wepgroup]
