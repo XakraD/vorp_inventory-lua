@@ -204,7 +204,7 @@ function exports.vorp_inventory:subItem(source, item, amount, metadata, callback
 ---@param source integer player id
 ---@param itemId number item id
 ---@param metadata table item metadata
----@param amount number amount of item
+---@param amount number? amount of item
 ---@param callback fun(boolean:boolean)? callback function async or sync leave nil
 function exports.vorp_inventory:setItemMetadata(source, itemId, metadata, amount, callback) end
 
