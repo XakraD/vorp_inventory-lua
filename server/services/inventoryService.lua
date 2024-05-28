@@ -990,8 +990,9 @@ end
 function InventoryService.getItemsTable()
 	local _source = source
 
-	if ServerItems ~= nil then
-		TriggerClientEvent("vorpInventory:giveItemsTable", _source, ServerItems)
+	if ServerItems then
+		local data = msgpack.pack(ServerItems)
+		TriggerClientEvent("vorpInventory:giveItemsTable", _source, data)
 	end
 end
 

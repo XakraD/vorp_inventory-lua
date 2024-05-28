@@ -144,6 +144,7 @@ end
 
 function InventoryService.processItems(items)
 	ClientItems = {}
+	local items = msgpack.unpack(items)
 	for _, item in pairs(items) do
 		ClientItems[item.item] = Item:New(item)
 	end
