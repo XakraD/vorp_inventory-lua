@@ -1318,7 +1318,7 @@ function InventoryService.canStoreItem(identifier, charIdentifier, invId, name, 
 	end
 
 	if not invData:getIgnoreItemStack() then
-		local item = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
+		local item = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, nil)
 		if item ~= nil then
 			local totalCount = item:getCount() + amount
 
@@ -1343,7 +1343,7 @@ function InventoryService.getNearbyCharacters(obj, sources)
 			}
 		else
 			characters[#characters + 1] = {
-				label = tostring(playerId), -- show server id instead of steam name
+				label = tostring(playerId),
 				player = playerId
 			}
 		end
@@ -1359,7 +1359,7 @@ function InventoryService.DoesHavePermission(invId, job, grade, Table)
 		return true
 	end
 
-	if not Table or not next(Table) then -- if empty allow anyone, by default is empty
+	if not Table or not next(Table) then
 		return true
 	end
 
@@ -1411,6 +1411,38 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 	end
 end
 
+local function CanProceed(item, amount, sourceIdentifier, sourceName)
+	if item.type == "item_weapon" then
+		if not UsersWeapons.default[item.id] then
+			print("Player: " .. sourceName .. " is trying to add weapons to a custom inventory that he does not have, possible Cheat!!")
+			return false
+		end
+		local weaponCount = 0
+		for _, weapon in pairs(UsersWeapons.default) do
+			if weapon.name == item.name then
+				weaponCount = weaponCount + 1
+			end
+		end
+		if weaponCount < amount then
+			print("Player: " .. sourceName .. " is trying to add ammount of weapons to a custom inventory that he does not have, possible Cheat!!")
+			return false
+		end
+	else
+		local inventory = UsersInventories.default[sourceIdentifier]
+		if not inventory or not inventory[item.id] then
+			print("Player: " .. sourceName .. " is trying to add items to a custom inventory that he does not have, possible Cheat!!")
+			return false
+		end
+
+		if inventory[item.id]:getCount() < amount then
+			print("Player: " .. sourceName .. " is trying to add ammount of items to a custom inventory that he does not have, possible Cheat!!")
+			return false
+		end
+	end
+
+	return true
+end
+
 function InventoryService.MoveToCustom(obj)
 	local _source = source
 	local data = json.decode(obj)
@@ -1427,39 +1459,8 @@ function InventoryService.MoveToCustom(obj)
 	local CanMove = InventoryService.DoesHavePermission(invId, job, grade, Table)
 	local IsBlackListed = InventoryService.CheckIsBlackListed(invId, string.lower(item.name)) -- lower so we can checkitems and weapons
 
-	local function CanProceed()
-		if item.type == "item_weapon" then
-			if not UsersWeapons.default[item.id] then
-				print("Player: " .. sourceName .. " is trying to add weapons to a custom inventory that he does not have, possible Cheat!!")
-				return false
-			end
-			local weaponCount = 0
-			for _, weapon in pairs(UsersWeapons.default) do
-				if weapon.name == item.name then
-					weaponCount = weaponCount + 1
-				end
-			end
-			if weaponCount < amount then
-				print("Player: " .. sourceName .. " is trying to add ammount of weapons to a custom inventory that he does not have, possible Cheat!!")
-				return false
-			end
-		else
-			local inventory = UsersInventories.default[sourceIdentifier]
-			if not inventory or not inventory[item.id] then
-				print("Player: " .. sourceName .. " is trying to add items to a custom inventory that he does not have, possible Cheat!!")
-				return false
-			end
 
-			if inventory[item.id]:getCount() < amount then
-				print("Player: " .. sourceName .. " is trying to add ammount of items to a custom inventory that he does not have, possible Cheat!!")
-				return false
-			end
-		end
-
-		return true
-	end
-
-	if not CanProceed() then
+	if not CanProceed(item, amount, sourceIdentifier, sourceName) then
 		return
 	end
 
@@ -1649,6 +1650,12 @@ function InventoryService.MoveToPlayer(obj)
 		items = "You cannot give this amount of items to this player. Limit exceeded.",
 		cooldown = "In cooldown, Player cant accept more "
 	}
+
+
+	if not CanProceed(item, amount, sourceCharacter.identifier, sourceName) then
+		return
+	end
+
 	local IsBlackListed = PlayerBlackListedItems[string.lower(item.name)]
 
 	if IsBlackListed then

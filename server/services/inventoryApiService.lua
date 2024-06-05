@@ -1662,7 +1662,7 @@ exports("openInventory", InventoryAPI.openInventory)
 
 ---close  inventory
 ---@param source number
----@param id string
+---@param id? string
 function InventoryAPI.closeInventory(source, id)
 	local _source = source
 	if id and CustomInventoryInfos[id] then
@@ -1725,7 +1725,10 @@ function InventoryAPI.openPlayerInventory(data, callback)
 	local title = data.title
 	local target = data.target
 	local source = data.source
-	local charid = Core.getUser(target).getUsedCharacter.charIdentifier
+	local _target = Core.getUser(target)
+	if not _target then return false end
+	InventoryAPI.closeInventory(target)
+	local charid = _target.getUsedCharacter.charIdentifier
 
 	PlayerBlackListedItems = data.blacklist or {}
 
