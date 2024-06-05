@@ -1,6 +1,4 @@
----@diagnostic disable: undefined-global, duplicate-set-field
 Weapon = {}
-
 Weapon.name = nil
 Weapon.label = nil
 Weapon.id = nil
@@ -42,16 +40,16 @@ local function addWeapon(weapon, slot, id)
 			slot = 1
 		end
 	end
-	local weaponHash = joaat(weapon)
-	local sHash = "SLOTID_WEAPON_" .. tostring(slot)
-	local reason = joaat("ADD_REASON_DEFAULT")
+	local weaponHash  = joaat(weapon)
+	local sHash       = "SLOTID_WEAPON_" .. tostring(slot)
+	local reason      = joaat("ADD_REASON_DEFAULT")
 	local inventoryId = 1
-	local slotHash = joaat(sHash)
-	local move = false
+	local slotHash    = joaat(sHash)
+	local move        = false
 	local playerPedId = PlayerPedId()
 
 	--Now add it to the characters inventory
-	local isValid = Citizen.InvokeNative(0x6D5D51B188333FD1, weaponHash, 0) --ItemdatabaseIsKeyValid
+	local isValid     = Citizen.InvokeNative(0x6D5D51B188333FD1, weaponHash, 0) --ItemdatabaseIsKeyValid
 	if not isValid then
 		print("Non valid weapon")
 		return false
@@ -87,8 +85,7 @@ local function addWeapon(weapon, slot, id)
 	end
 
 	local itemData = DataView.ArrayBuffer(8 * 13)
-	local isAdded = Citizen.InvokeNative(0xCB5D11F9508A928D, inventoryId, itemData:Buffer(), weaponItem:Buffer(),
-		weaponHash, slotHash, 1, reason) --Actually add the item now
+	local isAdded = Citizen.InvokeNative(0xCB5D11F9508A928D, inventoryId, itemData:Buffer(), weaponItem:Buffer(), weaponHash, slotHash, 1, reason) --Actually add the item now
 	if not isAdded then
 		print("Not added")
 		return false
@@ -129,6 +126,7 @@ function Weapon:RemoveWeaponFromPed()
 	local isWeaponOneHanded = Citizen.InvokeNative(0xD955FEE4B87AFA07, joaat(self.name))
 	local move = false
 	local playerPedId = PlayerPedId()
+	local inventoryId = 1
 
 	if isWeaponAGun and isWeaponOneHanded then
 		for k, v in pairs(equippedWeapons) do
@@ -274,18 +272,18 @@ end
 
 function Weapon:getTotalAmmoCount()
 	local count = 0
-	for _, value in pairs(self.ammo) do
+	for type, value in pairs(self.ammo) do
 		count = count + value
 	end
 	return count
 end
 
-function Weapon:setAmmo(type, amount)
+function Weapon:setAmmo(type, amount) -- not being used?
 	self.ammo[type] = tonumber(amount)
 	TriggerServerEvent("vorpinventory:setWeaponBullets", self.id, type, amount)
 end
 
-function Weapon:addAmmo(type, amount)
+function Weapon:addAmmo(type, amount) -- not being used?
 	if self.ammo[type] ~= nil then
 		self.ammo[type] = self.ammo[type] + tonumber(amount)
 	else

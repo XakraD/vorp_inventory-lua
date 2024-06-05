@@ -1,17 +1,16 @@
----@diagnostic disable: undefined-global
-local isProcessingPay = false
-local timerUse = 0
-local candrop = true
-local cangive = true
-local CanOpen = true
+local isProcessingPay     = false
+local timerUse            = 0
+local candrop             = true
+local cangive             = true
+local CanOpen             = true
 local InventoryIsDisabled = false
-local T = TranslationInv.Langs[Lang]
-local Core = exports.vorp_core:GetCore()
+local T                   = TranslationInv.Langs[Lang]
+local Core                = exports.vorp_core:GetCore()
 
-StoreSynMenu = false
-GenSynInfo = {}
-InInventory = false
-NUIService = {}
+StoreSynMenu              = false
+GenSynInfo                = {}
+InInventory               = false
+NUIService                = {}
 
 RegisterNetEvent('inv:dropstatus', function(x)
 	candrop = x
@@ -335,22 +334,22 @@ local function getGuidFromItemId(inventoryId, itemData, category, slotId)
 end
 
 local function addWardrobeInventoryItem(itemName, slotHash)
-	local itemHash = GetHashKey(itemName)
-	local addReason = GetHashKey("ADD_REASON_DEFAULT")
+	local itemHash    = joaat(itemName)
+	local addReason   = joaat("ADD_REASON_DEFAULT")
 	local inventoryId = 1
 
 	-- _ITEMDATABASE_IS_KEY_VALID
-	local isValid = Citizen.InvokeNative(0x6D5D51B188333FD1, itemHash, 0) --ItemdatabaseIsKeyValid
+	local isValid     = Citizen.InvokeNative(0x6D5D51B188333FD1, itemHash, 0) --ItemdatabaseIsKeyValid
 	if not isValid then
 		return false
 	end
 
-	local characterItem = getGuidFromItemId(inventoryId, nil, GetHashKey("CHARACTER"), 0xA1212100)
+	local characterItem = getGuidFromItemId(inventoryId, nil, joaat("CHARACTER"), 0xA1212100)
 	if not characterItem then
 		return false
 	end
 
-	local wardrobeItem = getGuidFromItemId(inventoryId, characterItem, GetHashKey("WARDROBE"), 0x3DABBFA7)
+	local wardrobeItem = getGuidFromItemId(inventoryId, characterItem, joaat("WARDROBE"), 0x3DABBFA7)
 	if not wardrobeItem then
 		return false
 	end
@@ -358,8 +357,7 @@ local function addWardrobeInventoryItem(itemName, slotHash)
 	local itemData = DataView.ArrayBuffer(8 * 13)
 
 	-- _INVENTORY_ADD_ITEM_WITH_GUID
-	local isAdded = Citizen.InvokeNative(0xCB5D11F9508A928D, inventoryId, itemData:Buffer(), wardrobeItem, itemHash,
-		slotHash, 1, addReason)
+	local isAdded = Citizen.InvokeNative(0xCB5D11F9508A928D, inventoryId, itemData:Buffer(), wardrobeItem, itemHash, slotHash, 1, addReason)
 	if not isAdded then
 		return false
 	end
@@ -395,7 +393,7 @@ local function useWeapon(data)
 		UserWeapons[weaponId]:loadComponents()
 		UserWeapons[weaponId]:setUsed(true)
 		TriggerServerEvent("syn_weapons:weaponused", data)
-	elseif not UserWeapons[weaponId]:getUsed() and not Citizen.InvokeNative(0x8DECB02F88F428BC, ped, weapName, 0, true) or Citizen.InvokeNative(0x30E7C16B12DA8211, joaat(weapName)) then
+	elseif not UserWeapons[weaponId]:getUsed() and not Citizen.InvokeNative(0x8DECB02F88F428BC, ped, weapName, 0, true) or Citizen.InvokeNative(0x30E7C16B12DA8211, weapName) then
 		notdual = true
 	end
 
@@ -500,7 +498,7 @@ function NUIService.LoadInv()
 	for _, currentWeapon in pairs(UserWeapons) do
 		local label = currentWeapon:getCustomLabel() or currentWeapon:getLabel()
 		local weapon = {}
-		weapon.count = currentWeapon:getTotalAmmoCount()
+		weapon.count = currentWeapon:getTotalAmmoCount() -- doesnt actually get anything cause nothing is adding it?
 		weapon.limit = -1
 		weapon.label = label
 		weapon.name = currentWeapon:getName()
@@ -606,7 +604,7 @@ CreateThread(function()
 
 		if not InInventory then
 			sleep = 0
-			if IsControlJustReleased(1, Config.OpenKey) and IsInputDisabled(0) then
+			if IsControlJustReleased(1, Config.OpenKey) then
 				local player = PlayerPedId()
 				local hogtied = IsPedHogtied(player) == 1
 				local cuffed = IsPedCuffed(player)
@@ -628,7 +626,7 @@ end)
 
 -- Prevent Spam
 CreateThread(function()
-	repeat Wait(1000) until LocalPlayer.state.IsInSession
+	repeat Wait(2000) until LocalPlayer.state.IsInSession
 	while true do
 		Wait(1000)
 		if timerUse > 0 then

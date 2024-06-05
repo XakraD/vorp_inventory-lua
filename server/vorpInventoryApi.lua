@@ -1,5 +1,4 @@
----@diagnostic disable: undefined-global
--- it is advised to use the exports and not these events
+---@deprecated
 exports('vorp_inventoryApi', function()
     local INV = {}
 

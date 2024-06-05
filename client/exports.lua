@@ -5,23 +5,23 @@ exports('CloseInventory', function()
 end)
 
 exports('GetWeaponDefaultWeight', function(hash)
-    return Utils.GetWeaponWeight(hash)
+    return Utils.GetWeaponDefaultWeight(hash)
 end)
 
 exports('GetWeaponDefaultDesc', function(hash)
-    return Utils.GetWeaponDesc(hash)
+    return Utils.GetWeaponDefaultDesc(hash)
 end)
 
 exports('GetWeaponDefaultLabel', function(hash)
-    return Utils.GetWeaponLabel(hash)
+    return Utils.GetWeaponDefaultLabel(hash)
 end)
 
 exports('GetWeaponName', function(hash)
     return Utils.GetWeaponName(hash)
 end)
 
-exports('GetWeaponsData', function(request)
-    return Utils.GetWeaponsData(request)
+exports('GetWeaponsDefaultData', function(request)
+    return Utils.GetWeaponsDefaultData(request)
 end)
 
 exports('GetItem', function(name)

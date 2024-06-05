@@ -87,7 +87,7 @@ function Utils.getNearestPlayers()
 	return closestPlayers
 end
 
-function Utils.GetWeaponLabel(hash)
+function Utils.GetWeaponDefaultLabel(hash)
 	for _, wp in ipairs(SharedData.Weapons) do
 		if wp.HashName == hash then
 			return wp.Name
@@ -96,7 +96,7 @@ function Utils.GetWeaponLabel(hash)
 	return hash
 end
 
-function Utils.GetWeaponDesc(hash)
+function Utils.GetWeaponDefaultDesc(hash)
 	for k, v in ipairs(SharedData.Weapons) do
 		if v.HashName == hash then
 			return v.Desc
@@ -105,7 +105,7 @@ function Utils.GetWeaponDesc(hash)
 	return hash
 end
 
-function Utils.GetWeaponWeight(hash)
+function Utils.GetWeaponDefaultWeight(hash)
 	for k, v in ipairs(SharedData.Weapons) do
 		if joaat(v.HashName) == hash then
 			return v.Weight
@@ -123,7 +123,7 @@ function Utils.GetWeaponName(hash)
 	return hash
 end
 
-function Utils.GetWeaponsData(request)
+function Utils.GetWeaponsDefaultData(request)
 	local weapons = {}
 	for _, v in ipairs(SharedData.Weapons) do
 		for _, value in ipairs(request) do
@@ -183,7 +183,7 @@ function Utils.GetLabel(hash, id)
 		end
 		return hash
 	else
-		return Utils.GetWeaponLabel(hash)
+		return Utils.GetWeaponDefaultLabel(hash)
 	end
 end
 

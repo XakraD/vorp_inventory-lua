@@ -1,11 +1,12 @@
-PickupsService = {}
-local promptGroup = GetRandomIntInRange(0, 0xffffff)
-local WorldPickups = {}
-local dropAll = false
-local lastCoords = {}
-local T = TranslationInv.Langs[Lang]
+PickupsService                        = {}
+local promptGroup                     = GetRandomIntInRange(0, 0xffffff)
+local T                               = TranslationInv.Langs[Lang]
+local WorldPickups                    = {}
+local dropAll                         = false
+local lastCoords                      = {}
 
-PickupsService.CreateObject = function(objectHash, position)
+PickupsService.CreateObject           = function(objectHash, position)
+	--TODO make it server side
 	if not HasModelLoaded(objectHash) then
 		RequestModel(objectHash, false)
 		repeat Wait(0) until HasModelLoaded(objectHash)
@@ -22,11 +23,11 @@ PickupsService.CreateObject = function(objectHash, position)
 	return entityHandle
 end
 
-PickupsService.createPickup = function(name, amount, metadata, weaponId, id)
-	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed, true, true)
-	local forward = GetEntityForwardVector(playerPed)
-	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+PickupsService.createPickup           = function(name, amount, metadata, weaponId, id)
+	local playerPed   = PlayerPedId()
+	local coords      = GetEntityCoords(playerPed, true, true)
+	local forward     = GetEntityForwardVector(playerPed)
+	local position    = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
 	local pickupModel = "P_COTTONBOX01X"
 
 	if dropAll then
@@ -46,17 +47,16 @@ PickupsService.createPickup = function(name, amount, metadata, weaponId, id)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
 end
 
-PickupsService.createMoneyPickup = function(amount)
-	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed, true, true)
-	local forward = GetEntityForwardVector(playerPed)
-	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+PickupsService.createMoneyPickup      = function(amount)
+	local playerPed   = PlayerPedId()
+	local coords      = GetEntityCoords(playerPed, true, true)
+	local forward     = GetEntityForwardVector(playerPed)
+	local position    = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
 	local pickupModel = "p_moneybag02x"
 
 	if dropAll then
 		local randomOffsetX = math.random(-35, 35)
 		local randomOffsetY = math.random(-35, 35)
-
 		position = vector3(lastCoords.x + (randomOffsetX / 10.0), lastCoords.y + (randomOffsetY / 10.0), lastCoords.z)
 	end
 
@@ -66,15 +66,15 @@ PickupsService.createMoneyPickup = function(amount)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
 end
 
-PickupsService.createGoldPickup = function(amount)
+PickupsService.createGoldPickup       = function(amount)
 	if not Config.UseGoldItem then
 		return
 	end
 
-	local playerPed = PlayerPedId()
-	local coords = GetEntityCoords(playerPed, true, true)
-	local forward = GetEntityForwardVector(playerPed)
-	local position = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	local playerPed   = PlayerPedId()
+	local coords      = GetEntityCoords(playerPed, true, true)
+	local forward     = GetEntityForwardVector(playerPed)
+	local position    = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
 	local pickupModel = "s_pickup_goldbar01x"
 
 	if dropAll then
@@ -90,7 +90,7 @@ PickupsService.createGoldPickup = function(amount)
 	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
 end
 
-PickupsService.sharePickupClient = function(data, value)
+PickupsService.sharePickupClient      = function(data, value)
 	if value == 1 then
 		if WorldPickups[data.obj] == nil then
 			local label = Utils.GetLabel(data.name, data.weaponId)
@@ -135,9 +135,6 @@ PickupsService.shareMoneyPickupClient = function(entityHandle, amount, position,
 
 			pickup.prompt:SetVisible(false)
 			WorldPickups[entityHandle] = pickup
-			if Config.Debug then
-				print('Money pickup added: ' .. tostring(pickup.name))
-			end
 		end
 	else
 		if WorldPickups[entityHandle] ~= nil then
@@ -147,7 +144,7 @@ PickupsService.shareMoneyPickupClient = function(entityHandle, amount, position,
 	end
 end
 
-PickupsService.shareGoldPickupClient = function(entityHandle, amount, position, value)
+PickupsService.shareGoldPickupClient  = function(entityHandle, amount, position, value)
 	if value == 1 then
 		if WorldPickups[entityHandle] == nil then
 			local pickup = Pickup:New({
@@ -163,9 +160,6 @@ PickupsService.shareGoldPickupClient = function(entityHandle, amount, position, 
 
 			pickup.prompt:SetVisible(false)
 			WorldPickups[entityHandle] = pickup
-			if Config.Debug then
-				print('Gold pickup added: ' .. tostring(pickup.name))
-			end
 		end
 	else
 		if WorldPickups[entityHandle] ~= nil then
@@ -175,7 +169,7 @@ PickupsService.shareGoldPickupClient = function(entityHandle, amount, position, 
 	end
 end
 
-PickupsService.removePickupClient = function(entityHandle)
+PickupsService.removePickupClient     = function(entityHandle)
 	SetEntityAsMissionEntity(entityHandle, false, true)
 	NetworkRequestControlOfEntity(entityHandle)
 
@@ -190,9 +184,9 @@ PickupsService.removePickupClient = function(entityHandle)
 	DeleteObject(entityHandle)
 end
 
-PickupsService.playerAnim = function()
+PickupsService.playerAnim             = function()
 	local playerPed = PlayerPedId()
-	local animDict = "amb_work@world_human_box_pickup@1@male_a@stand_exit_withprop"
+	local animDict  = "amb_work@world_human_box_pickup@1@male_a@stand_exit_withprop"
 	if not HasAnimDictLoaded(animDict) then
 		RequestAnimDict(animDict)
 		repeat Wait(0) until HasAnimDictLoaded(animDict)
@@ -205,14 +199,14 @@ PickupsService.playerAnim = function()
 	ClearPedTasks(playerPed)
 end
 
-PickupsService.DeadActions = function()
+PickupsService.DeadActions            = function()
 	local playerPed = PlayerPedId()
 	lastCoords = GetEntityCoords(playerPed, true, true)
 	dropAll = true
 	PickupsService.dropAllPlease()
 end
 
-PickupsService.dropAllPlease = function()
+PickupsService.dropAllPlease          = function()
 	if Config.UseClearAll then
 		return
 	end
@@ -281,7 +275,7 @@ CreateThread(function()
 		return count
 	end
 
-	repeat Wait(0) until LocalPlayer.state.IsInSession
+	repeat Wait(2000) until LocalPlayer.state.IsInSession
 
 	local pressed = false
 	while true do

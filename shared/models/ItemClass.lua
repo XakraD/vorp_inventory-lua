@@ -122,9 +122,6 @@ end
 
 function Item:quitCount(amount)
 	if not amount then
-		if Config.Debug then
-			print('[^3Item quitCount^7]^1 Error: given amount is nil^7')
-		end
 		return
 	end
 	self.count = self.count - amount

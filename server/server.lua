@@ -1,5 +1,4 @@
----@diagnostic disable: undefined-global
-local Core = exports.vorp_core:GetCore()
+local Core               = exports.vorp_core:GetCore()
 local InventoryBeingUsed = {}
 
 if Config.DevMode then
@@ -15,8 +14,7 @@ end)
 RegisterServerEvent("vorpinventory:netduplog", function()
     local _source = source
     local playername = GetPlayerName(_source)
-    local description = Logs.NetDupWebHook.Language.descriptionstart ..
-        name .. Logs.NetDupWebHook.Language.descriptionend
+    local description = Logs.NetDupWebHook.Language.descriptionstart .. playername .. Logs.NetDupWebHook.Language.descriptionend
 
     if Logs.NetDupWebHook.Active then
         Info = {
@@ -61,7 +59,8 @@ AddEventHandler('playerDropped', function()
             return
         end
 
-        local charid = char.getUsedCharacter.charIdentifier
+        local character = char.getUsedCharacter
+        local charid = character.charIdentifier
         for key, value in pairs(weapons) do
             if value.charId == charid then
                 UsersWeapons.default[key] = nil

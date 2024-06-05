@@ -1,5 +1,4 @@
----@diagnostic disable: undefined-global
-local Core = exports.vorp_core:GetCore()
+local Core           = exports.vorp_core:GetCore()
 
 ---@class SvUtils @Server Utility Service
 ---@field FindAllWeaponsByName fun(invId: string, name: string): table<number, Weapon>
@@ -11,8 +10,7 @@ local Core = exports.vorp_core:GetCore()
 ---@field InProcessing fun(id: number): boolean
 ---@field Trem fun(id: string, keepInventoryOpen: boolean)
 ---@field DoesItemExist fun(itemName:string,api:string): boolean
-SvUtils = {}
-
+SvUtils              = {}
 
 local processingUser = {}
 math.randomseed(GetGameTimer())

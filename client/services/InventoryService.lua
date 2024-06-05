@@ -68,10 +68,10 @@ function InventoryService.removeItem(name, id, count)
 	end
 end
 
-function InventoryService.receiveWeapon(id, propietary, name, ammos, label, serial_number, custom_label, source, custom_desc, weight)
+function InventoryService.receiveWeapon(id, propietary, name, ammos, label, serial_number, custom_label, source,
+										custom_desc, weight)
 	local weaponAmmo = {}
 	local desc = ""
-
 	for type, amount in pairs(ammos) do
 		weaponAmmo[type] = tonumber(amount)
 	end
@@ -83,9 +83,9 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 		end
 	end
 	if serial_number ~= "" then
-		desc = custom_desc or Utils.GetWeaponDesc(name) .. "<br><br>" .. T.serialnumber .. serial_number
+		desc = custom_desc or Utils.GetWeaponDefaultDesc(name) .. "<br><br>" .. T.serialnumber .. serial_number
 	else
-		desc = custom_desc or Utils.GetWeaponDesc(name)
+		desc = custom_desc or Utils.GetWeaponDefaultDesc(name)
 	end
 	if UserWeapons[id] == nil then
 		local newWeapon = Weapon:New({
@@ -102,7 +102,7 @@ function InventoryService.receiveWeapon(id, propietary, name, ammos, label, seri
 			serial_number = serial_number,
 			custom_label = custom_label,
 			custom_desc = custom_desc,
-			weight = weight
+			weight = weight,
 
 		})
 		UserWeapons[newWeapon:getId()] = newWeapon
@@ -144,8 +144,8 @@ end
 
 function InventoryService.processItems(items)
 	ClientItems = {}
-	local items = msgpack.unpack(items)
-	for _, item in pairs(items) do
+	local data = msgpack.unpack(items)
+	for _, item in pairs(data) do
 		ClientItems[item.item] = Item:New(item)
 	end
 end
@@ -154,7 +154,6 @@ end
 function InventoryService.getLoadout(loadout)
 	for _, weapon in pairs(loadout) do
 		local weaponAmmo = weapon.ammo
-
 		for type, amount in pairs(weaponAmmo) do
 			weaponAmmo[type] = tonumber(amount)
 		end
@@ -176,7 +175,7 @@ function InventoryService.getLoadout(loadout)
 				custom_desc = weapon.custom_desc .. serialNumber
 			end
 
-			local label = weapon.custom_label or Utils.GetWeaponLabel(weapon.name)
+			local label = weapon.custom_label or Utils.GetWeaponDefaultLabel(weapon.name)
 			local newWeapon = Weapon:New({
 				id = tonumber(weapon.id),
 				identifier = weapon.identifier,
@@ -186,14 +185,15 @@ function InventoryService.getLoadout(loadout)
 				components = weapon.components,
 				used = weaponUsed,
 				used2 = weaponUsed2,
-				desc = custom_desc or Utils.GetWeaponDesc(weapon.name) .. serialNumber,
+				desc = custom_desc or Utils.GetWeaponDefaultDesc(weapon.name) .. serialNumber,
 				currInv = weapon.curr_inv,
 				dropped = 0,
 				group = 5,
 				custom_label = weapon.custom_label,
 				serial_number = weapon.serial_number,
 				custom_desc = custom_desc,
-				weight = weapon.weight,
+				weight = weapon.weight
+
 			})
 			UserWeapons[newWeapon:getId()] = newWeapon
 

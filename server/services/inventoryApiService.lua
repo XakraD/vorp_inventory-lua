@@ -1,8 +1,8 @@
----@diagnostic disable: undefined-field
 ---@class InventoryAPI @Inventory API
-InventoryAPI = {}
-local T = TranslationInv.Langs[Lang]
-local Core = exports.vorp_core:GetCore()
+InventoryAPI         = {}
+
+local T              = TranslationInv.Langs[Lang]
+local Core           = exports.vorp_core:GetCore()
 
 ---@class CustomInventoryInfos @Custom Inventory Infos
 ---@field id string
@@ -42,12 +42,12 @@ CustomInventoryInfos = {
 
 ---@type table<string,function> table of Registered items
 UsableItemsFunctions = {}
-PlayerItemsLimit = {}
-CoolDownStarted = {}
-allplayersammo = {}
+PlayerItemsLimit     = {}
+CoolDownStarted      = {}
+allplayersammo       = {}
 
 ---@type table<string, table<number, table<number, Item>>> contain users inventory items
-UsersInventories = { default = {} }
+UsersInventories     = { default = {} }
 
 --- sync or async helper
 local function respond(cb, result)
@@ -406,7 +406,7 @@ function InventoryAPI.addItem(player, name, amount, metadata, cb, allow)
 		return respond(cb, true)
 	end
 
-	DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, function(craftedItem)
+	DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, name, function(craftedItem)
 		item = Item:New({
 			id = craftedItem.id,
 			count = amount,
@@ -631,7 +631,7 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 		item:quitCount(amountRemove)
 		DBService.SetItemAmount(charId, item.id, item:getCount())
 		TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
-		DBService.CreateItem(charId, ServerItems[item.name].id, amount or 1, metadata, function(craftedItem)
+		DBService.CreateItem(charId, ServerItems[item.name].id, amountRemove, metadata, item:getName(), function(craftedItem)
 			item = Item:New(
 				{
 					id = craftedItem.id,

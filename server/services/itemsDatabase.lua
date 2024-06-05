@@ -1,9 +1,10 @@
-local Core = exports.vorp_core:GetCore()
-ServerItems = {}
+local Core   = exports.vorp_core:GetCore()
+ServerItems  = {}
 UsersWeapons = { default = {} }
 
+-- temporary just to assing serial numbers to old weapons and labels will be removed eventually
 MySQL.ready(function()
-	DBService.queryAsync('SELECT * FROM loadout', {},
+	DBService.queryAsync('SELECT name,id,label,serial_number FROM loadout', {},
 		function(result)
 			if next(result) then
 				for _, db_weapon in pairs(result) do

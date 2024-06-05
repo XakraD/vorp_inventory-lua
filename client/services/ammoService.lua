@@ -1,6 +1,6 @@
-local playerammoinfo = {}
+local playerammoinfo   = {}
 local updatedAmmoCache = {}
-local Core = exports.vorp_core:GetCore()
+local Core             = exports.vorp_core:GetCore()
 
 local function addAmmoToPed(ammoData)
     for ammoType, ammo in pairs(ammoData) do
@@ -60,7 +60,7 @@ end)
 
 -- AMMO SAVING THREAD
 Citizen.CreateThread(function()
-    repeat Wait(1000) until LocalPlayer.state.IsInSession
+    repeat Wait(2000) until LocalPlayer.state.IsInSession
 
     while true do
         local sleep = 1000
@@ -116,7 +116,7 @@ end)
 
 -- AMMO UPDATE THREAD
 Citizen.CreateThread(function()
-    repeat Wait(1000) until LocalPlayer.state.IsInSession
+    repeat Wait(2000) until LocalPlayer.state.IsInSession
     while true do
         if ammoupdate then
             if next(updatedAmmoCache) ~= nil then
