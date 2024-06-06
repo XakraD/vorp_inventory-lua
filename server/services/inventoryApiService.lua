@@ -1,8 +1,8 @@
----@class InventoryAPI @Inventory API
-InventoryAPI         = {}
-
 local T              = TranslationInv.Langs[Lang]
 local Core           = exports.vorp_core:GetCore()
+
+---@class InventoryAPI
+InventoryAPI         = {}
 
 ---@class CustomInventoryInfos @Custom Inventory Infos
 ---@field id string
@@ -20,6 +20,7 @@ local Core           = exports.vorp_core:GetCore()
 ---@field BlackListItems table<string, string>
 ---@field whitelistWeapons boolean
 ---@field limitedWeapons table<string, integer>
+---@field webhook string | boolean
 CustomInventoryInfos = {
 	default = {
 		id = "default",
@@ -35,7 +36,8 @@ CustomInventoryInfos = {
 		UseBlackList = false,
 		BlackListItems = {},
 		whitelistWeapons = false,
-		limitedWeapons = {}
+		limitedWeapons = {},
+		webook = false,
 		--TODO: Add parameter to use contaner with weight
 	}
 }
@@ -44,8 +46,7 @@ CustomInventoryInfos = {
 UsableItemsFunctions = {}
 PlayerItemsLimit     = {}
 CoolDownStarted      = {}
-allplayersammo       = {}
-
+AmmoData             = {}
 ---@type table<string, table<number, table<number, Item>>> contain users inventory items
 UsersInventories     = { default = {} }
 
@@ -57,34 +58,28 @@ local function respond(cb, result)
 	return result
 end
 
-
---- check can carry item or weapon in inventory
----@param player number source
----@param amount number amount of items
----@param cb fun(canCarry: boolean)? async or sync callback
+---@deprecated
 function InventoryAPI.canCarryAmountItem(player, amount, cb)
 	local _source = player
-	local sourceCharacter = Core.getUser(_source).getUsedCharacter
-	local identifier = sourceCharacter.identifier
-	local charid = sourceCharacter.charIdentifier
-	local limit = sourceCharacter.invCapacity
-	local userInventory = UsersInventories.default[identifier]
+	local character = Core.getUser(_source)
+	if not character then return respond(cb, false) end
+	character = character.getUsedCharacter
+	local userInventory = UsersInventories.default[character.identifier]
 
 	if not userInventory then
 		return respond(cb, false)
 	end
+
 	local function cancarryammount()
-		local totalAmount = InventoryAPI.getUserTotalCountItems(identifier, charid)
-		local totalAmountWeapons = InventoryAPI.getUserTotalCountWeapons(identifier, charid, true)
-		return limit ~= -1 and totalAmount + totalAmountWeapons <= limit
+		local totalAmount = InventoryAPI.getUserTotalCountItems(character.identifier, character.charIdentifier)
+		local totalAmountWeapons = InventoryAPI.getUserTotalCountWeapons(character.identifier, character.charIdentifier, true)
+		return character.invCapacity ~= -1 and totalAmount + totalAmountWeapons <= character.invCapacity
 	end
 
-	local canCarry = cancarryammount()
-	return respond(cb, canCarry)
+	return respond(cb, cancarryammount())
 end
 
 exports("canCarryItems", InventoryAPI.canCarryAmountItem)
-
 
 ---check limit of item
 ---@param target number source
@@ -114,7 +109,6 @@ function InventoryAPI.canCarryItem(target, itemName, amount, cb)
 	end
 
 	local character = user.getUsedCharacter
-	local invLimit = character.invCapacity
 	local svItem = ServerItems[itemName]
 	local canCarry = false
 
@@ -123,7 +117,7 @@ function InventoryAPI.canCarryItem(target, itemName, amount, cb)
 	end
 
 	if svItem.limit ~= -1 and not exceedsItemLimit(character.identifier, svItem.limit) then
-		canCarry = not exceedsInvLimit(character.identifier, character.charIdentifier, invLimit, svItem.weight)
+		canCarry = not exceedsInvLimit(character.identifier, character.charIdentifier, character.invCapacity, svItem.weight)
 	elseif svItem.limit == -1 then
 		canCarry = true
 	end
@@ -829,9 +823,9 @@ function InventoryAPI.removeAllUserAmmo(player, cb)
 		return respond(cb, nil)
 	end
 	sourceCharacter = sourceCharacter.getUsedCharacter
-	allplayersammo[_source].ammo = {}
-	TriggerClientEvent("vorpinventory:updateuiammocount", _source, allplayersammo[_source].ammo)
-	TriggerClientEvent("vorpinventory:recammo", _source, allplayersammo[_source])
+	AmmoData[_source].ammo = {}
+	TriggerClientEvent("vorpinventory:updateuiammocount", _source, AmmoData[_source].ammo)
+	TriggerClientEvent("vorpinventory:recammo", _source, AmmoData[_source])
 	local params = { charId = sourceCharacter.charIdentifier, ammo = json.encode({}) }
 	DBService.updateAsync('UPDATE characters SET ammo = @ammo WHERE charidentifier = @charId', params)
 	return respond(cb, true)
@@ -849,7 +843,7 @@ function InventoryAPI.getUserAmmo(player, cb)
 	if not sourceCharacter then
 		return respond(cb, nil)
 	end
-	local ammo = allplayersammo[_source].ammo
+	local ammo = AmmoData[_source].ammo
 	if not ammo then
 		return respond(cb, nil)
 	end
@@ -873,7 +867,7 @@ function InventoryAPI.addBullets(player, bulletType, amount, cb)
 	end
 	sourceCharacter = sourceCharacter.getUsedCharacter
 	local charidentifier = sourceCharacter.charIdentifier
-	local ammo = allplayersammo[_source].ammo
+	local ammo = AmmoData[_source].ammo
 
 	if ammo and ammo[bulletType] then
 		ammo[bulletType] = tonumber(ammo[bulletType]) + amount
@@ -881,10 +875,10 @@ function InventoryAPI.addBullets(player, bulletType, amount, cb)
 		ammo[bulletType] = amount
 	end
 
-	allplayersammo[_source].ammo = ammo
-	TriggerClientEvent("vorpinventory:updateuiammocount", _source, allplayersammo[_source].ammo)
+	AmmoData[_source].ammo = ammo
+	TriggerClientEvent("vorpinventory:updateuiammocount", _source, AmmoData[_source].ammo)
 	TriggerClientEvent("vorpCoreClient:addBullets", _source, bulletType, ammo[bulletType])
-	TriggerClientEvent("vorpinventory:recammo", _source, allplayersammo[_source])
+	TriggerClientEvent("vorpinventory:recammo", _source, AmmoData[_source])
 	local query1 = 'UPDATE characters SET ammo = @ammo WHERE charidentifier = @charidentifier'
 	local params1 = { charidentifier = charidentifier, ammo = json.encode(ammo) }
 	DBService.updateAsync(query1, params1)
@@ -914,7 +908,7 @@ function InventoryAPI.subBullets(weaponId, bulletType, amount, cb)
 		if userWeapons:getPropietary() == identifier then
 			userWeapons:subAmmo(bulletType, amount)
 			TriggerClientEvent("vorpCoreClient:subBullets", _source, bulletType, amount)
-			TriggerClientEvent("vorpinventory:updateuiammocount", _source, allplayersammo[_source].ammo)
+			TriggerClientEvent("vorpinventory:updateuiammocount", _source, AmmoData[_source].ammo)
 			return respond(cb, true)
 		end
 	end
@@ -1395,9 +1389,9 @@ function InventoryAPI.registerInventory(data)
 	if CustomInventoryInfos[data.id] then
 		return
 	end
-
 	local newInventory = CustomInventoryAPI:New(data)
 	newInventory:Register()
+	return newInventory
 end
 
 exports("registerInventory", InventoryAPI.registerInventory)

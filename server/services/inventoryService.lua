@@ -1050,21 +1050,21 @@ function InventoryService.getInventory()
 end
 
 Core.Callback.Register("vorpinventory:getammoinfo", function(source, cb)
-	if not allplayersammo[source] then
+	if not AmmoData[source] then
 		return cb(false)
 	end
 
-	cb(allplayersammo[source])
+	cb(AmmoData[source])
 end)
 
 -- give ammo to player
 function InventoryService.serverGiveAmmo(ammotype, amount, target, maxcount)
 	local _source = source
-	local player1ammo = allplayersammo[_source].ammo[ammotype]
-	local player2ammo = allplayersammo[target].ammo[ammotype]
+	local player1ammo = AmmoData[_source].ammo[ammotype]
+	local player2ammo = AmmoData[target].ammo[ammotype]
 
 	if player2ammo == nil then
-		allplayersammo[target].ammo[ammotype] = 0
+		AmmoData[target].ammo[ammotype] = 0
 	end
 
 	if player1ammo == nil or player2ammo == nil then
@@ -1083,28 +1083,28 @@ function InventoryService.serverGiveAmmo(ammotype, amount, target, maxcount)
 		return
 	end
 
-	allplayersammo[_source].ammo[ammotype] = allplayersammo[_source].ammo[ammotype] - amount
-	allplayersammo[target].ammo[ammotype] = allplayersammo[target].ammo[ammotype] + amount
-	local charidentifier = allplayersammo[_source].charidentifier
-	local charidentifier2 = allplayersammo[target].charidentifier
+	AmmoData[_source].ammo[ammotype] = AmmoData[_source].ammo[ammotype] - amount
+	AmmoData[target].ammo[ammotype] = AmmoData[target].ammo[ammotype] + amount
+	local charidentifier = AmmoData[_source].charidentifier
+	local charidentifier2 = AmmoData[target].charidentifier
 
 	local query = "UPDATE characters Set ammo=@ammo WHERE charidentifier=@charidentifier"
-	local params = { charidentifier = charidentifier, ammo = json.encode(allplayersammo[_source].ammo) }
-	local params2 = { charidentifier = charidentifier2, ammo = json.encode(allplayersammo[target].ammo) }
+	local params = { charidentifier = charidentifier, ammo = json.encode(AmmoData[_source].ammo) }
+	local params2 = { charidentifier = charidentifier2, ammo = json.encode(AmmoData[target].ammo) }
 	DBService.updateAsync(query, params, function(r) end)
 	DBService.updateAsync(query, params2, function(r) end)
 
-	TriggerClientEvent("vorpinventory:updateuiammocount", _source, allplayersammo[_source].ammo)
-	TriggerClientEvent("vorpinventory:updateuiammocount", target, allplayersammo[target].ammo)
-	TriggerClientEvent("vorpinventory:setammotoped", _source, allplayersammo[_source].ammo)
-	TriggerClientEvent("vorpinventory:setammotoped", target, allplayersammo[target].ammo)
+	TriggerClientEvent("vorpinventory:updateuiammocount", _source, AmmoData[_source].ammo)
+	TriggerClientEvent("vorpinventory:updateuiammocount", target, AmmoData[target].ammo)
+	TriggerClientEvent("vorpinventory:setammotoped", _source, AmmoData[_source].ammo)
+	TriggerClientEvent("vorpinventory:setammotoped", target, AmmoData[target].ammo)
 	-- notify
 	Core.NotifyRightTip(_source, T.transferedammo .. SharedData.AmmoLabels[ammotype] .. " : " .. amount, 2000)
 	Core.NotifyRightTip(target, T.recammo .. SharedData.AmmoLabels[ammotype] .. " : " .. amount, 2000)
 	TriggerClientEvent("vorp_inventory:ProcessingReady", _source)
 	-- update players client side
-	TriggerClientEvent("vorpinventory:recammo", _source, allplayersammo[_source])
-	TriggerClientEvent("vorpinventory:recammo", target, allplayersammo[target])
+	TriggerClientEvent("vorpinventory:recammo", _source, AmmoData[_source])
+	TriggerClientEvent("vorpinventory:recammo", target, AmmoData[target])
 end
 
 function InventoryService.updateAmmo(ammoinfo)
@@ -1113,7 +1113,7 @@ function InventoryService.updateAmmo(ammoinfo)
 	local params = { charidentifier = ammoinfo.charidentifier, ammo = json.encode(ammoinfo.ammo) }
 	DBService.updateAsync(query, params, function(result)
 		if result then
-			allplayersammo[_source] = ammoinfo
+			AmmoData[_source] = ammoinfo
 		end
 	end)
 end
@@ -1127,7 +1127,7 @@ function InventoryService.LoadAllAmmo()
 	DBService.queryAsync(query, params, function(result)
 		if result[1] then
 			local ammo = json.decode(result[1].ammo)
-			allplayersammo[_source] = { charidentifier = charidentifier, ammo = ammo }
+			AmmoData[_source] = { charidentifier = charidentifier, ammo = ammo }
 			if next(ammo) then
 				for k, v in pairs(ammo) do
 					local ammocount = tonumber(v)
@@ -1136,7 +1136,7 @@ function InventoryService.LoadAllAmmo()
 					end
 				end
 				-- update players client side
-				TriggerClientEvent("vorpinventory:recammo", _source, allplayersammo[_source])
+				TriggerClientEvent("vorpinventory:recammo", _source, AmmoData[_source])
 			end
 		end
 	end)
@@ -1397,15 +1397,15 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 	local footerlogo = Logs.WebHook.cusfooterlogo
 	local avatar = Logs.WebHook.cusavatar
 	local names = Logs.WebHook.cuswebhookname
-
+	local webhook = CustomInventoryInfos[inventory]:getWebhook()
 	if type == "Move" then
-		local webhook = Logs.WebHook.CustomInventoryMoveTo
+		webhook = webhook or Logs.WebHook.CustomInventoryMoveTo
 		local description = "**Player:**`" .. playerName .. "`\n **Moved to:** `" .. inventory .. "` \n**Weapon** `" .. itemName .. "`\n **Count:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end
 
 	if type == "Take" then
-		local webhook = Logs.WebHook.CustomInventoryTakeFrom
+		webhook = webhook or Logs.WebHook.CustomInventoryTakeFrom
 		local description = "**Player:**`" .. playerName .. "`\n **Took from:** `" .. inventory .. "`\n **item** `" .. itemName .. "`\n **amount:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end

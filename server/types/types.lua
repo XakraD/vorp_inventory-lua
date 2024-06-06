@@ -2,14 +2,6 @@
 ---@meta
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
---- check inventory limit
----@param source integer player id
----@param amount number amount of item
----@param callback fun(canCarry:boolean)?  callback function async or sync leave nil
----@return boolean
-function exports.vorp_inventory:canCarryItems(source, amount, callback) end
-
---- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- checks item limit
 ---@param source integer player id
 ---@param item string item name
@@ -264,7 +256,8 @@ function exports.vorp_inventory:subWeapon(source, weaponId, callback) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- register custom inventory
----@param data { id:string, name:string, limit:number, acceptWeapons:boolean, shared:boolean, ignoreItemStackLimit:boolean, whitelistItems:boolean, UsePermissions:boolean, UseBlackList:boolean, whitelistWeapons:boolean }
+---@param data { id:string, name:string, limit:number, acceptWeapons:boolean, shared:boolean, ignoreItemStackLimit:boolean, whitelistItems:boolean, UsePermissions:boolean, UseBlackList:boolean, whitelistWeapons:boolean,webhook:string }
+---@return table methods to interact with the inventory
 function exports.vorp_inventory:registerInventory(data) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
