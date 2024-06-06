@@ -369,7 +369,6 @@ function giveGetHowManyGold() {
 }
 
 function closeInventory() {
-    // need to close tool tip 
     $('.tooltip').remove();
     $.post(`https://${GetParentResourceName()}/NUIFocusOff`, JSON.stringify({}));
     isOpen = false;

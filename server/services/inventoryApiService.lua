@@ -926,8 +926,8 @@ exports("subBullets", InventoryAPI.subBullets)
 --- can carry ammount of weapons
 ---@param player number source
 ---@param amount number amount to check
----@param weaponName string|number? weapon name not neccesary but allows to check if weapon is in the list of not weapons
 ---@param cb fun(success: boolean)?   async or sync callback
+---@param weaponName string|number weapon name not neccesary but allows to check if weapon is in the list of not weapons
 ---@return boolean
 function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	local _source = player
@@ -936,10 +936,10 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	if not sourceCharacter then
 		return respond(cb, false)
 	end
-	-- suport for hash not only names
+
 	local function getWeaponNameFromHash()
 		if weaponName and type(weaponName) == "number" then
-			for name, value in ipairs(SharedData.Weapons) do
+			for _, value in ipairs(SharedData.Weapons) do
 				if joaat(value.HashName) == weaponName then
 					return value.HashName
 				end
@@ -1115,27 +1115,12 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		return respond(cb, nil)
 	end
 
-	local function isInventryFull(targetIdentifier, targetCharId, targetCharacter)
-		local weaponWeight = SvUtils.GetWeaponWeight(wepname)
-		local itemsTotalWeight = InventoryAPI.getUserTotalCountItems(targetIdentifier, targetCharId)
-		local weaponsTotalWeight = InventoryAPI.getUserTotalCountWeapons(targetIdentifier, targetCharId, true)
-		if (itemsTotalWeight + weaponsTotalWeight + weaponWeight) > targetCharacter.invCapacity then
-			Core.NotifyRightTip(_target, T.cantweapons, 2000)
-			return true
-		end
-		return false
-	end
-
 	local targetCharacter = targetUser.getUsedCharacter
 	local targetIdentifier = targetCharacter.identifier
 	local targetCharId = targetCharacter.charIdentifier
-	local job = targetCharacter.job
 	local name = wepname:upper()
 	local ammo = {}
 	local component = {}
-	local DefaultAmount = Config.MaxItemsInInventory.Weapons
-
-	local notListed = false
 
 	local _comps = comps or {}
 	local _status = status or { 
@@ -1151,30 +1136,6 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 
 	if components and not components.nothing and not comps then
 		_comps = components
-	end
-
-	if Config.JobsAllowed[job] then
-		DefaultAmount = Config.JobsAllowed[job]
-	end
-
-	if DefaultAmount ~= 0 then
-		if name then
-			if SharedUtils.IsValueInArray(name, Config.notweapons) then
-				notListed = true
-			end
-		end
-		-- look for weight
-		if isInventryFull(targetIdentifier, targetCharId, targetCharacter) then
-			return respond(cb, nil)
-		end
-
-		if not notListed then
-			local targetTotalWeaponCount = InventoryAPI.getUserTotalCountWeapons(targetIdentifier, targetCharId) + 1
-			if targetTotalWeaponCount > DefaultAmount then
-				Core.NotifyRightTip(_target, T.cantweapons2, 2000)
-				return respond(cb, nil)
-			end
-		end
 	end
 
 	if ammos then

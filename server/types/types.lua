@@ -22,7 +22,7 @@ function exports.vorp_inventory:canCarryItem(source, item, amount, callback) end
 --- can carry weapons
 ---@param source integer player id
 ---@param amount number amount of weapons
----@param weaponName string | number? weapon name or hash not neccesary but allows to check if weapon is in the list of not weapons
+---@param weaponName string | number weapon name or hash names needs to be passed to allow inv weight check
 ---@param callback fun(canCarry: boolean)? callback function async or sync leave nil
 ---@return boolean
 function exports.vorp_inventory:canCarryWeapons(source, amount, callback, weaponName) end
