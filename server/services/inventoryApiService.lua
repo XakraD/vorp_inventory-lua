@@ -58,7 +58,7 @@ local function respond(cb, result)
 	return result
 end
 
----@deprecated
+---private function to check if item exist
 function InventoryAPI.canCarryAmountItem(player, amount, cb)
 	local _source = player
 	local character = Core.getUser(_source)

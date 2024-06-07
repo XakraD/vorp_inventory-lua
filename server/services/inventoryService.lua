@@ -1203,8 +1203,8 @@ function InventoryService.reloadInventory(player, id, type, source)
 		end
 	elseif type == "player" then
 		userInventory = UsersInventories.default[sourceIdentifier]
-		for weaponId, weapon in pairs(UsersWeapons[id]) do
-			if weapon.charId == sourceCharIdentifier then
+		for weaponId, weapon in pairs(UsersWeapons.default) do
+			if weapon.charId == sourceCharIdentifier and weapon:getPropietary() == sourceIdentifier then
 				itemList[#itemList + 1] = Item:New({
 					id            = weaponId,
 					count         = 1,
@@ -1217,6 +1217,7 @@ function InventoryService.reloadInventory(player, id, type, source)
 					serial_number = weapon.serial_number,
 					custom_label  = weapon.custom_label,
 					custom_desc   = weapon.custom_desc,
+					weight        = weapon.weight,
 				})
 			end
 		end
