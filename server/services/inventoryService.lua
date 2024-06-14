@@ -930,6 +930,8 @@ function InventoryService.GiveItem(itemId, amount, target)
 	local function updateClient(addedItem)
 		TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, addedItem:getId(), amount, item:getMetadata())
 		TriggerClientEvent("vorpInventory:removeItem", _source, itemName, item:getId(), amount)
+		local data = { name = itemName, id = item:getId(), metadata = item:getMetadata() }
+		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		if item:getCount() - amount <= 0 then
 			DBService.DeleteItem(charid, item:getId())
 			sourceInventory[item:getId()] = nil

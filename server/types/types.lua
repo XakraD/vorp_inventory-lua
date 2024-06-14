@@ -195,7 +195,7 @@ function exports.vorp_inventory:subItem(source, item, amount, metadata, callback
 --- set item metadata
 ---@param source integer player id
 ---@param itemId number item id
----@param metadata table item metadata
+---@param metadata table `{ description:string?, image:string?}` **description** and **image** are reserved keys if they are not defined they will be ignored, image is the image name to apply
 ---@param amount number? amount of item
 ---@param callback fun(boolean:boolean)? callback function async or sync leave nil
 function exports.vorp_inventory:setItemMetadata(source, itemId, metadata, amount, callback) end
