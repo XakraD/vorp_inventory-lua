@@ -17,6 +17,11 @@ local function contains(arr, element)
     return false
 end
 
+
+RegisterNetEvent("vorpinventory:recammo", function(ammoData)
+    playerammoinfo.ammo = ammoData.ammo
+end)
+
 RegisterNetEvent("vorpinventory:loaded", function()
     SendNUIMessage({
         action = "reclabels",
