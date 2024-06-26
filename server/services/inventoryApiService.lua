@@ -15,6 +15,8 @@ InventoryAPI         = {}
 ---@field ignoreItemStackLimit boolean
 ---@field PermissionTakeFrom table<string, integer>
 ---@field PermissionMoveTo table<string, integer>
+---@field CharIdPermissionTakeFrom table<number, boolean>
+---@field CharIdPermissionMoveTo table<number, boolean>
 ---@field UsePermissions boolean
 ---@field UseBlackList boolean
 ---@field BlackListItems table<string, string>
@@ -32,6 +34,8 @@ CustomInventoryInfos = {
 		whitelistItems = false,
 		PermissionTakeFrom = {},
 		PermissionMoveTo = {},
+		CharIdPermissionTakeFrom = {},
+		CharIdPermissionMoveTo = {},
 		UsePermissions = false,
 		UseBlackList = false,
 		BlackListItems = {},
@@ -1396,7 +1400,7 @@ end
 
 exports("registerInventory", InventoryAPI.registerInventory)
 
-local function canContinue(id, jobName, grade)
+local function canContinue(id, jobName, grade, charid)
 	if not CustomInventoryInfos[id] then
 		return false
 	end
@@ -1405,13 +1409,13 @@ local function canContinue(id, jobName, grade)
 		return false
 	end
 
-	if not jobName and not grade then
+	if not jobName and not grade and not charid then
 		return false
 	end
 
 	return true
 end
---- add permissions to move items to custom inventory
+--- *add permissions to move items to custom inventory by jobs or an charids
 ---@param id string inventory id
 ---@param jobName string job name
 ---@param grade number job grade
@@ -1425,7 +1429,7 @@ end
 
 exports("AddPermissionMoveToCustom", InventoryAPI.AddPermissionMoveToCustom)
 
---- * add permissions to take items from custom inventory
+--- * add permissions to take items from custom inventory by jobs or an charids
 ---@param id string inventory id
 ---@param jobName string job name
 ---@param grade number job grade
@@ -1439,6 +1443,38 @@ function InventoryAPI.AddPermissionTakeFromCustom(id, jobName, grade)
 end
 
 exports("AddPermissionTakeFromCustom", InventoryAPI.AddPermissionTakeFromCustom)
+
+
+
+--- * add permissions to move items to custom inventory by char ids the state allows to remove or update temp permissions like false or true
+---@param id string inventory id
+---@param charid string charid
+---@param state boolean | nil
+function InventoryAPI.AddCharIdPermissionMoveToCustom(id, charid, state)
+	if canContinue(id, false, false, charid) then
+		return
+	end
+
+	local data = { name = charid, state = state }
+	CustomInventoryInfos[id]:AddCharIdPermissionMoveTo(data)
+end
+
+exports("AddCharIdPermissionMoveToCustom", InventoryAPI.AddCharIdPermissionMoveToCustom)
+
+--- * add permissions to take items from custom inventory by char ids the state allows to remove or update temp permissions like false or true
+---@param id string inventory id
+---@param charid string charid
+---@param state boolean | nil
+function InventoryAPI.AddCharIdPermissionTakeFromCustom(id, charid, state)
+	if canContinue(id, false, false, charid) then
+		return
+	end
+
+	local data = { charid = charid, state = state }
+	CustomInventoryInfos[id]:AddCharIdPermissionTakeFrom(data)
+end
+
+exports("AddCharIdPermissionTakeFromCustom", InventoryAPI.AddCharIdPermissionTakeFromCustom)
 
 --- Black list weapons or items
 ---@param id string inventory id
