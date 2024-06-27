@@ -920,8 +920,8 @@ function InventoryService.GiveItem(itemId, amount, target)
 		return
 	end
 
-	local charname, scourceidentifier, steamname = getSourceInfo(_source)
-	local charname2, scourceidentifier2, steamname2 = getSourceInfo(_target)
+	local charname, _, steamname = getSourceInfo(_source)
+	local charname2, _, steamname2 = getSourceInfo(_target)
 	local title = T.gaveitem
 	local description = "**" .. T.WebHookLang.amount .. "**: `" .. amount .. "`\n **" .. T.WebHookLang.item .. "** : `" .. itemName .. "`" .. "\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "` \n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "` \n**" .. T.to .. "** `" .. charname2 .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname2 .. "` \n"
 	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorgiveitem }
@@ -978,6 +978,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 			})
 			targetInventory[craftedItem.id] = targetItem
 			updateClient(targetItem)
+			TriggerEvent("vorp_inventory:Server:OnItemCreated", targetItem, _target)
 		end)
 	end
 
