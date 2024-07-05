@@ -1074,6 +1074,9 @@ exports("getWeaponComponents", InventoryAPI.getcomps)
 ---@return nil | boolean
 function InventoryAPI.deleteWeapon(player, weaponid, cb)
 	local userWeapons = UsersWeapons.default
+	if not userWeapons[weaponid] then
+		return respond(cb, false)
+	end
 	userWeapons[weaponid]:setPropietary('')
 	local query = 'DELETE FROM loadout WHERE id = @id'
 	local params = { id = weaponid }
@@ -1772,3 +1775,141 @@ function InventoryAPI.openPlayerInventory(data, callback)
 end
 
 exports("openPlayerInventory", InventoryAPI.openPlayerInventory)
+
+local function getTotalAmmountInCustomInventory(id, amount)
+	local currentWeaponsAmount = DBService.GetTotalWeaponsInCustomInventory(id)
+	local currentItemsAmount = DBService.GetTotalItemsInCustomInventory(id)
+	local total = amount + currentWeaponsAmount + currentItemsAmount
+	return total
+end
+
+-- add items to custom inventory
+---@param id string inventory id
+---@param items table items
+---@param charid number charidentifier of the owner of the storage if custom inv is not shared , if its shared can be any characteridentifer
+---@param callback fun(success: boolean)? async or sync callback
+function InventoryAPI.addItemsToCustomInventory(id, items, charid, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if not charid or charid == 0 then
+		local msg = "InventoryAPI.addItemsToCustomInventory: charid is not valid %s"
+		print((msg):format(id))
+		return respond(callback, false)
+	end
+
+	if type(items) ~= "table" then
+		print("InventoryAPI.addItemsToCustomInventory: items must be a table")
+		return respond(callback, false)
+	end
+
+	local totalAmount = 0
+	for index, value in ipairs(items) do
+		local item = ServerItems[value.name]
+		if not item then
+			print(("item %s dont exist, this request was cancelled make sure to add the items to database items table"):format(value.name))
+			return respond(callback, false)
+		end
+		totalAmount = totalAmount + value.amount
+	end
+
+	local total = getTotalAmmountInCustomInventory(id, totalAmount)
+	if total > CustomInventoryInfos[id]:getLimit() then
+		print("InventoryAPI.addItemsToCustomInventory: total amount is greater than inventory limit, cannot add items to this inv")
+		return respond(callback, false)
+	end
+
+	InventoryService.addItemsToCustomInventory(id, items, charid)
+
+	return respond(callback, true)
+end
+
+exports("addItemsToCustomInventory", InventoryAPI.addItemsToCustomInventory)
+
+-- add weapons to custom inventory
+---@param id string inventory id
+---@param weapons table weapons
+---@param charid number charidentifier of the owner of the storage if custom inv is not shared , if its shared can be any characteridentifer
+---@param callback fun(success: boolean)? async or sync callback
+function InventoryAPI.addWeaponsToCustomInventory(id, weapons, charid, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	--is this inv allowed to add weapons ?
+	if not CustomInventoryInfos[id]:doesAcceptWeapons() then
+		print("InventoryAPI.addWeaponsToCustomInventory: this inventory does not accept weapons, change the settings in the registerCustomInventory export")
+		--return respond(callback, false)
+	end
+
+	if not charid or charid == 0 then
+		local msg = "InventoryAPI.addWeaponsToCustomInventory: charid is not valid %s"
+		print((msg):format(id))
+		return respond(callback, false)
+	end
+
+	if type(weapons) ~= "table" then
+		print("InventoryAPI.addWeaponsToCustomInventory: weapons must be a table")
+		return respond(callback, false)
+	end
+
+	if getTotalAmmountInCustomInventory(id, #weapons) > CustomInventoryInfos[id]:getLimit() then
+		print("InventoryAPI.addWeaponsToCustomInventory: total amount is greater than inventory limit, cannot add weapons to this inv")
+		return respond(callback, false)
+	end
+
+	InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
+
+	return respond(callback, true)
+end
+
+exports("addWeaponsToCustomInventory", InventoryAPI.addWeaponsToCustomInventory)
+
+function InventoryAPI.GetTotalOfItemInCustomInventory(id, item_name)
+	local result = MySQL.query.await("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
+	if result[1] and result[1].total_amount then
+		return result[1].total_amount
+	end
+	return 0
+end
+
+exports('GetTotalOfItemInCustomInventory', InventoryAPI.GetTotalOfItemInCustomInventory)
+
+
+function InventoryAPI.GetTotalOfWeaponInCustomInventory(id, weapon_name)
+	local result = MySQL.query.await("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
+	if result[1] and result[1].total_count then
+		return result[1].total_count
+	end
+	return 0
+end
+
+exports('GetTotalOfWeaponInCustomInventory', InventoryAPI.GetTotalOfWeaponInCustomInventory)
+
+--EXAMPLES
+--RegisterCommand("test1", function(source, args)
+--	local items = {
+--		{ name = "apple", amount = 1, metadata = { quality = 90 } },
+--		{ name = "coal",  amount = 1 },
+--	}
+--	exports.vorp_inventory:addItemsToCustomInventory("outsider_mailman1", items, 147, function(success)
+--		if success then
+--			print("success")
+--		else
+--			print("failed")
+--		end
+--	end)
+--
+--	local weapons = {
+--		{ name = "WEAPON_REVOLVER_CATTLEMAN" },
+--		--{ name = "WEAPON_REVOLVER_CATTLEMAN" ,custom_label = "test", custom_desc = "test", serial_number = "test" } -- or this way
+--	}
+--	exports.vorp_inventory:addWeaponsToCustomInventory("outsider_mailman1", weapons, 147, function(success)
+--		if success then
+--			print("success")
+--		else
+--			print("failed")
+--		end
+--	end)
+--end, false)

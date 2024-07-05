@@ -1789,3 +1789,109 @@ function InventoryService.TakeFromPlayer(obj)
 		end, true)
 	end
 end
+
+function InventoryService.addItemsToCustomInventory(id, items, charid)
+	local resulItems = {}
+	local newTable = {}
+	local result = DBService.queryAwait("SELECT inventory_type FROM character_inventories WHERE inventory_type = @id", { id = id })
+
+	if not result[1] then
+		for _, value in ipairs(items) do
+			local item = ServerItems[value.name]
+			DBService.CreateItem(charid, item:getId(), value.amount, (value.metadata or {}), value.name, function()
+			end, id)
+		end
+	else
+		for _, value in ipairs(items) do
+			local item = ServerItems[value.name]
+			local itemMetadata = value.metadata or {}
+			local result1 = DBService.queryAwait("SELECT amount, item_crafted_id FROM character_inventories WHERE item_name =@itemname AND inventory_type = @inventory_type", { itemname = value.name, inventory_type = id })
+
+			if not result1[1] then
+				DBService.CreateItem(charid, item:getId(), value.amount, itemMetadata, value.name, function()
+				end, id)
+			else
+				local resulItems = {}
+				for k, v in ipairs(result1) do -- if there is more than one apple we need to check which ones have metadata
+					local result2 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id =@id", { id = v.item_crafted_id })
+					local hasMetadata = json.decode(result2[1].metadata)
+					if next(hasMetadata) then
+						resulItems[#resulItems + 1] = v
+					end
+				end
+
+				if #resulItems == 0 then
+					if next(itemMetadata) then
+						DBService.CreateItem(charid, item:getId(), value.amount, itemMetadata, value.name, function()
+						end, id)
+					else
+						DBService.updateAsync("UPDATE character_inventories SET amount = amount + @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = value.amount, itemname = value.name, inventory_type = id })
+					end
+				else
+					for _, v in ipairs(resulItems) do
+						local result2 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id =@id", { id = v.item_crafted_id })
+						local metadata = json.decode(result2[1].metadata)
+						local result3 = SharedUtils.Table_equals(metadata, itemMetadata)
+						if result3 then
+							newTable[#newTable + 1] = v
+						end
+					end
+
+					if #newTable == 0 then -- metadata of any of the items dont match new one so we create new one
+						DBService.CreateItem(charid, item:getId(), value.amount, itemMetadata, value.name, function()
+						end, id)
+					else
+						-- means we have a match so we update the amount
+						DBService.updateAsync("UPDATE character_inventories SET amount = amount + @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = value.amount, itemname = value.name, inventory_type = id })
+					end
+				end
+			end
+		end
+	end
+	table.wipe(newTable)
+	table.wipe(resulItems)
+end
+
+function InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
+	for _, value in ipairs(weapons) do
+		local label = SvUtils.GenerateWeaponLabel(value.name)
+		local serial_number = value.serial_number or SvUtils.GenerateSerialNumber(value.name)
+		local custom_label = value.custom_label or SvUtils.GenerateWeaponLabel(value.name)
+		local weight = SvUtils.GetWeaponWeight(value.name)
+		local params = {
+			curr_inv = id,
+			charidentifier = charid,
+			name = value.name,
+			serial_number = serial_number,
+			label = label,
+			custom_label = custom_label,
+			custom_desc = value.custom_desc or nil
+		}
+
+		DBService.insertAsync("INSERT INTO loadout (identifier, curr_inv, charidentifier, name,serial_number,label,custom_label,custom_desc) VALUES ('', @curr_inv, @charidentifier, @name, @serial_number, @label, @custom_label, @custom_desc)", params, function(result)
+			local weaponId = result
+			local newWeapon = Weapon:New({
+				id = weaponId,
+				propietary = "",
+				name = value.name,
+				ammo = {},
+				used = false,
+				used2 = false,
+				charId = charid,
+				currInv = id,
+				dropped = 0,
+				source = 0,
+				label = label,
+				serial_number = serial_number,
+				custom_label = label,
+				custom_desc = value.custom_desc or nil,
+				group = 5,
+				weight = weight
+			})
+			if not UsersWeapons[id] then
+				UsersWeapons[id] = {}
+			end
+			UsersWeapons[id][weaponId] = newWeapon
+		end)
+	end
+end
