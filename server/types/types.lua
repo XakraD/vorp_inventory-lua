@@ -353,3 +353,35 @@ function exports.vorp_inventory:updateCustomInvData(data, callback) end
 --- open player inventory
 ---@param data table data to update
 function exports.vorp_inventory:openPlayerInventory(data) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- add items to custom inventory
+---@param invId string inventory id
+---@param item {name:string, amount:number, metadata:table?}[]
+---@param charId number char id
+---@param callback fun(success:boolean)? callback function async or sync leave nil
+function exports.vorp_inventory:addItemsToCustomInventory(invId, item, charId, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- add weapons to custom inventory
+---@param invId string inventory id
+---@param weapons {name:string, custom_serial:string?, custom_label:string?, custom_desc:string?}[]
+---@param charId number char id
+---@param callback fun(success:boolean)? callback function async or sync leave nil
+function exports.vorp_inventory:addWeaponsToCustomInventory(invId, weapons, charId, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- get amount of item in custom inventory
+---@param invId string inventory id
+---@param item string item name
+---@param callback fun(amount:number)? callback function async or sync leave nil
+---@return number
+function exports.vorp_inventory:getCustomInventoryItemCount(invId, item, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- get amount weapon in custom inventory
+---@param invId string inventory id
+---@param weaponName string weapon name
+---@param callback fun(amount:number)? callback function async or sync leave nil
+---@return number
+function exports.vorp_inventory:getCustomInventoryWeaponCount(invId, weaponName, callback) end

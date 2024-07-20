@@ -949,7 +949,7 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 	weaponName = getWeaponNameFromHash()
 
 	local function isInventoryFull(identifier, charId, invCapacity)
-		local weaponWeight = SvUtils.GetWeaponWeight(weaponName)
+		local weaponWeight = SvUtils.GetWeaponWeight(weaponName) * amount
 		local itemsTotalWeight = InventoryAPI.getUserTotalCountItems(identifier, charId)
 		local weaponsTotalWeight = InventoryAPI.getUserTotalCountWeapons(identifier, charId, true)
 
@@ -1866,7 +1866,10 @@ end
 
 exports("addWeaponsToCustomInventory", InventoryAPI.addWeaponsToCustomInventory)
 
-function InventoryAPI.GetTotalOfItemInCustomInventory(id, item_name)
+function InventoryAPI.getCustomInventoryItemCount(id, item_name)
+	if not CustomInventoryInfos[id] then
+		return 0
+	end
 	local result = MySQL.query.await("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
 	if result[1] and result[1].total_amount then
 		return result[1].total_amount
@@ -1874,10 +1877,14 @@ function InventoryAPI.GetTotalOfItemInCustomInventory(id, item_name)
 	return 0
 end
 
-exports('GetTotalOfItemInCustomInventory', InventoryAPI.GetTotalOfItemInCustomInventory)
+exports('getCustomInventoryItemCount', InventoryAPI.getCustomInventoryItemCount)
 
 
-function InventoryAPI.GetTotalOfWeaponInCustomInventory(id, weapon_name)
+function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name)
+	if not CustomInventoryInfos[id] then
+		return 0
+	end
+
 	local result = MySQL.query.await("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
 	if result[1] and result[1].total_count then
 		return result[1].total_count
@@ -1885,31 +1892,4 @@ function InventoryAPI.GetTotalOfWeaponInCustomInventory(id, weapon_name)
 	return 0
 end
 
-exports('GetTotalOfWeaponInCustomInventory', InventoryAPI.GetTotalOfWeaponInCustomInventory)
-
---EXAMPLES
---RegisterCommand("test1", function(source, args)
---	local items = {
---		{ name = "apple", amount = 1, metadata = { quality = 90 } },
---		{ name = "coal",  amount = 1 },
---	}
---	exports.vorp_inventory:addItemsToCustomInventory("outsider_mailman1", items, 147, function(success)
---		if success then
---			print("success")
---		else
---			print("failed")
---		end
---	end)
---
---	local weapons = {
---		{ name = "WEAPON_REVOLVER_CATTLEMAN" },
---		--{ name = "WEAPON_REVOLVER_CATTLEMAN" ,custom_label = "test", custom_desc = "test", serial_number = "test" } -- or this way
---	}
---	exports.vorp_inventory:addWeaponsToCustomInventory("outsider_mailman1", weapons, 147, function(success)
---		if success then
---			print("success")
---		else
---			print("failed")
---		end
---	end)
---end, false)
+exports('getCustomInventoryWeaponCount', InventoryAPI.getCustomInventoryWeaponCount)
