@@ -108,9 +108,6 @@ PickupsService.sharePickupClient      = function(data, value)
 			})
 			pickup.prompt:SetVisible(false)
 			WorldPickups[data.obj] = pickup
-			if Config.Debug then
-				print('Item pickup added: ' .. tostring(pickup.name))
-			end
 		end
 	else
 		if WorldPickups[data.obj] ~= nil then
@@ -177,7 +174,6 @@ PickupsService.removePickupClient     = function(entityHandle)
 	while not NetworkHasControlOfEntity(entityHandle) and timeout < 5000 do
 		timeout = timeout + 100
 		if timeout >= 5000 then
-			print("Failed to get Control of the Entity" .. entityHandle)
 			break
 		end
 		Wait(100)

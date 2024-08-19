@@ -1872,7 +1872,7 @@ function InventoryAPI.getCustomInventoryItemCount(id, item_name)
 	end
 	local result = MySQL.query.await("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
 	if result[1] and result[1].total_amount then
-		return result[1].total_amount
+		return tonumber(result[1].total_amount)
 	end
 	return 0
 end
@@ -1887,7 +1887,7 @@ function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name)
 
 	local result = MySQL.query.await("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
 	if result[1] and result[1].total_count then
-		return result[1].total_count
+		return tonumber(result[1].total_count)
 	end
 	return 0
 end
