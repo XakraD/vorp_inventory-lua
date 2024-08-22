@@ -11,6 +11,7 @@ StoreSynMenu              = false
 GenSynInfo                = {}
 InInventory               = false
 NUIService                = {}
+synPending 			  = false
 
 RegisterNetEvent('inv:dropstatus', function(x)
 	candrop = x
@@ -64,6 +65,7 @@ function NUIService.ReloadInventory(inventory)
 	SendNUIMessage(payload)
 	Wait(500)
 	NUIService.LoadInv()
+	synPending = false
 end
 
 function NUIService.OpenCustomInventory(name, id, capacity, weight)
