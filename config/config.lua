@@ -50,7 +50,6 @@ Config = {
 	WeightMeasure            = "kg", -- Weight measure (kg, lbs, etc)
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD =====================--
 
-
 	UseClearAll         = false, -- if you want to use the clear item function if false will use DropOnDeath function
 
 	OnPlayerRespawn     = {
@@ -152,5 +151,4 @@ Config = {
 		"WEAPON_LASSO",
 		"WEAPON_LASSO_REINFORCED",
 	}
-
 }

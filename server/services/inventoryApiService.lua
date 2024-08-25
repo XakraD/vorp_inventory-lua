@@ -1837,10 +1837,9 @@ function InventoryAPI.addWeaponsToCustomInventory(id, weapons, charid, callback)
 		return respond(callback, false)
 	end
 
-	--is this inv allowed to add weapons ?
 	if not CustomInventoryInfos[id]:doesAcceptWeapons() then
 		print("InventoryAPI.addWeaponsToCustomInventory: this inventory does not accept weapons, change the settings in the registerCustomInventory export")
-		--return respond(callback, false)
+		return respond(callback, false)
 	end
 
 	if not charid or charid == 0 then
@@ -1870,7 +1869,7 @@ function InventoryAPI.getCustomInventoryItemCount(id, item_name)
 	if not CustomInventoryInfos[id] then
 		return 0
 	end
-	local result = MySQL.query.await("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
+	local result = DBService.queryAwait("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
 	if result[1] and result[1].total_amount then
 		return tonumber(result[1].total_amount)
 	end
@@ -1879,13 +1878,13 @@ end
 
 exports('getCustomInventoryItemCount', InventoryAPI.getCustomInventoryItemCount)
 
-
 function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name)
 	if not CustomInventoryInfos[id] then
 		return 0
 	end
 
-	local result = MySQL.query.await("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
+	--local result = MySQL.query.await("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
+	local result = DBService.queryAwait("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
 	if result[1] and result[1].total_count then
 		return tonumber(result[1].total_count)
 	end
@@ -1893,3 +1892,43 @@ function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name)
 end
 
 exports('getCustomInventoryWeaponCount', InventoryAPI.getCustomInventoryWeaponCount)
+
+
+-- remove item from inventory
+---@param id string inventory id
+---@param item_name string item name
+---@param amount number amount to remove
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.removeItemFromCustomInventory(id, item_name, amount) then
+		return respond(callback, true)
+	end
+
+	return respond(callback, false)
+end
+
+exports("removeItemFromCustomInventory", InventoryAPI.removeItemFromCustomInventory)
+
+-- remove weapon from inventory
+---@param id string inventory id
+---@param weapon_name string weapon name
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.removeWeaponFromCustomInventory(id, weapon_name, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.removeWeaponFromCustomInventory(id, weapon_name) then
+		return respond(callback, true)
+	end
+
+	return respond(callback, false)
+end
+
+exports("removeWeaponFromCustomInventory", InventoryAPI.removeWeaponFromCustomInventory)

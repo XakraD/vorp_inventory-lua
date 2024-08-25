@@ -1895,3 +1895,42 @@ function InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
 		end)
 	end
 end
+
+function InventoryService.removeItemFromCustomInventory(invId, item_name, amount)
+	local result = DBService.queryAwait("SELECT amount, item_crafted_id FROM character_inventories WHERE item_name =@itemname AND inventory_type = @inventory_type", { itemname = item_name, inventory_type = invId })
+	if not result[1] then
+		return false
+	end
+
+	local item = result[1]
+	local item_crafted_id = item.item_crafted_id
+	local itemAmount = item.amount
+	if itemAmount < amount then
+		return false
+	end
+
+	if amount <= itemAmount then
+		-- if its less than what we have or equals then we update its count
+		if amount == itemAmount then
+			DBService.updateAsync("DELETE FROM character_inventories WHERE item_name = @itemname AND inventory_type = @inventory_type", { itemname = item_name, inventory_type = invId })
+			DBService.updateAsync("DELETE FROM items_crafted WHERE id = @id", { id = item_crafted_id })
+		else
+			DBService.updateAsync("UPDATE character_inventories SET amount = amount - @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = amount, itemname = item_name, inventory_type = invId })
+		end
+	end
+	return true
+end
+
+function InventoryService.removeWeaponFromCustomInventory(invId, weapon_name)
+	local result = DBService.queryAwait("SELECT id FROM loadout WHERE curr_inv = @invId AND name = @name", { invId = invId, name = weapon_name })
+	if not result[1] then
+		return false
+	end
+
+	local weaponId = result[1].id
+	DBService.updateAsync("DELETE FROM loadout WHERE id = @id", { id = weaponId })
+	if UsersWeapons[invId] then
+		UsersWeapons[invId][weaponId] = nil
+	end
+	return true
+end
