@@ -17,8 +17,8 @@ function NUIService.NUIMoveToClan(obj)
 end
 
 function NUIService.NUITakeFromClan(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
         TriggerServerEvent("syn_clan:TakeFromClan", json.encode(obj))
     end
 end
@@ -42,8 +42,8 @@ function NUIService.NUIMoveToContainer(obj)
 end
 
 function NUIService.NUITakeFromContainer(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("syn_Container:TakeFromContainer", json.encode(obj))
     end
@@ -69,8 +69,8 @@ function NUIService.NUIMoveToHorse(obj)
 end
 
 function NUIService.NUITakeFromHorse(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("vorp_stables:TakeFromHorse", json.encode(obj))
     end
@@ -81,8 +81,8 @@ function NUIService.NUIMoveToStore(obj)
 end
 
 function NUIService.NUITakeFromStore(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("syn_store:TakeFromStore", json.encode(obj))
     end
@@ -126,8 +126,8 @@ function NUIService.NUIMoveTosteal(obj)
 end
 
 function NUIService.NUITakeFromsteal(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("syn_search:TakeFromsteal", json.encode(obj))
     end
@@ -154,8 +154,8 @@ function NUIService.NUIMoveToCart(obj)
 end
 
 function NUIService.NUITakeFromCart(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("vorp_stables:TakeFromCart", json.encode(obj))
     end
@@ -180,8 +180,8 @@ function NUIService.NUIMoveToHouse(obj)
 end
 
 function NUIService.NUITakeFromHouse(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("vorp_housing:TakeFromHouse", json.encode(obj))
     end
@@ -206,8 +206,8 @@ function NUIService.NUIMoveToHideout(obj)
 end
 
 function NUIService.NUITakeFromHideout(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("syn_underground:TakeFromHideout", json.encode(obj))
     end
@@ -232,8 +232,8 @@ function NUIService.NUIMoveToBank(obj)
 end
 
 function NUIService.NUITakeFromBank(obj)
-    if not synPending then 
-        synPending = true 
+    if not SynPending then
+        SynPending = true
 
         TriggerServerEvent("vorp_bank:TakeFromBank", json.encode(obj))
     end

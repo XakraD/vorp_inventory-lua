@@ -6,12 +6,11 @@ local CanOpen             = true
 local InventoryIsDisabled = false
 local T                   = TranslationInv.Langs[Lang]
 local Core                = exports.vorp_core:GetCore()
-
 StoreSynMenu              = false
 GenSynInfo                = {}
 InInventory               = false
 NUIService                = {}
-synPending 			  = false
+SynPending                = false
 
 RegisterNetEvent('inv:dropstatus', function(x)
 	candrop = x
@@ -65,7 +64,7 @@ function NUIService.ReloadInventory(inventory)
 	SendNUIMessage(payload)
 	Wait(500)
 	NUIService.LoadInv()
-	synPending = false
+	SynPending = false
 end
 
 function NUIService.OpenCustomInventory(name, id, capacity, weight)
@@ -434,6 +433,9 @@ function NUIService.NUIUseItem(data)
 	end
 end
 
+exports("useItem", useItem) -- not tested yet
+
+
 function NUIService.NUISound()
 	PlaySoundFrontend("BACK", "RDRO_Character_Creator_Sounds", true, 0)
 end
@@ -475,7 +477,7 @@ function NUIService.LoadInv()
 				item.metadata.orgdescription = nil
 			end
 		end
-		if GenSynInfo.buyitems ~= nil and next(GenSynInfo.buyitems) ~= nil then
+		if GenSynInfo.buyitems and next(GenSynInfo.buyitems) then
 			local buyitems = GenSynInfo.buyitems
 			for _, item in pairs(UserInventory) do
 				for k, v in ipairs(buyitems) do
@@ -598,12 +600,13 @@ end
 
 -- Main loop
 CreateThread(function()
-	repeat Wait(1000) until LocalPlayer.state.IsInSession
+	local controlVar = false -- best to use variable than to check statebag every frame
+	repeat Wait(2000) until LocalPlayer.state.IsInSession
 	NUIService.initiateData()
+	LocalPlayer.state:set("IsInvOpen", false, true) -- init
 
 	while true do
 		local sleep = 1000
-
 		if not InInventory then
 			sleep = 0
 			if IsControlJustReleased(1, Config.OpenKey) then
@@ -619,6 +622,20 @@ CreateThread(function()
 		if Config.DisableDeathInventory then
 			if InInventory and IsPedDeadOrDying(PlayerPedId(), false) then
 				NUIService.CloseInv()
+			end
+		end
+
+		if InInventory then
+			if not controlVar then
+				controlVar = true
+				LocalPlayer.state:set("IsInvActive", true, true)
+				TriggerEvent("vorp_inventory:Client:OnInvStateChange", true)
+			end
+		else
+			if controlVar then
+				controlVar = false
+				LocalPlayer.state:set("IsInvActive", false, true)
+				TriggerEvent("vorp_inventory:Client:OnInvStateChange", false)
 			end
 		end
 
