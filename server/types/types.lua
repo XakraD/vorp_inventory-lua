@@ -401,3 +401,43 @@ function exports.vorp_inventory:removeItemFromCustomInventory(invid, itemName, c
 ---@param callback fun(result:number)? async or sync callback
 ---@return boolean
 function exports.vorp_inventory:removeWeaponFromCustomInventory(invid, weaponName, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- get all items in custom inventory
+--- @param invId string inventory id
+--- @param callback fun(items:table)? async or sync callback
+--- @return table items
+function exports.vorp_inventory:getCustomInventoryItems(invId, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- get all weapons in custom inventory
+--- @param invId string inventory id
+--- @param callback fun(weapons:table)? async or sync callback
+--- @return table weapons
+function exports.vorp_inventory:getCustomInventoryWeapons(invId, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- update item in custom inventory
+--- @param invId string inventory id
+--- @param item_id number item id
+--- @param metadata table metadata to update
+--- @param amount number? amount of item
+--- @param callback fun(success:boolean)? async or sync callback
+--- @return boolean
+function exports.vorp_inventory:updateCustomInventoryItem(invId, item_id, metadata, amount, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- remove/update item/amount from custom inventory by item id
+--- @param invId string inventory id
+--- @param item_id number item id
+--- @param callback fun(success:boolean)? async or sync callback
+--- @return boolean
+function exports.vorp_inventory:removeCustomInventoryItemById(invId, item_id, callback) end
+
+--- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
+--- remove weapon from custom inventory by weapon id
+--- @param invId string inventory id
+--- @param weapon_id number weapon id
+--- @param callback fun(success:boolean)? async or sync callback
+--- @return boolean
+function exports.vorp_inventory:removeCustomInventoryWeaponById(invId, weapon_id, callback) end

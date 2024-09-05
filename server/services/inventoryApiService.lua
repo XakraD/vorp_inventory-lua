@@ -1932,3 +1932,96 @@ function InventoryAPI.removeWeaponFromCustomInventory(id, weapon_name, callback)
 end
 
 exports("removeWeaponFromCustomInventory", InventoryAPI.removeWeaponFromCustomInventory)
+
+
+-- get all items from custom inventory
+---@param id string inventory id
+---@param callback fun(items: table)? async or sync callback
+---@return table | nil
+function InventoryAPI.getCustomInventoryItems(id, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	local items = InventoryService.getAllItemsFromCustomInventory(id)
+	return respond(callback, items)
+end
+
+exports("getCustomInventoryItems", InventoryAPI.getCustomInventoryItems)
+
+-- get all weapons from custom inventory
+---@param id string inventory id
+---@param callback fun(weapons: table)? async or sync callback
+---@return table | boolean
+function InventoryAPI.getCustomInventoryWeapons(id, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	local weapons = InventoryService.getAllWeaponsFromCustomInventory(id)
+	return respond(callback, weapons)
+end
+
+exports("getCustomInventoryWeapons", InventoryAPI.getCustomInventoryWeapons)
+
+
+-- remove/update item/amount  from custom inventory by item id
+---@param id string inventory id
+---@param item_id number item id
+---@param amount number amount to remove
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.removeItemByIdFromCustomInventory(id, item_id, amount, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.removeItemsByIdFromCustomInventory(id, item_id, amount) then
+		return respond(callback, true)
+	end
+
+	return respond(callback, false)
+end
+
+exports("removeCustomInventoryItemById", InventoryAPI.removeItemByIdFromCustomInventory)
+
+
+-- remove weapon from custom inventory by weapon id
+---@param id string inventory id
+---@param weapon_id number weapon id
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.removeWeaponByIdFromCustomInventory(id, weapon_id, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.removeWeaponsByIdFromCustomInventory(id, weapon_id) then
+		return respond(callback, true)
+	end
+
+	return respond(callback, false)
+end
+
+exports("removeCustomInventoryWeaponById", InventoryAPI.removeWeaponByIdFromCustomInventory)
+
+-- update item amount and metdata
+---@param id string inventory id
+---@param item_id number item id
+---@param metadata table? metadata
+---@param amount number? amount
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.updateItemInCustomInventory(id, item_id, metadata, amount, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.updateItemInCustomInventory(id, item_id, metadata, amount) then
+		return respond(callback, true)
+	end
+
+	return respond(callback, false)
+end
+
+exports("updateCustomInventoryItem", InventoryAPI.updateItemInCustomInventory)
