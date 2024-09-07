@@ -1195,6 +1195,7 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		query = 'INSERT INTO loadout (id, identifier, charidentifier, name, ammo, components, comps, label, dirtlevel, mudlevel, conditionlevel, rustlevel, serial_number, custom_label, custom_desc) VALUES (@id, @identifier, @charid, @name, @ammo, @components, @comps, @label, @dirtlevel, @mudlevel, @conditionlevel, @rustlevel, @serial_number, @custom_label, @custom_desc)'
 	end
 	local params = {
+		id = wepId,
 		identifier = targetIdentifier,
 		charid = targetCharId,
 		name = name,
