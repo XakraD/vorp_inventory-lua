@@ -1358,7 +1358,8 @@ function InventoryService.getNearbyCharacters(obj, sources)
 end
 
 --* CUSTOM INVENTORY *--
----@return boolean
+
+
 function InventoryService.DoesHavePermission(invId, job, grade, Table)
 	if not CustomInventoryInfos[invId]:isPermEnabled() then
 		return true
@@ -2001,7 +2002,6 @@ function InventoryService.removeWeaponsByIdFromCustomInventory(invId, weaponId)
 	return true
 end
 
--- update item metadata,or amount in cutom inventory
 function InventoryService.updateItemInCustomInventory(invId, item_crafted_id, metadata, amount)
 	local result = DBService.queryAwait("SELECT amount FROM character_inventories WHERE item_crafted_id = @item_crafted_id AND inventory_type = @inventory_type", { item_crafted_id = item_crafted_id, inventory_type = invId })
 	if not result[1] or not metadata then
@@ -2022,4 +2022,22 @@ function InventoryService.updateItemInCustomInventory(invId, item_crafted_id, me
 		DBService.updateAsync("UPDATE items_crafted SET metadata = @metadata WHERE id = @id", { metadata = metadata, id = item_crafted_id })
 	end
 	return true
+end
+
+function InventoryService.deleteCustomInventory(invId)
+	local result = DBService.queryAwait("SELECT item_crafted_id FROM character_inventories WHERE inventory_type = @inventory_type", { inventory_type = invId })
+	if not result[1] then
+		return false
+	end
+
+	for _, value in ipairs(result) do
+		DBService.updateAsync("DELETE FROM items_crafted WHERE id = @id", { id = value.item_crafted_id })
+	end
+
+	DBService.updateAsync("DELETE FROM character_inventories WHERE inventory_type = @inventory_type", { inventory_type = invId })
+	DBService.updateAsync("DELETE FROM loadout WHERE curr_inv = @invId", { invId = invId })
+
+	if UsersWeapons[invId] then
+		UsersWeapons[invId] = nil
+	end
 end

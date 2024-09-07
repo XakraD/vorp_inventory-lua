@@ -2025,3 +2025,21 @@ function InventoryAPI.updateItemInCustomInventory(id, item_id, metadata, amount,
 end
 
 exports("updateCustomInventoryItem", InventoryAPI.updateItemInCustomInventory)
+
+-- delete custom inventory items and weapons, after this inventory will be clear from all items and weapons including cache
+---@param id string inventory id
+---@param callback fun(success: boolean)? async or sync callback
+---@return boolean
+function InventoryAPI.deleteCustomInventory(id, callback)
+	if not CustomInventoryInfos[id] then
+		return respond(callback, false)
+	end
+
+	if InventoryService.deleteCustomInventory(id) then
+		return respond(callback, true)
+	end
+	CustomInventoryInfos[id]:removeCustomInventory()
+	return respond(callback, false)
+end
+
+exports("deleteCustomInventory", InventoryAPI.deleteCustomInventory)
