@@ -1466,6 +1466,7 @@ function InventoryService.MoveToCustom(obj)
 	local _source = source
 	local data = json.decode(obj)
 	local invId = tostring(data.id)
+	if not CustomInventoryInfos[invId] then return end
 	local item = data.item
 	local amount = tonumber(data.number)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter
@@ -1546,6 +1547,7 @@ function InventoryService.TakeFromCustom(obj)
 	local _source = source
 	local data = json.decode(obj)
 	local invId = tostring(data.id)
+	if not CustomInventoryInfos[invId] then return end
 	local item = data.item
 	local amount = tonumber(data.number)
 	local sourceCharacter = Core.getUser(_source).getUsedCharacter

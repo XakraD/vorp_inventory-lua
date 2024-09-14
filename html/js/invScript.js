@@ -289,167 +289,169 @@ function inventorySetup(items) {
 
 
     $.each(items, function (index, item) {
-        var count = item.count;
-        var limit = item.limit;
-        const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
+        if (item) {
+            var count = item.count;
+            var limit = item.limit;
+            const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
 
-        if (item.type != "item_weapon") {
-            const custom = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
-            const degradation = item.degradation ? `<br>${LANGUAGE.labels.decay}<span style="color: ${getColorForDegradation(item.degradation)}">${item.degradation}%</span>` : "";
-            const weight = item.weight ? "<br>" + LANGUAGE.labels.weight + (item.weight * count).toFixed(2) + " " + Config.WeightMeasure : "<br>" + LANGUAGE.labels.weight + (count / 4).toFixed(2) + " " + Config.WeightMeasure;
-            const groupKey = getGroupKey(group);
-            const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
-            const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${LANGUAGE.labels.limit + limit + custom + weight + degradation}` : `${LANGUAGE.labels.limit} ${limit}${custom}${weight}${degradation}`;
-            const image = item.metadata?.image ? item.metadata.image : item.name ? item.name : "default";
-            const url = `url("img/items/${image}.png");`;
+            if (item.type != "item_weapon") {
+                const custom = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
+                const degradation = item.degradation ? `<br>${LANGUAGE.labels.decay}<span style="color: ${getColorForDegradation(item.degradation)}">${item.degradation}%</span>` : "";
+                const weight = item.weight ? "<br>" + LANGUAGE.labels.weight + (item.weight * count).toFixed(2) + " " + Config.WeightMeasure : "<br>" + LANGUAGE.labels.weight + (count / 4).toFixed(2) + " " + Config.WeightMeasure;
+                const groupKey = getGroupKey(group);
+                const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
+                const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${LANGUAGE.labels.limit + limit + custom + weight + degradation}` : `${LANGUAGE.labels.limit} ${limit}${custom}${weight}${degradation}`;
+                const image = item.metadata?.image ? item.metadata.image : item.name ? item.name : "default";
+                const url = `url("img/items/${image}.png");`;
 
-            $("#inventoryElement").append(`
+                $("#inventoryElement").append(`
                 <div data-group='${group}' data-label='${item.label}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip='${tooltipContent}'> 
                     <div class='count'>
                         <span style='color:Black'>${count}</span>
                     </div>
                     <div class='text'></div>
                 </div>`);
-        } else {
-            const weight = item.weight ? LANGUAGE.labels.weight + item.weight.toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (count / 4).toFixed(2) + " " + Config.WeightMeasure;
-            const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
-            $("#inventoryElement").append(`
+            } else {
+                const weight = item.weight ? LANGUAGE.labels.weight + item.weight.toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (count / 4).toFixed(2) + " " + Config.WeightMeasure;
+                const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
+                $("#inventoryElement").append(`
                 <div data-label='${item.label}' data-group='${group}' style='background-image: url("img/items/${item.name}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
                     <div class='equipped-icon' style='display: ${!item.used && !item.used2 ? "none" : "block"};'></div>
                 </div>`);
-        }
+            }
 
 
-        $("#item-" + index).data("item", item);
-        $("#item-" + index).data("inventory", "main");
+            $("#item-" + index).data("item", item);
+            $("#item-" + index).data("inventory", "main");
 
-        var data = [];
+            var data = [];
 
-        if (Config.DoubleClickToUse) {
+            if (Config.DoubleClickToUse) {
 
-            $("#item-" + index).dblclick(function () {
+                $("#item-" + index).dblclick(function () {
 
-                if (item.used || item.used2) {
-                    $(this).find('.equipped-icon').hide();
-                    $.post(`https://${GetParentResourceName()}/UnequipWeapon`, JSON.stringify({
-                        item: item.name,
-                        id: item.id,
-                    }));
-
-                } else {
-
-                    if (item.type == "item_weapon") {
-                        $(this).find('.equipped-icon').show();
-                    }
-                    $.post(`https://${GetParentResourceName()}/UseItem`, JSON.stringify({
-                        item: item.name,
-                        type: item.type,
-                        hash: item.hash,
-                        amount: item.count,
-                        id: item.id,
-                    }));
-                }
-            });
-
-        } else {
-            if (item.used || item.used2) {
-                data.push({
-                    text: LANGUAGE.unequip,
-                    action: function () {
+                    if (item.used || item.used2) {
                         $(this).find('.equipped-icon').hide();
-                        $.post(
-                            `https://${GetParentResourceName()}/UnequipWeapon`,
-                            JSON.stringify({
-                                item: item.name,
-                                id: item.id,
-                            })
-                        );
-                    },
-                });
-            } else {
-                if (item.type != "item_weapon") {
-                    lang = LANGUAGE.use;
-                } else {
-                    lang = LANGUAGE.equip;
-                }
-                data.push({
-                    text: lang,
-                    action: function () {
+                        $.post(`https://${GetParentResourceName()}/UnequipWeapon`, JSON.stringify({
+                            item: item.name,
+                            id: item.id,
+                        }));
+
+                    } else {
+
                         if (item.type == "item_weapon") {
                             $(this).find('.equipped-icon').show();
                         }
-                        $.post(
-                            `https://${GetParentResourceName()}/UseItem`,
-                            JSON.stringify({
-                                item: item.name,
-                                type: item.type,
-                                hash: item.hash,
-                                amount: item.count,
-                                id: item.id,
-                            })
+                        $.post(`https://${GetParentResourceName()}/UseItem`, JSON.stringify({
+                            item: item.name,
+                            type: item.type,
+                            hash: item.hash,
+                            amount: item.count,
+                            id: item.id,
+                        }));
+                    }
+                });
+
+            } else {
+                if (item.used || item.used2) {
+                    data.push({
+                        text: LANGUAGE.unequip,
+                        action: function () {
+                            $(this).find('.equipped-icon').hide();
+                            $.post(
+                                `https://${GetParentResourceName()}/UnequipWeapon`,
+                                JSON.stringify({
+                                    item: item.name,
+                                    id: item.id,
+                                })
+                            );
+                        },
+                    });
+                } else {
+                    if (item.type != "item_weapon") {
+                        lang = LANGUAGE.use;
+                    } else {
+                        lang = LANGUAGE.equip;
+                    }
+                    data.push({
+                        text: lang,
+                        action: function () {
+                            if (item.type == "item_weapon") {
+                                $(this).find('.equipped-icon').show();
+                            }
+                            $.post(
+                                `https://${GetParentResourceName()}/UseItem`,
+                                JSON.stringify({
+                                    item: item.name,
+                                    type: item.type,
+                                    hash: item.hash,
+                                    amount: item.count,
+                                    id: item.id,
+                                })
+                            );
+                        },
+                    });
+                }
+            }
+
+            if (item.canRemove) {
+                data.push({
+                    text: LANGUAGE.give,
+                    action: function () {
+                        giveGetHowMany(
+                            item.name,
+                            item.type,
+                            item.hash,
+                            item.id,
+                            item.metadata,
+                            item.count
+                        );
+                    },
+                });
+
+                data.push({
+                    text: LANGUAGE.drop,
+                    action: function () {
+                        dropGetHowMany(
+                            item.name,
+                            item.type,
+                            item.hash,
+                            item.id,
+                            item.metadata,
+                            item.count
                         );
                     },
                 });
             }
-        }
-
-        if (item.canRemove) {
-            data.push({
-                text: LANGUAGE.give,
-                action: function () {
-                    giveGetHowMany(
-                        item.name,
-                        item.type,
-                        item.hash,
-                        item.id,
-                        item.metadata,
-                        item.count
-                    );
-                },
-            });
-
-            data.push({
-                text: LANGUAGE.drop,
-                action: function () {
-                    dropGetHowMany(
-                        item.name,
-                        item.type,
-                        item.hash,
-                        item.id,
-                        item.metadata,
-                        item.count
-                    );
-                },
-            });
-        }
-        if (data.length > 0) {
-            $("#item-" + index).contextMenu([data], {
-                offsetX: 1,
-                offsetY: 1,
-            });
-        }
-
-        $("#item-" + index).hover(
-            function () {
-                OverSetTitle(item.label);
-            },
-            function () {
-                OverSetTitle(" ");
+            if (data.length > 0) {
+                $("#item-" + index).contextMenu([data], {
+                    offsetX: 1,
+                    offsetY: 1,
+                });
             }
-        );
 
-        $("#item-" + index).hover(
-            function () {
-                if (!!item.metadata && !!item.metadata.description) {
-                    OverSetDesc(item.metadata.description);
-                } else {
-                    OverSetDesc(!!item.desc ? item.desc : "");
+            $("#item-" + index).hover(
+                function () {
+                    OverSetTitle(item.label);
+                },
+                function () {
+                    OverSetTitle(" ");
                 }
-            },
-            function () {
-                OverSetDesc(" ");
-            }
-        );
+            );
+
+            $("#item-" + index).hover(
+                function () {
+                    if (!!item.metadata && !!item.metadata.description) {
+                        OverSetDesc(item.metadata.description);
+                    } else {
+                        OverSetDesc(!!item.desc ? item.desc : "");
+                    }
+                },
+                function () {
+                    OverSetDesc(" ");
+                }
+            );
+        }
 
     });
 

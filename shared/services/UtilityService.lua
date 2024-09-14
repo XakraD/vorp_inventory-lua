@@ -32,10 +32,10 @@ function SharedUtils.Table_equals(o1, o2, ignore_mt)
     end
 
     for key2, _ in pairs(o2) do
-        if keySet[key2] then return true end
+        if not keySet[key2] then return false end
     end
 
-    return false
+    return true
 end
 
 function SharedUtils.Table_contains(o1, o2)
