@@ -278,7 +278,16 @@ function getColorForDegradation(degradation) {
     }
 }
 
-function inventorySetup(items) {
+async function getUrlForImage(image) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(`url("img/items/${image}.png");`);
+        img.onerror = () => resolve(`url("img/items/placeholder.png");`);
+        img.src = `img/items/${image}.png`;
+    });
+}
+
+async function inventorySetup(items) {
 
     $("#inventoryElement").html("");
     var divAmount = 0;
@@ -288,7 +297,7 @@ function inventorySetup(items) {
     });
 
 
-    $.each(items, function (index, item) {
+    for (const [index, item] of items.entries()) {
         if (item) {
             var count = item.count;
             var limit = item.limit;
@@ -302,7 +311,7 @@ function inventorySetup(items) {
                 const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
                 const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${LANGUAGE.labels.limit + limit + custom + weight + degradation}` : `${LANGUAGE.labels.limit} ${limit}${custom}${weight}${degradation}`;
                 const image = item.metadata?.image ? item.metadata.image : item.name ? item.name : "default";
-                const url = `url("img/items/${image}.png");`;
+                const url = await getUrlForImage(image);
 
                 $("#inventoryElement").append(`
                 <div data-group='${group}' data-label='${item.label}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip='${tooltipContent}'> 
@@ -453,8 +462,7 @@ function inventorySetup(items) {
             );
         }
 
-    });
-
+    };
 
     var gunbelt_item = "gunbelt";
     var gunbelt_label = LANGUAGE.gunbeltlabel;

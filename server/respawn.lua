@@ -3,12 +3,9 @@ local Core = exports.vorp_core:GetCore()
 -- * CLEAR ITEMS WEAPONS AND MONEY * --
 RegisterNetEvent("vorp:PlayerForceRespawn", function()
     local _source = source
-    local User = Core.getUser(_source)
-    local _value = Config.OnPlayerRespawn
 
-    if not User then
-        return
-    end
+    local User = Core.getUser(_source)
+    if not User then return end
 
     User = User.getUsedCharacter
     local job = User.job
@@ -17,6 +14,8 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if not Config.UseClearAll or not isdead then
         return
     end
+
+    local _value <const> = Config.OnPlayerRespawn
 
     --MONEY
     if _value.Money.ClearMoney then

@@ -37,26 +37,14 @@ function NUIService.ReloadInventory(inventory)
 	for _, item in pairs(payload.itemList) do
 		if item.type == "item_weapon" then
 			item.label = item.custom_label or Utils.GetWeaponDefaultLabel(item.name)
-			local serial_number = ""
-			local custom_desc = nil
-
-			if item.serial_number then
-				serial_number = item.serial_number
-			end
 			if item.custom_desc then
-				local serial_number_str = "<br><br>" .. T.serialnumber .. serial_number
-				if not string.find(item.custom_desc, serial_number_str, 1, true) then
-					custom_desc = item.custom_desc .. "<br><br>" .. T.serialnumber .. serial_number
-				end
+				item.desc = item.custom_desc
+			else
+				item.desc = Utils.GetWeaponDefaultDesc(item.name)
 			end
 
-			if item.desc and custom_desc then
-				item.desc = custom_desc
-			end
-
-			if item.desc == nil then
-				local applySerial = Utils.filterWeaponsSerialNumber(item.name)
-				item.desc = applySerial and Utils.GetWeaponDefaultDesc(item.name) .. "<br><br>" .. T.serialnumber .. serial_number or Utils.GetWeaponDefaultDesc(item.name)
+			if not item.desc then
+				item.desc = Utils.GetWeaponDefaultDesc(item.name)
 			end
 		end
 	end
@@ -68,23 +56,22 @@ function NUIService.ReloadInventory(inventory)
 end
 
 function NUIService.OpenCustomInventory(name, id, capacity, weight)
-	local result = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
-	CanOpen = result
-	if CanOpen then
-		ApplyPosfx()
-		DisplayRadar(false)
-		CanOpen = false
-		SetNuiFocus(true, true)
-		SendNUIMessage({
-			action = "display",
-			type = "custom",
-			title = tostring(name),
-			id = tostring(id),
-			capacity = capacity,
-			weight = weight,
-		})
-		InInventory = true
-	end
+	CanOpen = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
+	if not CanOpen then return end
+
+	ApplyPosfx()
+	DisplayRadar(false)
+	CanOpen = false
+	SetNuiFocus(true, true)
+	SendNUIMessage({
+		action = "display",
+		type = "custom",
+		title = tostring(name),
+		id = tostring(id),
+		capacity = capacity,
+		weight = weight,
+	})
+	InInventory = true
 end
 
 function NUIService.NUIMoveToCustom(obj)
@@ -96,21 +83,20 @@ function NUIService.NUITakeFromCustom(obj)
 end
 
 function NUIService.OpenPlayerInventory(name, id)
-	local result = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
-	CanOpen = result
-	if CanOpen then
-		CanOpen = false
-		ApplyPosfx()
-		DisplayRadar(false)
-		SetNuiFocus(true, true)
-		SendNUIMessage({
-			action = "display",
-			type = "player",
-			title = name,
-			id = id,
-		})
-		InInventory = true
-	end
+	CanOpen = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
+	if not CanOpen then return end
+
+	CanOpen = false
+	ApplyPosfx()
+	DisplayRadar(false)
+	SetNuiFocus(true, true)
+	SendNUIMessage({
+		action = "display",
+		type = "player",
+		title = name,
+		id = id,
+	})
+	InInventory = true
 end
 
 function NUIService.NUIMoveToPlayer(obj)
@@ -140,7 +126,7 @@ function NUIService.CloseInv()
 		end
 	end
 
-	if not CanOpen then -- only trigger if somone is in inv
+	if not CanOpen then
 		TriggerServerEvent("vorp_inventory:Server:UnlockCustomInv")
 	end
 	DisplayRadar(true)
@@ -169,7 +155,7 @@ function NUIService.NUIGetNearPlayers(obj)
 	local nearestPlayers = Utils.getNearestPlayers()
 
 	local playerIds = {}
-	for _, player in pairs(nearestPlayers) do
+	for _, player in ipairs(nearestPlayers) do
 		playerIds[#playerIds + 1] = GetPlayerServerId(player)
 	end
 	TriggerServerEvent('vorp_inventory:getNearbyCharacters', obj, playerIds)
@@ -183,7 +169,7 @@ function NUIService.NUISetNearPlayers(obj, nearestPlayers)
 	local itemHash = obj.hash or 1
 
 	if not isAnyPlayerFound then
-		TriggerEvent('vorp:TipRight', T.noplayersnearby, 5000)
+		Core.NotifyRightTip(T.noplayersnearby, 5000)
 		return
 	end
 
@@ -202,7 +188,7 @@ end
 
 function NUIService.NUIGiveItem(obj)
 	if not cangive then
-		return TriggerEvent('vorp:TipRight', T.cantgivehere, 5000)
+		return Core.NotifyRightTip(T.cantgivehere, 5000)
 	end
 
 	local nearestPlayers = Utils.getNearestPlayers()
@@ -211,7 +197,7 @@ function NUIService.NUIGiveItem(obj)
 	local isvalid = Validator.IsValidNuiCallback(data.hsn)
 
 	if isvalid then
-		for _, player in pairs(nearestPlayers) do
+		for _, player in ipairs(nearestPlayers) do
 			if player ~= PlayerId() then
 				if GetPlayerServerId(player) == tonumber(data.player) then
 					local itemId = data2.id
@@ -255,67 +241,65 @@ function NUIService.NUIGiveItem(obj)
 end
 
 function NUIService.NUIDropItem(obj)
-	if candrop then
-		local aux = Utils.expandoProcessing(obj)
-		local isvalid = Validator.IsValidNuiCallback(aux.hsn)
+	if not candrop then return Core.NotifyRightTip(T.cantdrophere, 5000) end
 
-		if isvalid then
-			local itemName = aux.item
-			local itemId = aux.id
-			local metadata = aux.metadata
-			local type = aux.type
-			local qty = tonumber(aux.number)
+	local aux = Utils.expandoProcessing(obj)
+	local isvalid = Validator.IsValidNuiCallback(aux.hsn)
 
-			if type == "item_money" then
-				TriggerServerEvent("vorpinventory:serverDropMoney", qty)
-			end
+	if isvalid then
+		local itemName = aux.item
+		local itemId = aux.id
+		local metadata = aux.metadata
+		local type = aux.type
+		local qty = tonumber(aux.number)
 
-			if Config.UseGoldItem then
-				if type == "item_gold" then
-					TriggerServerEvent("vorpinventory:serverDropGold", qty)
-				end
-			end
-
-			if type == "item_standard" then
-				if aux.number ~= nil and aux.number ~= '' then
-					local item = UserInventory[itemId]
-					if not item then
-						return
-					end
-
-					if qty <= 0 or qty > item:getCount() then
-						return
-					end
-
-					TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata)
-
-					item:quitCount(qty)
-					if item:getCount() == 0 then
-						UserInventory[itemId] = nil
-					end
-				end
-			end
-
-			if type == "item_weapon" then
-				TriggerServerEvent("vorpinventory:serverDropWeapon", aux.id)
-
-				if UserWeapons[aux.id] then
-					local weapon = UserWeapons[aux.id]
-
-					if weapon:getUsed() then
-						weapon:setUsed(false)
-						weapon:UnequipWeapon()
-					end
-
-					UserWeapons[aux.id] = nil
-				end
-			end
-			SetTimeout(100, function()
-				NUIService.LoadInv()
-			end)
+		if type == "item_money" then
+			TriggerServerEvent("vorpinventory:serverDropMoney", qty)
 		end
-	else
-		TriggerEvent('vorp:TipRight', T.cantdrophere, 5000)
+
+		if Config.UseGoldItem then
+			if type == "item_gold" then
+				TriggerServerEvent("vorpinventory:serverDropGold", qty)
+			end
+		end
+
+		if type == "item_standard" then
+			if aux.number ~= nil and aux.number ~= '' then
+				local item = UserInventory[itemId]
+				if not item then
+					return
+				end
+
+				if qty <= 0 or qty > item:getCount() then
+					return
+				end
+
+				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata)
+
+				item:quitCount(qty)
+				if item:getCount() == 0 then
+					UserInventory[itemId] = nil
+				end
+			end
+		end
+
+		if type == "item_weapon" then
+			TriggerServerEvent("vorpinventory:serverDropWeapon", aux.id)
+
+			if UserWeapons[aux.id] then
+				local weapon = UserWeapons[aux.id]
+
+				if weapon:getUsed() then
+					weapon:setUsed(false)
+					weapon:UnequipWeapon()
+				end
+
+				UserWeapons[aux.id] = nil
+			end
+		end
+		SetTimeout(100, function()
+			NUIService.LoadInv()
+		end)
 	end
 end
 
@@ -415,13 +399,12 @@ end
 
 exports("useWeapon", useWeapon)
 
-
 local function useItem(data)
 	if timerUse <= 0 then
 		TriggerServerEvent("vorp_inventory:useItem", data)
 		timerUse = 2000
 	else
-		TriggerEvent('vorp:TipRight', T.slow, 5000)
+		Core.NotifyRightTip(T.slow, 5000)
 	end
 end
 
@@ -600,10 +583,10 @@ end
 
 -- Main loop
 CreateThread(function()
-	local controlVar = false -- best to use variable than to check statebag every frame
+	local controlVar = false                     -- best to use variable than to check statebag every frame
+	LocalPlayer.state:set("IsInvOpen", false, true) -- init
 	repeat Wait(2000) until LocalPlayer.state.IsInSession
 	NUIService.initiateData()
-	LocalPlayer.state:set("IsInvOpen", false, true) -- init
 
 	while true do
 		local sleep = 1000
@@ -628,7 +611,7 @@ CreateThread(function()
 		if InInventory then
 			if not controlVar then
 				controlVar = true
-				LocalPlayer.state:set("IsInvActive", true, true)
+				LocalPlayer.state:set("IsInvActive", true, true) -- can also listen for statebag change
 				TriggerEvent("vorp_inventory:Client:OnInvStateChange", true)
 			end
 		else

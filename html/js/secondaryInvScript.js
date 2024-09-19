@@ -299,7 +299,7 @@ function initSecondaryInventoryHandlers() {
     });
 }
 
-function secondInventorySetup(items, info) {
+async function secondInventorySetup(items, info) {
     $("#inventoryElement").html("");
     $("#secondInventoryElement").html("").data("info", info);
 
@@ -308,7 +308,7 @@ function secondInventorySetup(items, info) {
         divCount = divCount + 1;
     });
 
-    $.each(items, function (index, item) {
+    for (const [index, item] of items.entries()) {
         count = item.count;
         const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
         if (item.type !== "item_weapon") {
@@ -320,7 +320,7 @@ function secondInventorySetup(items, info) {
             const groupImg = groupKey ? window.Actions[groupKey].img : 'satchel_nav_all.png';
             const tooltipContent = group > 1 ? `<img src="img/itemtypes/${groupImg}"> ${weight + degradation + custom}` : `${weight + degradation + custom}`;
             const image = item.metadata?.image ? item.metadata.image : item.name ? item.name : "default";
-            const url = `url("img/items/${image}.png");`;
+            const url = await getUrlForImage(image);
 
             $("#secondInventoryElement").append(` <div data-label='${item.label}' data-group ='${group}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id="item-${index}"  class='item' class='item' data-tooltip='${tooltipContent}'> ${count > 0 ? `<div class='count'>${count}</div>` : ``}<div class='text'></div></div> `);
         } else {

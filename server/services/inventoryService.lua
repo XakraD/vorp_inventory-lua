@@ -98,7 +98,7 @@ function InventoryService.DropMoney(amount)
 			else
 				userCharacter.removeCurrency(0, amount)
 			end
-			local charname, scourceidentifier, steamname = getSourceInfo(_source)
+			local charname, _, steamname = getSourceInfo(_source)
 			local title = T.dropmoney
 			local description = "**" .. T.WebHookLang.money .. ":** `" .. amount .. "` `$` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
 
@@ -110,42 +110,6 @@ function InventoryService.DropMoney(amount)
 			SvUtils.SendDiscordWebhook(info)
 		end
 		SvUtils.Trem(_source)
-	end
-end
-
-function InventoryService.DropAllMoney()
-	local _source = source
-	if not SvUtils.InProcessing(_source) then
-		SvUtils.ProcessUser(_source)
-		local userCharacter = Core.getUser(_source).getUsedCharacter
-		local userMoney = userCharacter.money
-		local charid = userCharacter.charIdentifier
-
-		if not InventoryService.CheckNewPlayer(_source, charid) then
-			return
-		end
-
-		if userMoney > 0 then
-			TriggerClientEvent("vorpInventory:createMoneyPickup", _source, userMoney)
-		end
-		SvUtils.Trem(_source)
-	end
-end
-
-function InventoryService.DropPartMoney()
-	local _source = source
-	local userCharacter = Core.getUser(_source).getUsedCharacter
-	local userMoney = userCharacter.money
-	local userPartMoney = userMoney - (userMoney * Config.DropOnRespawn.PartPercentage / 100)
-	local userMoneyDef = userMoney - userPartMoney
-	local charid = userCharacter.charIdentifier
-
-	if not InventoryService.CheckNewPlayer(_source, charid) then
-		return
-	end
-
-	if userMoney > 0 then
-		TriggerClientEvent("vorpInventory:createMoneyPickup", _source, userMoneyDef)
 	end
 end
 
@@ -225,22 +189,6 @@ function InventoryService.DropGold(amount)
 		SvUtils.SendDiscordWebhook(info)
 	end
 	SvUtils.Trem(_source)
-end
-
-function InventoryService.DropAllGold()
-	local _source = source
-	if SvUtils.InProcessing(_source) then
-		return
-	end
-
-	SvUtils.ProcessUser(_source)
-	local userCharacter = Core.getUser(_source).getUsedCharacter
-	local userGold = userCharacter.gold
-
-	if userGold > 0 then
-		TriggerClientEvent("vorpInventory:createGoldPickup", _source, userGold)
-	end
-	SvUtils.Trem(_source, false)
 end
 
 function InventoryService.giveGoldToPlayer(target, amount)
@@ -683,7 +631,7 @@ function InventoryService.sharePickupServerItem(data)
 	if not result then
 		return
 	end
-	local charname, scourceidentifier, steamname = getSourceInfo(_source)
+	local charname, _, steamname = getSourceInfo(_source)
 	local title = T.WebHookLang.itemDrop
 	local description = "**" .. T.WebHookLang.amount .. "** `" .. data.amount .. "`\n **" .. T.WebHookLang.itemDrop .. "**: `" .. data.name .. "`" .. "\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 	local info = {
@@ -805,8 +753,8 @@ function InventoryService.giveWeapon2(player, weaponId, target)
 	local serialNumber = userWeapons[weaponId]:getSerialNumber()
 	local desc = userWeapons[weaponId]:getCustomDesc()
 	local newWeight = userWeapons[weaponId]:getWeight()
-	local charname, scourceidentifier, steamname = getSourceInfo(_source)
-	local charname2, scourceidentifier2, steamname2 = getSourceInfo(_target)
+	local charname, _, steamname = getSourceInfo(_source)
+	local charname2, _, steamname2 = getSourceInfo(_target)
 	local notListed = false
 
 	if not desc then
