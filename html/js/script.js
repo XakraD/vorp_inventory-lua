@@ -24,6 +24,67 @@ $("document").ready(function () {
     initSecondaryInventoryHandlers();
 });
 
+
+async function handleEvent(event, type) {
+
+    await inventorySetup(event.data.itemList);
+
+    if (type != "main") {
+
+        $('.item').draggable({
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 99999,
+            revert: 'invalid',
+            start: function (event, ui) {
+
+                if (disabled) {
+                    return false;
+                }
+                stopTooltip = true;
+                itemData = $(this).data("item");
+                itemInventory = $(this).data("inventory");
+
+                if (itemInventory === "main") {
+                    $("#inventoryHud").fadeOut();
+                } else if (itemInventory === "second") {
+                    $("#secondInventoryHud").fadeOut();
+                }
+
+            },
+            stop: function () {
+                stopTooltip = false;
+                itemData = $(this).data("item");
+                itemInventory = $(this).data("inventory");
+
+                if (itemInventory === "main") {
+                    $("#inventoryHud").fadeIn();
+                } else if (itemInventory === "second") {
+                    $("#secondInventoryHud").fadeIn();
+                }
+
+
+            }
+        });
+    }
+}
+
+async function handleEventSecondary(event) {
+
+    await secondInventorySetup(event.data.itemList, event.data.info);
+
+    let l = event.data.itemList.length
+    let itemlist = event.data.itemList
+    let total = 0
+    let p = 0
+    for (p; p < l; p++) {
+        total += Number(itemlist[p].count)
+    }
+    let weight = null
+    //amount of items in Inventory
+    secondarySetCurrentCapacity(total, weight)
+}
+
 window.onload = initDivMouseOver;
 
 let stopTooltip = false;
@@ -218,61 +279,9 @@ window.addEventListener('message', function (event) {
         dialog.close();
         stopTooltip = true;
     } else if (event.data.action == "setItems") {
-        inventorySetup(event.data.itemList);
-
-        if (type != "main") {
-
-            $('.item').draggable({
-                helper: 'clone',
-                appendTo: 'body',
-                zIndex: 99999,
-                revert: 'invalid',
-                start: function (event, ui) {
-
-                    if (disabled) {
-                        return false;
-                    }
-                    stopTooltip = true;
-                    itemData = $(this).data("item");
-                    itemInventory = $(this).data("inventory");
-
-                    if (itemInventory === "main") {
-                        $("#inventoryHud").fadeOut();
-                    } else if (itemInventory === "second") {
-                        $("#secondInventoryHud").fadeOut();
-                    }
-
-                },
-                stop: function () {
-                    stopTooltip = false;
-                    itemData = $(this).data("item");
-                    itemInventory = $(this).data("inventory");
-
-                    if (itemInventory === "main") {
-                        $("#inventoryHud").fadeIn();
-                    } else if (itemInventory === "second") {
-                        $("#secondInventoryHud").fadeIn();
-                    }
-
-
-                }
-            });
-        }
-
+        handleEvent(event, type);
     } else if (event.data.action == "setSecondInventoryItems") {
-        secondInventorySetup(event.data.itemList, event.data.info);
-
-        let l = event.data.itemList.length
-        let itemlist = event.data.itemList
-        let total = 0
-        let p = 0
-        for (p; p < l; p++) {
-            total += Number(itemlist[p].count)
-        }
-        let weight = null
-        //amount of items in Inventory
-        secondarySetCurrentCapacity(total, weight)
-
+        handleEventSecondary(event);
     } else if (event.data.action == "nearPlayers") {
         if (event.data.what == "give") {
             selectPlayerToGive(event.data);

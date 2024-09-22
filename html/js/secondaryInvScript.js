@@ -356,7 +356,7 @@ async function secondInventorySetup(items, info) {
                 OverSetDescSecond(" ");
             }
         );
-    });
+    };
 
     /* in here we ensure that at least all divs are filled */
     if (divCount < 14) {
