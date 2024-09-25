@@ -5,6 +5,8 @@ UserInventory = {}
 
 
 function InventoryService.receiveItem(name, id, amount, metadata)
+	if not name or not ClientItems[name] then return end
+
 	if UserInventory[id] ~= nil then
 		UserInventory[id]:addCount(amount)
 	else

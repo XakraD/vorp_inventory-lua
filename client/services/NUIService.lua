@@ -37,10 +37,9 @@ function NUIService.ReloadInventory(inventory)
 	for _, item in pairs(payload.itemList) do
 		if item.type == "item_weapon" then
 			item.label = item.custom_label or Utils.GetWeaponDefaultLabel(item.name)
-			if item.custom_desc then
+
+			if item.desc and item.custom_desc then
 				item.desc = item.custom_desc
-			else
-				item.desc = Utils.GetWeaponDefaultDesc(item.name)
 			end
 
 			if not item.desc then
@@ -432,22 +431,8 @@ function NUIService.NUIFocusOff()
 	NUIService.CloseInv()
 end
 
-function NUIService.LoadInv()
-	local payload = {}
+local function loadItems()
 	local items = {}
-
-	Core.Callback.TriggerAsync("vorpinventory:get_slots", function(result)
-		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", result.totalInvWeight), info = string.format("%.1f", result.slots) })
-		SendNUIMessage({
-			action = "updateStatusHud",
-			show   = not IsRadarHidden(),
-			money  = result.money,
-			gold   = result.gold,
-			rol    = result.rol,
-			id     = GetPlayerServerId(PlayerId()),
-		})
-	end)
-
 	if not StoreSynMenu then
 		for _, item in pairs(UserInventory) do
 			--item.degradation = math.random(100, 1000) / 10 -- just for tests not implemented yet
@@ -460,6 +445,7 @@ function NUIService.LoadInv()
 				item.metadata.orgdescription = nil
 			end
 		end
+
 		if GenSynInfo.buyitems and next(GenSynInfo.buyitems) then
 			local buyitems = GenSynInfo.buyitems
 			for _, item in pairs(UserInventory) do
@@ -482,12 +468,16 @@ function NUIService.LoadInv()
 			end
 		end
 	end
+	return items
+end
+
+local function loadWeapons()
+	local weapons = {}
 	for _, currentWeapon in pairs(UserWeapons) do
-		local label = currentWeapon:getCustomLabel() or currentWeapon:getLabel()
 		local weapon = {}
-		weapon.count = currentWeapon:getTotalAmmoCount() -- doesnt actually get anything cause nothing is adding it?
+		weapon.count = currentWeapon:getTotalAmmoCount()
 		weapon.limit = -1
-		weapon.label = label
+		weapon.label = currentWeapon:getCustomLabel() or currentWeapon:getLabel()
 		weapon.name = currentWeapon:getName()
 		weapon.metadata = {}
 		weapon.hash = GetHashKey(currentWeapon:getName())
@@ -503,12 +493,55 @@ function NUIService.LoadInv()
 		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.custom_desc = currentWeapon:getCustomDesc()
 		weapon.weight = currentWeapon:getWeight()
+		table.insert(weapons, weapon)
+	end
+	return weapons
+end
 
-		table.insert(items, weapon)
+
+local function loadItemsAndWeapons()
+	local itemsToSend = {}
+	local items = loadItems()
+	local weapons = loadWeapons()
+
+	-- merged items with weapons
+	if Config.InventoryOrder == "items" then
+		for _, item in pairs(items) do
+			table.insert(itemsToSend, item)
+		end
+		for _, weapon in pairs(weapons) do
+			table.insert(itemsToSend, weapon)
+		end
+	else
+		for _, weapon in pairs(weapons) do
+			table.insert(itemsToSend, weapon)
+		end
+		for _, item in pairs(items) do
+			table.insert(itemsToSend, item)
+		end
 	end
 
+	return itemsToSend
+end
+
+function NUIService.LoadInv()
+	local payload = {}
+
+	Core.Callback.TriggerAsync("vorpinventory:get_slots", function(result)
+		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", result.totalInvWeight), info = string.format("%.1f", result.slots) })
+		SendNUIMessage({
+			action = "updateStatusHud",
+			show   = not IsRadarHidden(),
+			money  = result.money,
+			gold   = result.gold,
+			rol    = result.rol,
+			id     = GetPlayerServerId(PlayerId()),
+		})
+	end)
+
+	local itemsAndWeapons = loadItemsAndWeapons()
 	payload.action = "setItems"
-	payload.itemList = items
+	payload.itemList = itemsAndWeapons
 
 	SendNUIMessage(payload)
 end
@@ -649,4 +682,9 @@ end
 
 function NUIService.getActionsConfig(obj, cb)
 	cb(Actions)
+end
+
+function NUIService.CacheImages(info)
+	local unpack = msgpack.unpack(info)
+	SendNUIMessage({ action = "cacheImages", info = unpack })
 end
