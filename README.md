@@ -31,12 +31,6 @@
 * items and weapons with groups
 * item give on first connection and weaponsand much more
 
-
-![image](https://cdn.discordapp.com/attachments/835823498840375316/1229123830077718618/image.png?ex=662e89c5&is=661c14c5&hm=5fcda3b1b3a29632e2ee63c346c8077dc0e9e8dbdc96491e12b832dc762bfcd4&)
-
-<img width="354" height="520"  alt="image" src="https://cdn.discordapp.com/attachments/844700329933013032/1229407443998609458/image.png?ex=662f91e7&is=661d1ce7&hm=a19316783828c4f2e51fe2b518180f9b58b1cea64b7225100fea16d36c53d478&">
-<img width="354" height="520" alt="image" src="https://cdn.discordapp.com/attachments/844700329933013032/1229407600483897374/image.png?ex=662f920d&is=661d1d0d&hm=beaaea8da00a4c2e0ddac24fec6600cfcf5cf9bb4846d65ca6edca605c6d5e1f&">
-
 ## Extra Features
 * Description of all items in DB
 * Gold item like Dollars (You can give and drop item)
@@ -46,7 +40,7 @@
 
 ## DOCUMENTATION
 inventory api
-[documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory) 
+[documentation](https://docs.vorp-core.com/introduction)
 
 
 ## Credits
