@@ -164,10 +164,8 @@ function Weapon:equipwep()
 	local playerPedId = PlayerPedId()
 	local ammoCount = 0
 	-- is weapon assigned as no ammo needed then set to 1 so it can be used
-	for k, v in pairs(Config.nonAmmoThrowables) do
-		if tostring(v) == self.name then
-			ammoCount = 1
-		end
+	if Config.nonAmmoThrowables[self.name] then
+		ammoCount = 1
 	end
 
 	if isWeaponMelee or isWeaponThrowable then

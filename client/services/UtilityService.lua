@@ -88,50 +88,30 @@ function Utils.getNearestPlayers()
 end
 
 function Utils.GetWeaponDefaultLabel(hash)
-	for _, wp in ipairs(SharedData.Weapons) do
-		if wp.HashName == hash then
-			return wp.Name
-		end
-	end
-	return hash
+	return SharedData.Weapons[hash].Name or hash
 end
 
 function Utils.GetWeaponDefaultDesc(hash)
-	for k, v in ipairs(SharedData.Weapons) do
-		if v.HashName == hash then
-			return v.Desc
-		end
-	end
-	return hash
+	return SharedData.Weapons[hash].Desc or hash
 end
 
 function Utils.GetWeaponDefaultWeight(hash)
-	for k, v in ipairs(SharedData.Weapons) do
-		if joaat(v.HashName) == hash then
-			return v.Weight
-		end
-	end
-	return 0.25
+	return SharedData.Weapons[hash].Weight or 0.25
 end
 
 function Utils.GetWeaponName(hash)
-	for k, v in ipairs(SharedData.Weapons) do
-		if joaat(v.HashName) == hash then
-			return v.HashName
-		end
-	end
-	return hash
+	return SharedData.Weapons[hash].HashName or hash
 end
 
+-- request multiple weapon data
 function Utils.GetWeaponsDefaultData(request)
 	local weapons = {}
-	for _, v in ipairs(SharedData.Weapons) do
-		for _, value in ipairs(request) do
-			if v.HashName == value then
-				table.insert(weapons, v)
-			end
+	for _, value in ipairs(request) do
+		if SharedData.Weapons[value].HashName == value then
+			table.insert(weapons, SharedData.Weapons[value])
 		end
 	end
+
 	return weapons
 end
 
@@ -151,7 +131,7 @@ function Utils.GetAmmoLabel(ammo)
 	end
 end
 
-function Utils.GetItem(name)
+function Utils.GetInventoryItem(name)
 	if not UserInventory or not name then
 		return false
 	end
@@ -162,12 +142,34 @@ function Utils.GetItem(name)
 				label = item:getLabel(),
 				count = item:getCount(),
 				limit = item:getLimit(),
-				weight = item:getWeight()
+				weight = item:getWeight(),
+				metadata = item:getMetadata(),
+				name = item:getName(),
+				desc = item:getDesc(),
 			}
 		end
 	end
 
 	return false
+end
+
+function Utils.GetInventoryItems()
+	if not UserInventory then
+		return false
+	end
+	local items = {}
+	for _, item in pairs(UserInventory) do
+		table.insert(items, {
+			label = item:getLabel(),
+			count = item:getCount(),
+			limit = item:getLimit(),
+			weight = item:getWeight(),
+			metadata = item:getMetadata(),
+			name = item:getName(),
+			desc = item:getDesc(),
+		})
+	end
+	return items
 end
 
 function Utils.TableRemoveByKey(table, key)
@@ -188,10 +190,5 @@ function Utils.GetLabel(hash, id)
 end
 
 function Utils.filterWeaponsSerialNumber(name)
-	for _, weapon in ipairs(Config.noSerialNumber) do
-		if weapon == name then
-			return false
-		end
-	end
-	return true
+	return Config.noSerialNumber[name] and false or true
 end

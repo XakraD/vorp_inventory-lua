@@ -937,13 +937,13 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 
 	local function getWeaponNameFromHash()
 		if weaponName and type(weaponName) == "number" then
-			for _, value in ipairs(SharedData.Weapons) do
+			for _, value in pairs(SharedData.Weapons) do
 				if joaat(value.HashName) == weaponName then
 					return value.HashName
 				end
 			end
 		end
-		return weaponName
+		return SharedData.Weapons[weaponName] and weaponName or nil
 	end
 
 	weaponName = getWeaponNameFromHash()
@@ -970,10 +970,8 @@ function InventoryAPI.canCarryAmountWeapons(player, amount, cb, weaponName)
 		return respond(cb, false)
 	end
 
-	if weaponName then
-		if SharedUtils.IsValueInArray(weaponName:upper(), Config.notweapons) then
-			return respond(cb, true)
-		end
+	if weaponName and Config.notweapons[weaponName:upper()] then
+		return respond(cb, true)
 	end
 
 	if Config.JobsAllowed[job] then
@@ -1103,16 +1101,7 @@ function InventoryAPI.registerWeapon(_target, wepname, ammos, components, comps,
 		return respond(cb, nil)
 	end
 
-	local function isWeaponInConfig()
-		for index, value in ipairs(SharedData.Weapons) do
-			if value.HashName == wepname:upper() then
-				return true
-			end
-		end
-		return false
-	end
-
-	if not isWeaponInConfig() then
+	if not SharedData.Weapons[wepname:upper()] then
 		return respond(cb, nil)
 	end
 
@@ -1277,10 +1266,8 @@ function InventoryAPI.giveWeapon(player, weaponId, target, cb)
 	end
 
 	if DefaultAmount ~= 0 then
-		if weaponName then
-			if SharedUtils.IsValueInArray(weaponName:upper(), Config.notweapons) then
-				notListed = true
-			end
+		if weaponName and Config.notweapons[weaponName:upper()] then
+			notListed = true
 		end
 
 		if not notListed then
@@ -1377,7 +1364,7 @@ function InventoryAPI.getUserTotalCountWeapons(identifier, charId, checkWeight)
 
 		if owner_identifier == identifier and owner_charid == charId then
 			local weaponName = weapon:getName()
-			if not SharedUtils.IsValueInArray(weaponName:upper(), Config.notweapons) or checkWeight then
+			if weaponName and not Config.notweapons[weaponName:upper()] or checkWeight then
 				local count = 0
 				if checkWeight then
 					count = weapon:getWeight()
@@ -1484,7 +1471,7 @@ exports("AddCharIdPermissionTakeFromCustom", InventoryAPI.AddCharIdPermissionTak
 ---@param id string inventory id
 ---@param name string item or weapon name
 function InventoryAPI.BlackListCustom(id, name)
-	if not CustomInventoryInfos[id] then
+	if not CustomInventoryInfos[id] or not name then
 		return
 	end
 
@@ -1500,6 +1487,7 @@ function InventoryAPI.removeInventory(id)
 	if not CustomInventoryInfos[id] then
 		return
 	end
+
 	CustomInventoryInfos[id]:removeCustomInventory()
 end
 
@@ -1763,7 +1751,7 @@ function InventoryAPI.openPlayerInventory(data, callback)
 	local allowItems, cooldownItems = HandleLimits("items")
 
 	if cooldownWeapons and cooldownItems then
-		Core.NotifyObjective(source, "You can't open the inventory due to cooldown on both weapons and items.", 5000)
+		Core.NotifyObjective(source, T.BothonCool, 5000)
 		return respond(callback, false)
 	end
 
@@ -1964,28 +1952,6 @@ function InventoryAPI.getCustomInventoryWeapons(id, callback)
 end
 
 exports("getCustomInventoryWeapons", InventoryAPI.getCustomInventoryWeapons)
-
-
--- remove/update item/amount  from custom inventory by item id
----@param id string inventory id
----@param item_id number item id
----@param amount number amount to remove
----@param callback fun(success: boolean)? async or sync callback
----@return boolean
-function InventoryAPI.removeItemByIdFromCustomInventory(id, item_id, amount, callback)
-	if not CustomInventoryInfos[id] then
-		return respond(callback, false)
-	end
-
-	if InventoryService.removeItemsByIdFromCustomInventory(id, item_id, amount) then
-		return respond(callback, true)
-	end
-
-	return respond(callback, false)
-end
-
-exports("removeCustomInventoryItemById", InventoryAPI.removeItemByIdFromCustomInventory)
-
 
 -- remove weapon from custom inventory by weapon id
 ---@param id string inventory id

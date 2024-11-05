@@ -49,7 +49,7 @@ end
 function Prompt:New(control, label, promptType, group)
     local promptHandle = UiPromptRegisterBegin()
     UiPromptSetControlAction(promptHandle, control)
-    local strLabel = CreateVarString(10, "LITERAL_STRING", label)
+    local strLabel = VarString(10, "LITERAL_STRING", label)
     UiPromptSetText(promptHandle, strLabel)
     UiPromptSetPriority(promptHandle, 1)
     UiPromptSetTransportMode(promptHandle, 0)

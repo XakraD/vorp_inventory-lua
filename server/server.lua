@@ -1,5 +1,6 @@
 local Core               = exports.vorp_core:GetCore()
 local InventoryBeingUsed = {}
+local T              = TranslationInv.Langs[Lang]
 
 if Config.DevMode then
     Log.Warning("^1[DEV] ^7You are in dev mode, dont use this in production live servers")
@@ -94,6 +95,6 @@ Core.Callback.Register("vorp_inventory:Server:CanOpenCustom", function(source, c
         return cb(true)
     end
 
-    Core.NotifyObjective(_source, "someone is using this stash, wait for your turn", 5000)
+    Core.NotifyObjective(_source, T.SomeoneUseing, 5000)
     return cb(false)
 end)

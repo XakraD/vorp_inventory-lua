@@ -1,252 +1,252 @@
 SharedData = {}
 
 SharedData.Weapons = {
-    {
+    WEAPON_LASSO = {
         Name        = "Lasso",
         Desc        = "Used Up When You Hogtie Someone, The Reinforced one has unlimited hogtie usage",
         AttachPoint = "",             -- TODO add attach point
         HashName    = "WEAPON_LASSO", -- DONT TOUCH
         Weight      = 0.50,           -- 50 kg
     },
-    {
+    WEAPON_LASSO_REINFORCED = {
         Name        = "Reinforced Lasso",
         Desc        = "No Hogtie Limit",
         AttachPoint = "",
         HashName    = "WEAPON_LASSO_REINFORCED",
         Weight      = 0.55,
     },
-    {
+    WEAPON_MELEE_KNIFE = {
         Name = "Knife",
         Desc = "Knife used mainly for skinning animals",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE",
         Weight = 0.33,
     },
-    {
+    WEAPON_MELEE_KNIFE_RUSTIC = {
         Name = "Knife Rustic",
         Desc = "old looking knife, could it be still useful ?",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_RUSTIC",
         Weight = 0.40,
     },
-    {
+    WEAPON_MELEE_KNIFE_HORROR = {
         Name = "Knife Horror",
         Desc = "This knife was used to do plenty of unpleasant things",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_HORROR",
         Weight = 0.40,
     },
-    {
+    WEAPON_MELEE_KNIFE_CIVIL_WAR = {
         Name = "Knife Civil War",
         Desc = "A knife with a lot of history",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_CIVIL_WAR",
         Weight = 0.45,
     },
-    {
+    WEAPON_MELEE_KNIFE_JAWBONE = {
         Name = "Knife Jawbone",
         Desc = "A knife made of ancient bones",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_JAWBONE",
         Weight = 0.37,
     },
-    {
+    WEAPON_MELEE_KNIFE_MINER = {
         Name = "Knife Miner",
         Desc = "Miners bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_MINER",
         Weight = 0.40,
     },
-    {
+    WEAPON_MELEE_KNIFE_VAMPIRE = {
         Name = "Knife Vampire",
         Desc = "They cant be real...",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_VAMPIRE",
         Weight = 0.39,
     },
-    {
+    WEAPON_MELEE_CLEAVER = {
         Name = "Cleaver",
         Desc = "Scary looking but useful",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_CLEAVER",
         Weight = 0.73,
     },
-    {
+    WEAPON_MELEE_HATCHET = {
         Name = "Hachet",
         Desc = "A piece of wood with a blade",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_HATCHET",
         Weight = 1.05,
     },
-    {
+    WEAPON_MELEE_HATCHET_DOUBLE_BIT = {
         Name = "Hachet Double Bit",
         Desc = "A Piece of wood with twice the blade",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_HATCHET_DOUBLE_BIT",
         Weight = 1.15,
     },
-    {
+    WEAPON_MELEE_HATCHET_HEWING = {
         Name = "Hachet Hewing",
         Desc = "Some say this hatchet is magical",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_HATCHET_HEWING",
         Weight = 1.10,
     },
-    {
+    WEAPON_MELEE_HATCHET_HUNTER = {
         Name = "Hachet Hunter",
         Desc = "A Hunters bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_HATCHET_HUNTER",
         Weight = 1.15,
     },
-    {
+    WEAPON_MELEE_HATCHET_VIKING = {
         Name = "Hachet Viking",
         Desc = "Smells of fish and salt",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_HATCHET_VIKING",
         Weight = 1.20,
     },
-    {
+    WEAPON_THROWN_TOMAHAWK = {
         Name = "Tomahawk",
         Desc = "A weapon befitting a warrior",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_TOMAHAWK",
         Weight = 1.30,
     },
-    {
+    WEAPON_THROWN_TOMAHAWK_ANCIENT = {
         Name = "Tomahawk Ancient",
         Desc = "This one is Ancient",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_TOMAHAWK_ANCIENT",
         Weight = 1.50,
     },
-    {
+    WEAPON_THROWN_THROWING_KNIVES = {
         Name = "Throwing Knifes",
         Desc = "Folks love playing with these",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_THROWING_KNIVES",
         Weight = 1.05,
     },
-    {
+    WEAPON_MELEE_MACHETE = {
         Name = "Machete",
         Desc = "Useful in the jungle",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_MACHETE",
         Weight = 1.3,
     },
-    {
+    WEAPON_BOW = {
         Name = "Bow",
         Desc = "A Simple but effective weapon",
         AttachPoint = "",
         HashName = "WEAPON_BOW",
         Weight = 0.85,
     },
-    {
+    WEAPON_PISTOL_SEMIAUTO = {
         Name = "Pistol Semi-Auto",
         Desc = "repeating single-chamber handgun",
         AttachPoint = "",
         HashName = 'WEAPON_PISTOL_SEMIAUTO',
         Weight = 1.18,
     },
-    {
+    WEAPON_PISTOL_MAUSER = {
         Name = "Pistol Mauser",
         Desc = "semi-automatic pistol that was originally produced by German arms manufacturer Mauser",
         AttachPoint = "",
         HashName = "WEAPON_PISTOL_MAUSER",
         Weight = 1.13,
     },
-    {
+    WEAPON_PISTOL_VOLCANIC = {
         Name = "Pistol Volcanic",
         Desc = " an improved version of the Rocket Ball ammunition",
         AttachPoint = "",
         HashName = "WEAPON_PISTOL_VOLCANIC",
         Weight = 1.10,
     },
-    {
+    WEAPON_PISTOL_M1899 = {
         Name = "Pistol M1899",
         Desc = "its magazine-loaded ammunition allows for a swift reload",
         AttachPoint = "",
         HashName = "WEAPON_PISTOL_M1899",
         Weight = 1.15,
     },
-    {
+    WEAPON_REVOLVER_SCHOFIELD = {
         Name = "Revolver Schofield",
         Desc = "single-action, cartridge-firing, top-break revolver",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_SCHOFIELD",
         Weight = 1.30,
     },
-    {
+    WEAPON_REVOLVER_NAVY = {
         Name = "Revolver Navy",
         Desc = "cap and ball revolver that was designed by Samuel Colt",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_NAVY",
         Weight = 1.20,
     },
-    {
+    WEAPON_REVOLVER_NAVY_CROSSOVER = {
         Name = "Revolver Navy Crossover",
         Desc = "a revolver that is also a shotgun",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_NAVY_CROSSOVER",
         Weight = 1.25,
     },
-    {
+    WEAPON_REVOLVER_LEMAT = {
         Name = "Revolver Lemat",
         Desc = "a revolver that is also a shotgun",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_LEMAT",
         Weight = 1.86,
     },
-    {
+    WEAPON_REVOLVER_DOUBLEACTION = {
         Name = "Revolver Double Action",
         Desc = "has a trigger that both cocks the hammer and releases it in one pull ",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_DOUBLEACTION",
         Weight = 0.94,
     },
-    {
+    WEAPON_REVOLVER_CATTLEMAN = {
         Name = "Revolver Cattleman",
         Desc = "A cowboys bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_CATTLEMAN",
         Weight = 1.04,
     },
-    {
+    WEAPON_REVOLVER_CATTLEMAN_MEXICAN = {
         Name = "Revolver Cattleman mexican",
         Desc = "a different flavor",
         AttachPoint = "",
         HashName = "WEAPON_REVOLVER_CATTLEMAN_MEXICAN",
         Weight = 1.04,
     },
-    {
+    WEAPON_RIFLE_VARMINT = {
         Name = "Varmint Rifle",
         Desc = "A rifle useful for hunting critters",
         AttachPoint = "",
         HashName = "WEAPON_RIFLE_VARMINT",
         Weight = 3.80,
     },
-    {
+    WEAPON_REPEATER_WINCHESTER = {
         Name = "Winchester Repeater",
         Desc = "lever-action repeating rifles manufactured by the Winchester Repeating Arms Company",
         AttachPoint = "",
         HashName = "WEAPON_REPEATER_WINCHESTER",
         Weight = 4.30,
     },
-    {
+    WEAPON_REPEATER_HENRY = {
         Name = "Henry Reapeater",
         Desc = " lever-action tubular magazine rifle",
         AttachPoint = "",
         HashName = "WEAPON_REPEATER_HENRY",
         Weight = 4.20,
     },
-    {
+    WEAPON_REPEATER_EVANS = {
         Name = "Evans Repeater",
         Desc = "a lever-action repeating rifle designed by Warren R. Evans as a high capacity rifle",
         AttachPoint = "",
         HashName = "WEAPON_REPEATER_EVANS",
         Weight = 4.45,
     },
-    {
+    WEAPON_REPEATER_CARBINE = {
         Name = "Carabine Reapeater",
         Desc =
         "A reliable and popular repeating rifle, the Buck Carbine provides medium damage and a decent firing rate",
@@ -254,77 +254,77 @@ SharedData.Weapons = {
         HashName = "WEAPON_REPEATER_CARBINE",
         Weight = 4.10,
     },
-    {
+    WEAPON_SNIPERRIFLE_ROLLINGBLOCK = {
         Name = "Rolling Block Rifle",
         Desc = "Remington Rolling Block is a family of breech-loading rifles",
         AttachPoint = "",
         HashName = "WEAPON_SNIPERRIFLE_ROLLINGBLOCK",
         Weight = 4.20,
     },
-    {
+    WEAPON_SNIPERRIFLE_CARCANO = {
         Name = "Carcano Rifle",
         Desc = "The Carcano is an Italian, bolt action rifle",
         AttachPoint = "",
         HashName = "WEAPON_SNIPERRIFLE_CARCANO",
         Weight = 3.62,
     },
-    {
+    WEAPON_RIFLE_SPRINGFIELD = {
         Name = "Springfield Rifle",
         Desc = "Army's standard issue rifle",
         AttachPoint = "",
         HashName = "WEAPON_RIFLE_SPRINGFIELD",
         Weight = 3.90,
     },
-    {
+    WEAPON_RIFLE_ELEPHANT = {
         Name = "Elephant Rifle",
         Desc = "Best Weapon for a hunter looking to take down large prey",
         AttachPoint = "",
         HashName = "WEAPON_RIFLE_ELEPHANT",
         Weight = 12.50,
     },
-    {
+    WEAPON_RIFLE_BOLTACTION = {
         Name = "BoltAction Rifle",
         Desc = "manual firearm action that is operated by directly manipulating the bolt",
         AttachPoint = "",
         HashName = "WEAPON_RIFLE_BOLTACTION",
         Weight = 4.08,
     },
-    {
+    WEAPON_SHOTGUN_SEMIAUTO = {
         Name = "Semi-Auto Shotgun",
         Desc = "a repeating shotgun with a semi-automatic action, capable of automatically chambering a new shell",
         AttachPoint = "",
         HashName = "WEAPON_SHOTGUN_SEMIAUTO",
         Weight = 3.53,
     },
-    {
+    WEAPON_SHOTGUN_SAWEDOFF = {
         Name = "Sawedoff Shotgun",
         Desc = "shotgun with a shorter gun barre",
         AttachPoint = "",
         HashName = "WEAPON_SHOTGUN_SAWEDOFF",
         Weight = 1.90,
     },
-    {
+    WEAPON_SHOTGUN_REPEATING = {
         Name = "Repeating Shotgun",
         Desc = "The Lancaster Repeating Shotgun",
         AttachPoint = "",
         HashName = "WEAPON_SHOTGUN_REPEATING",
         Weight = 3.60,
     },
-    {
+    WEAPON_SHOTGUN_DOUBLEBARREL_EXOTIC = {
         Name = "Double Barrel Exotic Shotgun",
         Desc = "exotic-rarity variant of the Double Barrel Shotgun",
         AttachPoint = "",
         HashName = "WEAPON_SHOTGUN_DOUBLEBARREL_EXOTIC",
         Weight = 3.71,
     },
-    {
+    WEAPON_SHOTGUN_PUMP = {
         Name = "Pump Shotgun",
         Desc = "repeating firearm action that is operated manually by moving a sliding handguard",
         AttachPoint = "",
         HashName = "WEAPON_SHOTGUN_PUMP",
         Weight = 3.60,
     },
-    {
+    WEAPON_SHOTGUN_DOUBLEBARREL = {
         Name = "Double Barrel Shotgun",
         Desc =
         "break-action shotgun with two parallel barrels, allowing two single shots to be fired in quick succession",
@@ -332,182 +332,182 @@ SharedData.Weapons = {
         HashName = "WEAPON_SHOTGUN_DOUBLEBARREL",
         Weight = 3.65,
     },
-    {
+    WEAPON_KIT_CAMERA = {
         Name = "Camera",
         Desc = "a journalists bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_KIT_CAMERA",
         Weight = 0.47,
     },
-    {
+    WEAPON_KIT_BINOCULARS_IMPROVED = {
         Name = "Improved Binoculars",
         Desc = "See things clearly !",
         AttachPoint = "",
         HashName = "WEAPON_KIT_BINOCULARS_IMPROVED",
         Weight = 1.50,
     },
-    {
+    WEAPON_MELEE_KNIFE_TRADER = {
         Name = "Knife Trader",
         Desc = "a traders bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_KNIFE_TRADER",
         Weight = 0.45,
     },
-    {
+    WEAPON_KIT_BINOCULARS = {
         Name = "Binoculars",
         Desc = "lets you see far things",
         AttachPoint = "",
         HashName = "WEAPON_KIT_BINOCULARS",
         Weight = 1.45,
     },
-    {
+    WEAPON_KIT_CAMERA_ADVANCED = {
         Name = "Advanced Camera",
         Desc = "a camera thats slightly technologicaly better",
         AttachPoint = "",
         HashName = "WEAPON_KIT_CAMERA_ADVANCED",
         Weight = 0.55,
     },
-    {
+    WEAPON_MELEE_LANTERN = {
         Name = "Lantern",
         Desc = "lets you see better in the dark",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_LANTERN",
         Weight = 0.56,
     },
-    {
+    WEAPON_MELEE_DAVY_LANTERN = {
         Name = "Davy Lantern",
         Desc = "safety lamp for use in flammable atmospheres",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_DAVY_LANTERN",
         Weight = 0.65,
     },
-    {
+    WEAPON_MELEE_LANTERN_HALLOWEEN = {
         Name = "Halloween Lantern",
         Desc = "made with a real human skull",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_LANTERN_HALLOWEEN",
         Weight = 1.20,
     },
-    {
+    WEAPON_THROWN_POISONBOTTLE = {
         Name = "Poison Bottle",
         Desc = "who knows whats in this thing",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_POISONBOTTLE",
         Weight = 0.35,
     },
-    {
+    WEAPON_KIT_METAL_DETECTOR = {
         Name = "Metal Detector",
         Desc = "helps you find valuables",
         AttachPoint = "",
         HashName = "WEAPON_KIT_METAL_DETECTOR",
         Weight = 0.45,
     },
-    {
+    WEAPON_THROWN_DYNAMITE = {
         Name = "Dynamite",
         Desc = "boomstick",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_DYNAMITE",
         Weight = 0.19,
     },
-    {
+    WEAPON_THROWN_MOLOTOV = {
         Name = "Molotov",
         Desc = "an arsonists bestfriend",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_MOLOTOV",
         Weight = 0.45,
     },
-    {
+    WEAPON_BOW_IMPROVED = {
         Name = "Improved Bow",
         Desc = "a bow with better accuracy",
         AttachPoint = "",
         HashName = "WEAPON_BOW_IMPROVED",
         Weight = 1.10,
     },
-    {
+    WEAPON_MELEE_MACHETE_COLLECTOR = {
         Name = "Machete Collector",
         Desc = "every collector needs one",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_MACHETE_COLLECTOR",
         Weight = 1.40,
     },
-    {
+    WEAPON_MELEE_LANTERN_ELECTRIC = {
         Name = "Electric Lantern",
         Desc = "a marvel of technology",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_LANTERN_ELECTRIC",
         Weight = 0.95,
     },
-    {
+    WEAPON_MELEE_TORCH = {
         Name = "Torch",
         Desc = "your basic stick on fire",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_TORCH",
         Weight = 1.50,
     },
-    {
+    WEAPON_MOONSHINEJUG_MP = {
         Name = "Moonshine Jug",
         Desc = "those are very fun",
         AttachPoint = "",
         HashName = "WEAPON_MOONSHINEJUG_MP",
         Weight = 2.00,
     },
-    {
+    WEAPON_THROWN_BOLAS = {
         Name = "Bolas",
         Desc = "every badass cowboy needs one",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_BOLAS",
         Weight = 0.55,
     },
-    {
+    WEAPON_THROWN_BOLAS_HAWKMOTH = {
         Name = "Bolas Hawkmoth",
         Desc = "a bola with a twist",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_BOLAS_HAWKMOTH",
         Weight = 0.65,
     },
-    {
+    WEAPON_THROWN_BOLAS_IRONSPIKED = {
         Name = "Bolas Ironspiked",
         Desc = "a more edgy bola",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_BOLAS_IRONSPIKED",
         Weight = 0.75,
     },
-    {
+    WEAPON_THROWN_BOLAS_INTERTWINED = {
         Name = "Bolas Intertwined",
         Desc = "a stronger bola",
         AttachPoint = "",
         HashName = "WEAPON_THROWN_BOLAS_INTERTWINED",
         Weight = 0.60,
     },
-    {
+    WEAPON_FISHINGROD = {
         Name = "Fishing Rod",
         Desc = "whats better than catching fish",
         AttachPoint = "",
         HashName = "WEAPON_FISHINGROD",
         Weight = 1.10,
     },
-    {
+    WEAPON_MACHETE_HORROR = {
         Name = "Machete Horror",
         Desc = "this one scares people",
         AttachPoint = "",
         HashName = "WEAPON_MACHETE_HORROR",
         Weight = 1.40,
     },
-    {
+    WEAPON_MELEE_LANTERN_HALOWEEN = {
         Name = "Lantern Haloween",
         Desc = "made with a real human skull",
         AttachPoint = "",
         HashName = "WEAPON_MELEE_LANTERN_HALOWEEN",
         Weight = 0.95,
     },
-    {
+    WEAPON_MELEE_HAMMER = {
         Name        = "Hammer",
         Desc        = "Richards Hammer!",
         AttachPoint = "",
         HashName    = "WEAPON_MELEE_HAMMER",
         Weight      = 1.25,
     },
-    {
+    WEAPON_REVOLVER_DOUBLEACTION_GAMBLER = {
         Name        = "High Roller Double-Action Revolver",
         Desc        = "Double-action Revolver with gambler motifs engraved across the weapon",
         AttachPoint = "",

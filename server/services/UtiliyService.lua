@@ -201,24 +201,14 @@ end
 ---@param name string weapon name
 ---@return string
 function SvUtils.GenerateWeaponLabel(name)
-    for key, value in ipairs(SharedData.Weapons) do
-        if value.HashName == name then
-            return value.Name
-        end
-    end
-    return ""
+    return SharedData.Weapons[name] and SharedData.Weapons[name].Name or ""
 end
 
 --- filter weapons that should not have a serial number
 ---@param name string weapon name
 ---@return boolean
 function SvUtils.filterWeaponsSerialNumber(name)
-    for _, weapon in pairs(Config.noSerialNumber) do
-        if weapon == name then
-            return false
-        end
-    end
-    return true
+    return Config.noSerialNumber[name] and false or true
 end
 
 --- generate a unique random id
@@ -246,11 +236,9 @@ function SvUtils.SendDiscordWebhook(data)
     Core.AddWebhook(data.title, data.webhook, data.description, data.color, data.name)
 end
 
+--- get weapon weight
+---@param name string weapon name
+---@return number
 function SvUtils.GetWeaponWeight(name)
-    for _, weapon in ipairs(SharedData.Weapons) do
-        if weapon.HashName == name:upper() then
-            return weapon.Weight
-        end
-    end
-    return 1
+    return SharedData.Weapons[name:upper()] and SharedData.Weapons[name:upper()].Weight or 1
 end

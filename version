@@ -1,3 +1,25 @@
+<3.9>
+- fixed an issue with a query that was messing with shared custom inventories (this was added to attepmt to clean up the database)
+- added security check before removing items when players respawn to make sure the event can only be triggered if they are actually deprecated
+- fixed new export to get custom inventory count of items to return the proper value (an integer)
+- fixed new export to add items to custom inventory where metadata wasnt being added checked for nul values
+- fixed syn events, added security checks 
+- added new player timer to config refactored to use tables instead of arrays for faster look ups
+- added new exports for custom inventories remove weapons get weapons count add weapons 
+- added new exports to get all items and all weapons from custom inventory without sepcifying the items or weapons name
+- added new exports update items in custom inventories, their amount and metadata remove items by item id, remove weapons by id 
+- added new exports to clear all items or weapons from custom inventories
+- added new statebag IsInvOpen to detect if the inventory is open or closed and an event has also been added to detect when the inventory is open or closed client side only che check docs
+- added image preload cache feature to ensure images are loaded only once and added a default image incase image doesnt exist
+- removed serial number from descriptions since its already displaying on the tool tip
+- removed items/weapons drop on death feature (this was causing crashes when you had many items, wasnt also working  unless youwere in area and contributes to net obj pool)
+- added to config to decide what shows first between weapons or items 
+- added missing translations 
+- refactor and optimised ammo look ups by adding tables and removing arrays for faster look ups (fixes hatchet ammo was in wrong group)
+- refactor and optimised weapon look ups by adding tables and removed arrays for faster look ups
+- added exports for getting items to the client side for displaying and doing light checks 
+- other minor fixes and improvements were done as well 
+- make sure to update all files and fxmanifest   
 <3.8>
 - new exports for custom inventories using char id permissions just like jobs
 - new feature to pass image variable with item name for metadata to display different images
