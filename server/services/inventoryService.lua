@@ -1867,10 +1867,10 @@ function InventoryService.removeItemFromCustomInventory(invId, item_name, amount
 		local amountToRemove = math.min(remainingAmount, item.amount)
 
 		if amountToRemove >= item.amount then
-			DBService.updateAsync("DELETE FROM character_inventories WHERE item_crafted_id = @id AND inventory_type = @inventory_type", { id = item.item_crafted_id, inventory_type = invId })
-			DBService.updateAsync("DELETE FROM items_crafted WHERE id = @id", { id = item.item_crafted_id })
+			DBService.queryAwait("DELETE FROM character_inventories WHERE item_crafted_id = @id AND inventory_type = @inventory_type", { id = item.item_crafted_id, inventory_type = invId })
+			DBService.queryAwait("DELETE FROM items_crafted WHERE id = @id", { id = item.item_crafted_id })
 		else
-			DBService.updateAsync("UPDATE character_inventories SET amount = amount - @amount WHERE item_crafted_id = @id AND inventory_type = @inventory_type", { amount = amountToRemove, id = item.item_crafted_id, inventory_type = invId })
+			DBService.queryAwait("UPDATE character_inventories SET amount = amount - @amount WHERE item_crafted_id = @id AND inventory_type = @inventory_type", { amount = amountToRemove, id = item.item_crafted_id, inventory_type = invId })
 		end
 
 		remainingAmount = remainingAmount - amountToRemove
