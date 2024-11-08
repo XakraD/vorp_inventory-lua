@@ -7,7 +7,7 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     local user <const> = Core.getUser(_source)
     if not user then return end
 
-    local character <const> = user.getUsedCharacter()
+    local character <const> = user.getUsedCharacter
     local job <const> = character.job
     local isdead <const> = character.isdead
 
@@ -21,9 +21,9 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if value.Money.ClearMoney then
         if not SharedUtils.IsValueInArray(job, value.Money.JobLock) then
             if not value.Money.MoneyPercentage then
-                user.removeCurrency(0, user.money)
+                character.removeCurrency(0, user.money)
             else
-                user.removeCurrency(0, user.money * value.Money.MoneyPercentage)
+                character.removeCurrency(0, user.money * value.Money.MoneyPercentage)
             end
         end
     end
@@ -32,9 +32,9 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if value.Gold.ClearGold then
         if not SharedUtils.IsValueInArray(job, value.Gold.JobLock) then
             if not value.Gold.GoldPercentage then
-                user.removeCurrency(1, user.gold)
+                character.removeCurrency(1, user.gold)
             else
-                user.removeCurrency(1, user.gold * value.Gold.GoldPercentage)
+                character.removeCurrency(1, user.gold * value.Gold.GoldPercentage)
             end
         end
     end
