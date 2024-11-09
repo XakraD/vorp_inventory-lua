@@ -493,13 +493,6 @@ SharedData.Weapons = {
         HashName = "WEAPON_MACHETE_HORROR",
         Weight = 1.40,
     },
-    WEAPON_MELEE_LANTERN_HALOWEEN = {
-        Name = "Lantern Haloween",
-        Desc = "made with a real human skull",
-        AttachPoint = "",
-        HashName = "WEAPON_MELEE_LANTERN_HALOWEEN",
-        Weight = 0.95,
-    },
     WEAPON_MELEE_HAMMER = {
         Name        = "Hammer",
         Desc        = "Richards Hammer!",
