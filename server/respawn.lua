@@ -21,9 +21,9 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if value.Money.ClearMoney then
         if not SharedUtils.IsValueInArray(job, value.Money.JobLock) then
             if not value.Money.MoneyPercentage then
-                character.removeCurrency(0, user.money)
+                character.removeCurrency(0, character.money)
             else
-                character.removeCurrency(0, user.money * value.Money.MoneyPercentage)
+                character.removeCurrency(0, character.money * value.Money.MoneyPercentage)
             end
         end
     end
@@ -32,9 +32,9 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if value.Gold.ClearGold then
         if not SharedUtils.IsValueInArray(job, value.Gold.JobLock) then
             if not value.Gold.GoldPercentage then
-                character.removeCurrency(1, user.gold)
+                character.removeCurrency(1, character.gold)
             else
-                character.removeCurrency(1, user.gold * value.Gold.GoldPercentage)
+                character.removeCurrency(1, character.gold * value.Gold.GoldPercentage)
             end
         end
     end
