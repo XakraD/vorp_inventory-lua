@@ -1,24 +1,24 @@
-local Core               = exports.vorp_core:GetCore()
+local Core <const>       = exports.vorp_core:GetCore()
 local InventoryBeingUsed = {}
-local T              = TranslationInv.Langs[Lang]
+local T <const>          = TranslationInv.Langs[Lang]
 
 if Config.DevMode then
     Log.Warning("^1[DEV] ^7You are in dev mode, dont use this in production live servers")
 end
 
 RegisterServerEvent("syn:stopscene")
-AddEventHandler("syn:stopscene", function(x) -- new
-    local _source = source
+AddEventHandler("syn:stopscene", function(x)
+    local _source <const> = source
     TriggerClientEvent("inv:dropstatus", _source, x)
 end)
 
 RegisterServerEvent("vorpinventory:netduplog", function()
-    local _source = source
-    local playername = GetPlayerName(_source)
-    local description = Logs.NetDupWebHook.Language.descriptionstart .. playername .. Logs.NetDupWebHook.Language.descriptionend
+    local _source <const> = source
+    local playername <const> = GetPlayerName(_source)
+    local description <const> = Logs.NetDupWebHook.Language.descriptionstart .. playername .. Logs.NetDupWebHook.Language.descriptionend
 
     if Logs.NetDupWebHook.Active then
-        Info = {
+        local info <const> = {
             source = _source,
             title = Config.NetDupWebHook.Language.title,
             name = playername,
@@ -26,14 +26,14 @@ RegisterServerEvent("vorpinventory:netduplog", function()
             webhook = Logs.NetDupWebHook.webhook,
             color = Logs.NetDupWebHook.color
         }
-        SvUtils.SendDiscordWebhook(Info)
+        SvUtils.SendDiscordWebhook(info)
     else
         print('[' .. Logs.NetDupWebHook.Language.title .. '] ', description)
     end
 end)
 
 RegisterServerEvent("vorp_inventory:Server:UnlockCustomInv", function()
-    local _source = source
+    local _source <const> = source
     for i, value in pairs(InventoryBeingUsed) do
         if value == _source then
             InventoryBeingUsed[i] = nil
@@ -43,11 +43,14 @@ RegisterServerEvent("vorp_inventory:Server:UnlockCustomInv", function()
 end)
 
 AddEventHandler('playerDropped', function()
-    local _source = source
+    local _source <const> = source
     if _source then
-        local char = Core.getUser(_source)
-        local weapons = UsersWeapons.default
-        AmmoData[_source] = nil
+        local user <const>    = Core.getUser(_source)
+        local weapons <const> = UsersWeapons.default
+
+        if AmmoData[_source] then
+            AmmoData[_source] = nil
+        end
 
         for i, value in pairs(InventoryBeingUsed) do
             if value == _source then
@@ -56,12 +59,10 @@ AddEventHandler('playerDropped', function()
             end
         end
 
-        if not char then
-            return
-        end
+        if not user then return end
 
-        local character = char.getUsedCharacter
-        local charid = character.charIdentifier
+        local charid <const> = user.getUsedCharacter.charIdentifier
+
         for key, value in pairs(weapons) do
             if value.charId == charid then
                 UsersWeapons.default[key] = nil
@@ -71,30 +72,30 @@ AddEventHandler('playerDropped', function()
     end
 end)
 
-Core.Callback.Register("vorpinventory:get_slots", function(source, cb)
-    local _source = source
-    local User = Core.getUser(_source).getUsedCharacter
-    local totalItems = InventoryAPI.getUserTotalCountItems(User.identifier, User.charIdentifier)
-    local totalWeapons = InventoryAPI.getUserTotalCountWeapons(User.identifier, User.charIdentifier, true)
-    local totalInvWeight = (totalItems + totalWeapons)
+Core.Callback.Register("vorpinventory:get_slots", function(source, cb, _)
+    local user <const> = Core.getUser(source)
+    if not user then return end
+
+    local character <const>      = user.getUsedCharacter
+    local totalItems <const>     = InventoryAPI.getUserTotalCountItems(character.identifier, character.charIdentifier)
+    local totalWeapons <const>   = InventoryAPI.getUserTotalCountWeapons(character.identifier, character.charIdentifier, true)
+    local totalInvWeight <const> = (totalItems + totalWeapons)
     return cb({
         totalInvWeight = totalInvWeight,
-        slots = User.invCapacity,
-        money = User.money,
-        gold = User.gold,
-        rol = User.rol
+        slots = character.invCapacity,
+        money = character.money,
+        gold = character.gold,
+        rol = character.rol
     })
 end)
 
-
 Core.Callback.Register("vorp_inventory:Server:CanOpenCustom", function(source, cb, id)
-    local _source = source
     id = tostring(id)
     if not InventoryBeingUsed[id] then
-        InventoryBeingUsed[id] = _source
+        InventoryBeingUsed[id] = source
         return cb(true)
     end
 
-    Core.NotifyObjective(_source, T.SomeoneUseing, 5000)
+    Core.NotifyObjective(source, T.SomeoneUseing, 5000)
     return cb(false)
 end)

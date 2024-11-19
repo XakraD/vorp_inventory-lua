@@ -40,49 +40,46 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     end
 
     -- ITEMS
-    CreateThread(function()
-        if value.Items.AllItems then
-            if not SharedUtils.IsValueInArray(job, value.Items.JobLock) then
-                InventoryAPI.getInventory(_source, function(Userinventory)
-                    for i, item in pairs(Userinventory) do
-                        Wait(20)
-                        if next(value.Items.itemWhiteList) then
-                            for index, v in ipairs(value.Items.itemWhiteList) do
-                                if item.name ~= v then
-                                    InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
-                                end
+    if value.Items.AllItems then
+        if not SharedUtils.IsValueInArray(job, value.Items.JobLock) then
+            InventoryAPI.getInventory(_source, function(Userinventory)
+                for i, item in pairs(Userinventory) do
+                    Wait(20)
+                    if next(value.Items.itemWhiteList) then
+                        for index, v in ipairs(value.Items.itemWhiteList) do
+                            if item.name ~= v then
+                                InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
                             end
-                        else
-                            InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
                         end
+                    else
+                        InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
                     end
-                end)
-            end
+                end
+            end)
         end
-    end)
+    end
 
     -- WEAPONS
-    CreateThread(function()
-        if value.Weapons.AllWeapons then
-            if not SharedUtils.IsValueInArray(job, value.Weapons.JobLock) then
-                InventoryAPI.getUserWeapons(_source, function(Userweapons)
-                    for i, weapon in pairs(Userweapons) do
-                        if next(value.Weapons.WeaponWhitelisted) then
-                            for index, v in ipairs(value.Weapons.WeaponWhitelisted) do
-                                if v ~= weapon.name then
-                                    InventoryAPI.subWeapon(_source, weapon.id)
-                                    InventoryAPI.deleteWeapon(_source, weapon.id)
-                                end
+    if value.Weapons.AllWeapons then
+        if not SharedUtils.IsValueInArray(job, value.Weapons.JobLock) then
+            InventoryAPI.getUserWeapons(_source, function(Userweapons)
+                for i, weapon in pairs(Userweapons) do
+                    if next(value.Weapons.WeaponWhitelisted) then
+                        for index, v in ipairs(value.Weapons.WeaponWhitelisted) do
+                            if v ~= weapon.name then
+                                InventoryAPI.subWeapon(_source, weapon.id)
+                                InventoryAPI.deleteWeapon(_source, weapon.id)
                             end
-                        else
-                            InventoryAPI.subWeapon(_source, weapon.id)
-                            InventoryAPI.deleteWeapon(_source, weapon.id)
                         end
+                    else
+                        InventoryAPI.subWeapon(_source, weapon.id)
+                        InventoryAPI.deleteWeapon(_source, weapon.id)
                     end
-                end)
-            end
+                end
+            end)
         end
-    end)
+    end
+
 
     --AMMO
     if value.Ammo.AllAmmo then
