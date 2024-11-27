@@ -237,8 +237,19 @@ function SvUtils.SendDiscordWebhook(data)
 end
 
 --- get weapon weight
----@param name string weapon name
+---@param name string | number weapon name
 ---@return number
 function SvUtils.GetWeaponWeight(name)
-    return SharedData.Weapons[name:upper()] and SharedData.Weapons[name:upper()].Weight or 1
+    local weaponName = nil
+    if type(name) == "number" then
+        for _, value in pairs(SharedData.Weapons) do
+            if joaat(value.HashName) == name then
+                weaponName = value.HashName
+                break
+            end
+        end
+    else
+        weaponName = name
+    end
+    return SharedData.Weapons[weaponName] and SharedData.Weapons[weaponName].Weight or 1
 end
