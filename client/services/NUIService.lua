@@ -23,8 +23,8 @@ end)
 
 function ApplyPosfx()
 	if Config.UseFilter then
-		AnimpostfxPlay("OJDominoBlur")
-		AnimpostfxSetStrength("OJDominoBlur", 0.5)
+		AnimpostfxPlay(Config.Filter)
+		AnimpostfxSetStrength(Config.Filter, 0.5)
 	end
 end
 
@@ -108,7 +108,7 @@ end
 
 function NUIService.CloseInv()
 	if Config.UseFilter then
-		AnimpostfxStop("OJDominoBlur")
+		AnimpostfxStop(Config.Filter)
 	end
 	if StoreSynMenu then
 		StoreSynMenu = false
@@ -420,7 +420,7 @@ end
 
 function NUIService.NUIFocusOff()
 	if Config.UseFilter then
-		AnimpostfxStop("OJDominoBlur")
+		AnimpostfxStop(Config.Filter)
 	end
 	DisplayRadar(true)
 	PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)

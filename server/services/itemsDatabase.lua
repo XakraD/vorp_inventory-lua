@@ -114,31 +114,37 @@ MySQL.ready(function()
 	end)
 end)
 
+local function cacheImages()
+	-- only items from the database because items folder can contain duplicates or unused images
+	local newtable = {}
+	for k, v in pairs(ServerItems) do
+		newtable[k] = v.item
+	end
+	-- all weapon images from config because items folder can contain duplicates or unused images
+	for k, v in pairs(SharedData.Weapons) do
+		newtable[k] = k
+	end
+	local packed = msgpack.pack(newtable)
+
+	return packed
+end
 
 -- on player select character event
 AddEventHandler("vorp:SelectedCharacter", function(source, char)
 	loadPlayerWeapons(source, char)
 
-	local newtable = {}
-	for k, v in pairs(ServerItems) do
-		newtable[k] = v.item
-	end
-	local packed = msgpack.pack(newtable)
+	local packed = cacheImages()
 	TriggerClientEvent("vorp_inventory:server:CacheImages", source, packed)
 end)
 
--- reload on script restart
+-- reload on script restart for testing
 if Config.DevMode then
 	RegisterNetEvent("DEV:loadweapons", function()
 		local _source = source
 		local character = Core.getUser(_source).getUsedCharacter
 		loadPlayerWeapons(_source, character)
 
-		local newtable = {}
-		for k, v in pairs(ServerItems) do
-			newtable[k] = v.item
-		end
-		local packed = msgpack.pack(newtable)
-		TriggerClientEvent("vorp_inventory:server:CacheImages", source, packed)
+		local packed = cacheImages()
+		TriggerClientEvent("vorp_inventory:server:CacheImages", _source, packed)
 	end)
 end

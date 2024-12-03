@@ -347,9 +347,10 @@ function loadCustomInventoryItemsWeapons(item, index, group) {
 
     const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
     const weight = item.weight ? LANGUAGE.labels.weight + (item.weight * item.count).toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (item.count / 4).toFixed(2) + " " + Config.WeightMeasure;
+    const url = imageCache[item.name]
     $("#secondInventoryElement").append(`
     <div data-label='${item.label}' data-group ='${group}'
-    style='background-image: url("img/items/${item.name}.png"); background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
+    style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
     </div>`);
 
 }
