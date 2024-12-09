@@ -122,7 +122,7 @@ PickupsService.shareGoldPickupClient  = function(entityHandle, amount, position,
 	if value == 1 then
 		if WorldPickups[entityHandle] == nil then
 			local pickup = Pickup:New({
-				name = T.gold " (" .. tostring(amount) .. ")",
+				name = T.gold .. " (" .. tostring(amount) .. ")",
 				entityId = entityHandle,
 				amount = amount,
 				isMoney = false,
