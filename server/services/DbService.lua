@@ -2,7 +2,7 @@
 DBService = {}
 
 function DBService.GetSharedInventory(inventoryId, cb)
-    MySQL.query("SELECT ci.character_id, ic.id, i.item, ci.amount, ic.metadata, ci.created_at FROM items_crafted ic\
+    MySQL.query("SELECT ci.character_id, ic.id, i.item, ci.amount, ic.metadata, ci.created_at, ci.degradation, ci.percentage FROM items_crafted ic\
 		LEFT JOIN character_inventories ci on ic.id = ci.item_crafted_id\
 		LEFT JOIN items i on ic.item_id = i.id WHERE ci.inventory_type = @invType;", { invType = inventoryId }, function(result)
         cb(result or {})
@@ -10,7 +10,7 @@ function DBService.GetSharedInventory(inventoryId, cb)
 end
 
 function DBService.GetInventory(charIdentifier, inventoryId, cb)
-    MySQL.query("SELECT ic.id, i.item, ci.amount, ic.metadata, ci.created_at, ci.character_id FROM items_crafted ic\
+    MySQL.query("SELECT ic.id, i.item, ci.amount, ic.metadata, ci.created_at, ci.character_id, ci.degradation FROM items_crafted ic\
 		LEFT JOIN character_inventories ci on ic.id = ci.item_crafted_id\
 		LEFT JOIN items i on ic.item_id = i.id WHERE ci.inventory_type = @invType AND ci.character_id = @charid;", { invType = inventoryId, charid = charIdentifier }, function(result)
         cb(result or {})
@@ -41,12 +41,12 @@ function DBService.DeleteItem(sourceCharIdentifier, itemCraftedId)
     MySQL.query("DELETE FROM items_crafted WHERE id = @itemid;", { itemid = tonumber(itemCraftedId) })
 end
 
-function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, name, cb, invId)
+function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, name, degradation, cb, invId)
     MySQL.insert.await("INSERT INTO items_crafted (character_id, item_id, metadata,item_name) VALUES (@charid, @itemid, @metadata,@item_name);", {
         charid = tonumber(sourceCharIdentifier),
         itemid = tonumber(itemId),
         metadata = json.encode(metadata),
-        item_name = name
+        item_name = name,
     })
 
     local result = MySQL.query.await("SELECT id FROM items_crafted WHERE character_id = @charid AND item_id = @itemid AND JSON_CONTAINS(metadata, @metadata);", {
@@ -58,12 +58,13 @@ function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, na
     if result and result[1] then
         local item = result[#result]
 
-        MySQL.insert.await("INSERT INTO character_inventories (character_id, item_crafted_id, amount, inventory_type,item_name) VALUES (@charid, @itemid, @amount, @invId,@item_name);", {
+        MySQL.insert.await("INSERT INTO character_inventories (character_id, item_crafted_id, amount, inventory_type,item_name, degradation) VALUES (@charid, @itemid, @amount, @invId,@item_name, @degradation);", {
             charid = tonumber(sourceCharIdentifier),
             itemid = item.id,
             amount = tonumber(amount),
             invId = invId or "default",
-            item_name = name
+            item_name = name,
+            degradation = degradation
         })
 
         cb({ id = item.id })

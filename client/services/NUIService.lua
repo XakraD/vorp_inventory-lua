@@ -28,8 +28,14 @@ function ApplyPosfx()
 	end
 end
 
-function NUIService.ReloadInventory(inventory)
-	local payload = json.decode(inventory)
+function NUIService.ReloadInventory(inventory, packed)
+	local payload = {}
+	if packed then
+		payload = msgpack.unpack(packed)
+	else
+		payload = json.decode(inventory)
+	end
+
 	if payload.itemList == '[]' then
 		payload.itemList = {}
 	end
@@ -155,33 +161,35 @@ function NUIService.NUIGetNearPlayers(obj)
 
 	local playerIds = {}
 	for _, player in ipairs(nearestPlayers) do
-		playerIds[#playerIds + 1] = GetPlayerServerId(player)
+		if player ~= PlayerId() then
+			local playerId = GetPlayerServerId(player)
+			if Config.ShowCharacterNameOnGive then
+				local name = LocalPlayer.state.Character.FirstName .. " " .. LocalPlayer.state.Character.LastName
+				playerIds[#playerIds + 1] = { label = name, player = playerId }
+			else
+				playerIds[#playerIds + 1] = { label = playerId, player = playerId }
+			end
+		end
 	end
-	TriggerServerEvent('vorp_inventory:getNearbyCharacters', obj, playerIds)
+	if #playerIds > 0 then
+		NUIService.NUISetNearPlayers(obj, playerIds)
+	else
+		Core.NotifyRightTip(T.noplayersnearby, 5000)
+	end
 end
 
 function NUIService.NUISetNearPlayers(obj, nearestPlayers)
 	local nuiReturn = {}
-	local isAnyPlayerFound = next(nearestPlayers) ~= nil
-	local itemId = obj.id or 0
-	local itemCount = obj.count or 1
-	local itemHash = obj.hash or 1
-
-	if not isAnyPlayerFound then
-		Core.NotifyRightTip(T.noplayersnearby, 5000)
-		return
-	end
 
 	nuiReturn.action = "nearPlayers"
-	nuiReturn.foundAny = isAnyPlayerFound
+	nuiReturn.foundAny = true
 	nuiReturn.players = nearestPlayers
-	nuiReturn.item = nuiReturn.item or obj.item
-	nuiReturn.hash = itemHash
-	nuiReturn.count = itemCount
-	nuiReturn.id = itemId
+	nuiReturn.item = obj.item
+	nuiReturn.hash = obj.hash or 1
+	nuiReturn.count = obj.count or 1
+	nuiReturn.id = obj.id or 0
 	nuiReturn.type = obj.type
-	nuiReturn.what = nuiReturn.what or obj.what
-
+	nuiReturn.what = obj.what
 	SendNUIMessage(nuiReturn)
 end
 
@@ -191,8 +199,8 @@ function NUIService.NUIGiveItem(obj)
 	end
 
 	local nearestPlayers = Utils.getNearestPlayers()
-	local data = Utils.expandoProcessing(obj)
-	local data2 = Utils.expandoProcessing(data.data)
+	local data = obj
+	local data2 = data.data
 	local isvalid = Validator.IsValidNuiCallback(data.hsn)
 
 	if isvalid then
@@ -247,7 +255,7 @@ function NUIService.NUIDropItem(obj)
 		local metadata = aux.metadata
 		local type = aux.type
 		local qty = tonumber(aux.number)
-
+		local degradation = aux.degradation
 		if type == "item_money" then
 			TriggerServerEvent("vorpinventory:serverDropMoney", qty)
 		end
@@ -269,7 +277,7 @@ function NUIService.NUIDropItem(obj)
 					return
 				end
 
-				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata)
+				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata, degradation)
 
 				item:quitCount(qty)
 				if item:getCount() == 0 then
@@ -430,8 +438,7 @@ end
 local function loadItems()
 	local items = {}
 	if not StoreSynMenu then
-		for _, item in pairs(UserInventory) do
-			--item.degradation = math.random(100, 1000) / 10 -- just for tests not implemented yet
+		for id, item in pairs(UserInventory) do
 			table.insert(items, item)
 		end
 	elseif StoreSynMenu then
@@ -473,7 +480,7 @@ local function loadWeapons()
 		local weapon = {}
 		weapon.count = currentWeapon:getTotalAmmoCount()
 		weapon.limit = -1
-		weapon.label = currentWeapon:getCustomLabel() or currentWeapon:getLabel()
+		weapon.label = currentWeapon:getLabel()
 		weapon.name = currentWeapon:getName()
 		weapon.metadata = {}
 		weapon.hash = GetHashKey(currentWeapon:getName())
@@ -488,6 +495,7 @@ local function loadWeapons()
 		weapon.serial_number = currentWeapon:getSerialNumber()
 		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.custom_desc = currentWeapon:getCustomDesc()
+		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.weight = currentWeapon:getWeight()
 		table.insert(weapons, weapon)
 	end
@@ -538,7 +546,7 @@ function NUIService.LoadInv()
 	local itemsAndWeapons = loadItemsAndWeapons()
 	payload.action = "setItems"
 	payload.itemList = itemsAndWeapons
-
+	payload.timenow = GlobalState.TimeNow
 	SendNUIMessage(payload)
 end
 
@@ -610,7 +618,7 @@ function NUIService.initiateData()
 	})
 end
 
--- Main loop
+-- Main loo
 CreateThread(function()
 	local controlVar = false                     -- best to use variable than to check statebag every frame
 	LocalPlayer.state:set("IsInvOpen", false, true) -- init
@@ -683,4 +691,18 @@ end
 function NUIService.CacheImages(info)
 	local unpack = msgpack.unpack(info)
 	SendNUIMessage({ action = "cacheImages", info = unpack })
+end
+
+function NUIService.ContextMenu(data)
+	if not data then return end
+
+	if data.close then
+		NUIService.CloseInv()
+	end
+
+	if data.event.client then
+		TriggerEvent(data.event.client, data.arguments)
+	elseif data.event.server then
+		TriggerServerEvent(data.event.server, data.arguments)
+	end
 end

@@ -96,8 +96,9 @@ MySQL.ready(function()
 					canUse = db_item.usable,
 					canRemove = db_item.can_remove,
 					desc = db_item.desc,
-					group = db_item.groupId or 1,
-					weight = db_item.weight or 0.25,
+					group = db_item.groupId,
+					weight = db_item.weight,
+					maxDegradation = db_item.degradation,
 				})
 				ServerItems[item.item] = item
 			end

@@ -222,6 +222,7 @@ window.addEventListener('message', function (event) {
         dialog.close();
         stopTooltip = true;
     } else if (event.data.action == "setItems") {
+        TIME_NOW = event.data.timenow
 
         inventorySetup(event.data.itemList);
 
@@ -264,6 +265,7 @@ window.addEventListener('message', function (event) {
             });
         }
     } else if (event.data.action == "setSecondInventoryItems") {
+
         secondInventorySetup(event.data.itemList, event.data.info);
 
         let l = event.data.itemList.length

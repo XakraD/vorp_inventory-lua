@@ -4,7 +4,7 @@ UserWeapons = {}
 UserInventory = {}
 
 
-function InventoryService.receiveItem(name, id, amount, metadata)
+function InventoryService.receiveItem(name, id, amount, metadata, degradation, percentage)
 	if not name or not ClientItems[name] then return end
 
 	if UserInventory[id] ~= nil then
@@ -22,7 +22,10 @@ function InventoryService.receiveItem(name, id, amount, metadata)
 			canRemove = ClientItems[name].canRemove,
 			desc = ClientItems[name].desc,
 			group = ClientItems[name].group or 1,
-			weight = ClientItems[name].weight or 0.25
+			weight = ClientItems[name].weight or 0.25,
+			degradation = degradation,
+			maxDegradation = ClientItems[name].maxDegradation,
+			percentage = percentage
 		})
 	end
 	NUIService.LoadInv()
@@ -155,29 +158,28 @@ function InventoryService.getLoadout(loadout)
 end
 
 function InventoryService.getInventory(inventory)
-	if inventory and inventory ~= '' then
-		UserInventory = {}
-		local inventoryItems = json.decode(inventory)
+	UserInventory = {}
+	local inventoryItems = msgpack.unpack(inventory)
 
-		for _, item in ipairs(inventoryItems) do
-			local dbItem = ClientItems[item.item]
-			if dbItem then
-				UserInventory[item.id] = Item:New(
-					{
-						id = item.id,
-						count = tonumber(item.amount),
-						limit = tonumber(dbItem.limit),
-						label = dbItem.label,
-						name = item.item,
-						metadata = SharedUtils.MergeTables(dbItem.metadata, item.metadata),
-						type = dbItem.type,
-						canUse = dbItem.canUse,
-						canRemove = dbItem.canRemove,
-						desc = dbItem.desc,
-						group = dbItem.group or 1,
-						weight = dbItem.weight or 0.25
-					})
-			end
-		end
+	for id, item in pairs(inventoryItems) do
+		UserInventory[item.id] = Item:New(
+			{
+				id = item.id,
+				count = item.count,
+				limit = item.limit,
+				label = item.label,
+				name = item.name,
+				metadata = item.metadata,
+				type = item.type,
+				canUse = item.canUse,
+				canRemove = item.canRemove,
+				desc = item.desc,
+				owner = item.owner,
+				group = item.group,
+				weight = item.weight,
+				degradation = item.degradation,
+				maxDegradation = item.maxDegradation,
+				percentage = item.percentage
+			})
 	end
 end

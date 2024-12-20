@@ -24,4 +24,5 @@ let objToGive = {};
 let geninfo;
 let StoreId;
 let LuaConfig = {};
+let TIME_NOW;
 // Define the ID object

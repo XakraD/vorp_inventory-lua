@@ -99,8 +99,9 @@ function exports.vorp_inventory:getUserAmmo(source, callback) end
 ---@param item string item name
 ---@param metadata table |nil  item metadata
 ---@param callback fun(amount:number)? callback function async or sync leave nil
+---@param excludeExpired boolean? dont include expired items
 ---@return number
-function exports.vorp_inventory:getItemCount(source, callback, item, metadata) end
+function exports.vorp_inventory:getItemCount(source, callback, item, metadata, excludeExpired) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get item amount by name
@@ -206,8 +207,9 @@ function exports.vorp_inventory:setItemMetadata(source, itemId, metadata, amount
 ---@param item string item name
 ---@param callback fun(item:table)? callback function async or sync leave nil
 ---@param metadata table |nil item metadata
+---@param percentage number? item degradation percentage if 0 then gets expired items if 20 etc will get any item above this number
 ---@return table item data
-function exports.vorp_inventory:getItem(source, item, callback, metadata) end
+function exports.vorp_inventory:getItem(source, item, callback, metadata, percentage) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get wweapon components

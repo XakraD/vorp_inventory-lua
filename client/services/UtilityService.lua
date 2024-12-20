@@ -54,6 +54,8 @@ function Utils.addItems(name, id, amount)
 			desc = ClientItems[name].desc,
 			group = ClientItems[name].group or 1,
 			weight = ClientItems[name].weight or 0.25,
+			degradation = ClientItems[name].degradation or 0,
+			maxDegradation = ClientItems[name].maxDegradation or 0
 		})
 	end
 end
@@ -146,6 +148,8 @@ function Utils.GetInventoryItem(name)
 				metadata = item:getMetadata(),
 				name = item:getName(),
 				desc = item:getDesc(),
+				degradation = item:getDegradation(),
+				maxDegradation = item:getMaxDegradation()
 			}
 		end
 	end
@@ -167,6 +171,8 @@ function Utils.GetInventoryItems()
 			metadata = item:getMetadata(),
 			name = item:getName(),
 			desc = item:getDesc(),
+			degradation = item:getDegradation(),
+			maxDegradation = item:getMaxDegradation()
 		})
 	end
 	return items
@@ -178,17 +184,15 @@ function Utils.TableRemoveByKey(table, key)
 	return element
 end
 
-function Utils.GetLabel(hash, id)
+function Utils.GetLabel(hash, id, metadata)
 	if id <= 1 then
-		if ClientItems[hash] then
-			return ClientItems[hash].label
-		end
-		return hash
+		if metadata?.label then return metadata.label end
+		if ClientItems[hash] then return ClientItems[hash].label end
 	else
 		return Utils.GetWeaponDefaultLabel(hash)
 	end
 end
 
 function Utils.filterWeaponsSerialNumber(name)
-	return Config.noSerialNumber[name] and false or true
+	return Config.noSerialNumber[name]
 end

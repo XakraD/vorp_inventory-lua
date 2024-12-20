@@ -1,4 +1,3 @@
-
 -- Inventory Service Controller
 RegisterServerEvent("vorpinventory:getItemsTable", InventoryService.getItemsTable)
 RegisterServerEvent("vorpinventory:getInventory", InventoryService.getInventory)
@@ -20,7 +19,6 @@ RegisterServerEvent("vorpinventory:setWeaponBullets", InventoryService.setWeapon
 RegisterServerEvent("vorpinventory:giveMoneyToPlayer", InventoryService.giveMoneyToPlayer)
 RegisterServerEvent("vorpinventory:giveGoldToPlayer", InventoryService.giveGoldToPlayer)
 RegisterServerEvent("vorp_inventory:useItem", InventoryService.UseItem)
-RegisterServerEvent("vorp_inventory:getNearbyCharacters", InventoryService.getNearbyCharacters)
 RegisterServerEvent("vorp_inventory:MoveToCustom", InventoryService.MoveToCustom)
 RegisterServerEvent("vorp_inventory:TakeFromCustom", InventoryService.TakeFromCustom)
 RegisterServerEvent("vorp_inventory:MoveToPlayer", InventoryService.MoveToPlayer)
