@@ -33,12 +33,6 @@ function exports.vorp_inventory:getUserInventoryItems(source, callback) end
 function exports.vorp_inventory:registerUsableItem(item, callback) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
---- remove callback for item
----@param name string item name
----@param uniqueId string id generated when registering the item callback
-function exports.vorp_inventory:unRegisterUsableItem(name, uniqueId) end
-
---- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get user inventory weapon
 ---@param source integer player id
 ---@param callback fun(weapon:table)? callback function async or sync leave nil
@@ -99,9 +93,9 @@ function exports.vorp_inventory:getUserAmmo(source, callback) end
 ---@param item string item name
 ---@param metadata table |nil  item metadata
 ---@param callback fun(amount:number)? callback function async or sync leave nil
----@param excludeExpired boolean? dont include expired items
+---@param percentage number? if 0 then it will delete expired items or will delete item at a desired percentage if nil then it will delete any item
 ---@return number
-function exports.vorp_inventory:getItemCount(source, callback, item, metadata, excludeExpired) end
+function exports.vorp_inventory:getItemCount(source, callback, item, metadata, percentage) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- get item amount by name
@@ -181,7 +175,10 @@ function exports.vorp_inventory:getItemByMainId(source, mainid, callback) end
 ---@param source integer player id
 ---@param id number item id
 ---@param callback fun(boolean:boolean)? callback function async or sync leave nil
-function exports.vorp_inventory:subItemID(source, id, callback) end
+---@param allow boolean? allow to detect item removal false means allow true meand dont allow
+---@param amount number? amount of item
+---@return boolean
+function exports.vorp_inventory:subItemById(source, id, callback, allow, amount) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- sub item
@@ -190,7 +187,10 @@ function exports.vorp_inventory:subItemID(source, id, callback) end
 ---@param amount number amount of item
 ---@param metadata table |nil item metadata
 ---@param callback fun(boolean:boolean)? callback function async or sync leave nil
-function exports.vorp_inventory:subItem(source, item, amount, metadata, callback) end
+---@param allow boolean? allow to detect item removal false means allow true meand dont allow
+---@param percentage number? if 0 then it will delete expired items or will delete item at a desired percentage if nil then it will delete any item
+---@return boolean
+function exports.vorp_inventory:subItem(source, item, amount, metadata, callback, allow, percentage) end
 
 --- see [documentation](https://vorpcore.github.io/VORP_Documentation/api/inventory#inventory-exports)<br>
 --- set item metadata

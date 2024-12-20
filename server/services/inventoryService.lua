@@ -263,7 +263,7 @@ function InventoryService.subItem(source, invId, itemId, amount)
 
 	if item:getCount() == 0 then
 		if invId == "default" then
-			local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
+			local data = { name = item:getName(), count = amount }
 			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		end
 		userInventory[itemId] = nil
@@ -372,7 +372,8 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 
 			userInventory[craftedItem.id] = item
 			if invId == "default" then
-				TriggerEvent("vorp_inventory:Server:OnItemCreated", item, _source)
+				local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
+				TriggerEvent("vorp_inventory:Server:OnItemCreated", data, _source)
 			end
 
 			return cb(item)
@@ -921,7 +922,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 	local function updateClient(addedItem)
 		TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, addedItem:getId(), amount, item:getMetadata(), item:getDegradation(), item:getPercentage())
 		TriggerClientEvent("vorpInventory:removeItem", _source, itemName, item:getId(), amount)
-		local data = { name = itemName, id = item:getId(), metadata = item:getMetadata() }
+		local data = { name = itemName, count = amount }
 		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		if item:getCount() - amount <= 0 then
 			DBService.DeleteItem(charid, item:getId())
@@ -970,7 +971,8 @@ function InventoryService.GiveItem(itemId, amount, target)
 			targetInventory[craftedItem.id] = targetItem
 
 			updateClient(targetItem)
-			TriggerEvent("vorp_inventory:Server:OnItemCreated", targetItem, _target)
+			local data = { name = targetItem:getName(), count = amount, metadata = targetItem:getMetadata() }
+			TriggerEvent("vorp_inventory:Server:OnItemCreated", data, _target)
 		end)
 	end
 

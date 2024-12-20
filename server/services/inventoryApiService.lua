@@ -220,9 +220,9 @@ exports("registerUsableItem", InventoryAPI.registerUsableItem)
 ---@param cb fun(count: number | nil)? async or sync callback
 ---@param itemName string item name
 ---@param metadata table | nil? metadata
----@param excludeExpired boolean? dont include expired items
+---@param percentage number? if 0 it will get all expired items, anything above 0 will get items with that percentage or more if nil will get all items
 ---@return number
-function InventoryAPI.getItemCount(source, cb, itemName, metadata, excludeExpired)
+function InventoryAPI.getItemCount(source, cb, itemName, metadata, percentage)
 	local _source <const> = source
 
 	if not _source then
@@ -257,13 +257,12 @@ function InventoryAPI.getItemCount(source, cb, itemName, metadata, excludeExpire
 	end
 
 	-- get count of all items with or without metadata but can choose to get expired items
-	local itemTotalCount <const> = SvUtils.GetItemCount("default", identifier, itemName, excludeExpired)
+	local itemTotalCount <const> = SvUtils.GetItemCount("default", identifier, itemName, percentage)
 
 	return respond(cb, itemTotalCount)
 end
 
 exports("getItemCount", InventoryAPI.getItemCount)
-
 
 --- get item data from items loaded DB
 ---@param itemName string item name
@@ -277,6 +276,7 @@ end
 exports("getItemDB", InventoryAPI.getItemDB)
 
 
+---@deprecated this cannot be used as there is items with metadata and decay system which will return either one of these
 ---get item data by item name
 ---@param player number source
 ---@param itemName string item name
@@ -308,6 +308,7 @@ end
 
 exports("getItemByName", InventoryAPI.getItemByName)
 
+---@deprecated this does the same thing as getItem use getItem instead
 ---get item data by item name and its metadata
 ---@param player number source
 ---@param itemName string item name
@@ -340,6 +341,7 @@ end
 
 exports("getItemContainingMetadata", InventoryAPI.getItemContainingMetadata)
 
+---@deprecated this does the same thing as getItem use getItem instead
 --- get item matching metadata
 ---@param player number source
 ---@param itemName string item name
@@ -379,6 +381,7 @@ exports("getItemMatchingMetadata", InventoryAPI.getItemMatchingMetadata)
 ---@param amount number
 ---@param metadata table metadata
 ---@param allow boolean? allow to detect item creation false means allow true meand dont allow
+---@param degradation number? used for internal purposes moveToPlayer takeFromPlayer its a timestamp items are being exchanged
 ---@param cb fun(success: boolean)? async or sync callback
 function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degradation)
 	local _source = source
@@ -483,7 +486,8 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 
 		if not allow then
-			TriggerEvent("vorp_inventory:Server:OnItemCreated", item, _source)
+			local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
+			TriggerEvent("vorp_inventory:Server:OnItemCreated", data, _source)
 		end
 
 		return respond(cb, true)
@@ -491,6 +495,7 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 end
 
 exports("addItem", InventoryAPI.addItem)
+
 
 --- get item by its main id
 ---@param player number source
@@ -537,14 +542,17 @@ function InventoryAPI.getItemByMainId(player, mainid, cb)
 end
 
 exports("getItemByMainId", InventoryAPI.getItemByMainId)
+-- alias for getItemByMainId
+exports("getItemById", InventoryAPI.getItemByMainId)
 
 --- sub item by its id
 ---@param player number source
 ---@param id number item id
 ---@param cb fun(success: boolean)? async or sync callback
 ---@param allow boolean? allow to detect item removal false means allow true meand dont allow
+---@param amount number? amount to remove
 ---@return fun(success: boolean)
-function InventoryAPI.subItemID(player, id, cb, allow)
+function InventoryAPI.subItemID(player, id, cb, allow, amount)
 	local _source = player
 	local sourceCharacter = Core.getUser(_source)
 
@@ -561,8 +569,8 @@ function InventoryAPI.subItemID(player, id, cb, allow)
 	if not userInventory or not item then
 		return respond(cb, false)
 	end
-
-	item:quitCount(1)
+	amount = amount or 1
+	item:quitCount(amount)
 
 	if item:getCount() == 0 then
 		DBService.DeleteItem(charIdentifier, item:getId())
@@ -574,102 +582,169 @@ function InventoryAPI.subItemID(player, id, cb, allow)
 	end
 
 	if not allow then
-		local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
+		local data = { name = item:getName(), count = amount }
 		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 	end
 	return respond(cb, true)
 end
 
 exports("subItemID", InventoryAPI.subItemID)
+--alias for subItemID
+exports("subItemById", InventoryAPI.subItemID)
 
-
----sub item by name
+--- sub item by its name
 ---@param source number source
 ---@param name string item name
----@param amount number amount to sub
+---@param amount number
 ---@param metadata table? metadata
 ---@param cb fun(success: boolean)? async or sync callback
 ---@param allow boolean? allow to detect item removal false means allow true meand dont allow
+---@param percentage number? if 0 then it will delete expired items or will delete item at a desired percentage if nil then it will delete any item
 ---@return boolean
-function InventoryAPI.subItem(source, name, amount, metadata, cb, allow)
-	local _source = source
+function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percentage)
+	local _source <const> = source
 	local sourceCharacter = Core.getUser(_source)
 
 	if not sourceCharacter then
 		return respond(cb, false)
 	end
 
-	local svItem = SvUtils.DoesItemExist(name, "subItem")
+	local svItem <const> = SvUtils.DoesItemExist(name, "subItem")
 	if not svItem then
 		return respond(cb, false)
 	end
 
 	sourceCharacter = sourceCharacter.getUsedCharacter
-	local identifier = sourceCharacter.identifier
+	local identifier <const> = sourceCharacter.identifier
 
-	-- get the lowest percentage item if is degradable so it always removes those
-	local function getItemToRemove()
-		local userInventory = CustomInventoryInfos.default.shared and UsersInventories.default or UsersInventories.default[identifier]
-		if not userInventory then
-			return nil
-		end
-
-		local lowestItem = nil
-		local lowestPercentage = 101
-
-		for _, item in pairs(userInventory) do
-			if name == item:getName() then
-				local currentPercentage = item:getPercentage()
-				if currentPercentage <= 0 then return item end
-				if currentPercentage < lowestPercentage then
-					lowestPercentage = currentPercentage
-					lowestItem = item
-				end
-			end
-		end
-
-		return lowestItem
+	local userInventory <const> = CustomInventoryInfos.default.shared and UsersInventories.default or UsersInventories.default[identifier]
+	if not userInventory then
+		return respond(cb, false)
 	end
 
-	local item = getItemToRemove()
-
+	--* for items with metadata only
 	if metadata then
-		metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
-		local itemFound = SvUtils.FindItemByNameAndMetadata("default", identifier, name, metadata)
+		local itemFound <const> = SvUtils.FindItemByNameAndMetadata("default", identifier, name, metadata or {})
 		if not itemFound then
 			return respond(cb, false)
 		end
-		item = itemFound
+
+
+		itemFound:quitCount(amount)
+		TriggerClientEvent("vorpCoreClient:subItem", _source, itemFound:getId(), itemFound:getCount())
+		if itemFound:getCount() == 0 then
+			UsersInventories.default[identifier][itemFound:getId()] = nil
+			DBService.DeleteItem(sourceCharacter.charIdentifier, itemFound:getId())
+		else
+			DBService.SetItemAmount(sourceCharacter.charIdentifier, itemFound:getId(), itemFound:getCount())
+		end
+
+		if not allow then
+			local data <const> = { name = itemFound:getName(), count = amount }
+			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
+		end
+		return respond(cb, true)
 	end
 
-	if not item then
-		return respond(cb, false)
+	--* items with no metadata
+	local sortedItems = {}
+	for _, item in pairs(userInventory) do
+		-- dont allow metadata items because metadata was not passed that means we are not looking for these to delete
+		if name == item:getName() and not next(item:getMetadata()) then
+			-- decide which items to get
+			if percentage then
+				if percentage > 0 then
+					-- only items with a percentage greater than or equal to the percentage requested
+					if item:getPercentage() >= percentage then
+						table.insert(sortedItems, item)
+					end
+				else
+					-- only expired items
+					if item:getPercentage() == 0 then
+						table.insert(sortedItems, item)
+					end
+				end
+			else
+				-- all items
+				table.insert(sortedItems, item)
+			end
+		end
 	end
 
-	local sourceItemCount = item:getCount()
-	if amount > sourceItemCount then
-		return respond(cb, false)
+	-- if there is a stack with the same amount then remove that stack instead of removing from any stack
+	local exactMatchItem = nil
+	for _, item in ipairs(sortedItems) do
+		-- do we look for items expired or not expired?
+		if item:getCount() == amount then
+			exactMatchItem = item
+			break
+		end
 	end
 
-	item:quitCount(amount)
-	TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
+	if exactMatchItem then
+		-- if an exact match is found, use this instance
+		exactMatchItem:quitCount(amount)
+		TriggerClientEvent("vorpCoreClient:subItem", _source, exactMatchItem:getId(), exactMatchItem:getCount())
+		if exactMatchItem:getCount() == 0 then
+			UsersInventories.default[identifier][exactMatchItem:getId()] = nil
+			DBService.DeleteItem(sourceCharacter.charIdentifier, exactMatchItem:getId())
+		else
+			DBService.SetItemAmount(sourceCharacter.charIdentifier, exactMatchItem:getId(), exactMatchItem:getCount())
+		end
 
-
-	if item:getCount() == 0 then
-		UsersInventories.default[identifier][item:getId()] = nil
-		DBService.DeleteItem(sourceCharacter.charIdentifier, item:getId())
+		if not allow then
+			local data <const> = { name = exactMatchItem:getName(), count = amount }
+			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
+		end
 	else
-		DBService.SetItemAmount(sourceCharacter.charIdentifier, item:getId(), item:getCount())
-	end
+		-- sort items from lower to higher
+		table.sort(sortedItems, function(a, b) return a:getCount() < b:getCount() end)
 
-	if not allow then
-		local data = { name = item:getName(), id = item:getId(), metadata = item:getMetadata() }
-		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
+		-- combine stacks starting from the lowest to higher this allows to eliminate smaller stacks first
+		local itemsToRemove = {}
+		local totalNeeded = amount
+		for _, item in ipairs(sortedItems) do
+			if totalNeeded <= 0 then break end
+
+			-- in here we can add a condition to only get items expired or not expired? but this would cause issues if you get the amount of items and not selecting expired or not expired, because what if there is amount needed but not enough as expired or not expired.
+			local countAvailable <const> = item:getCount()
+			local removeCount <const> = math.min(countAvailable, totalNeeded)
+
+			table.insert(itemsToRemove, { item = item, count = removeCount })
+			totalNeeded = totalNeeded - removeCount
+		end
+
+		-- if there isnt enough items to remove then return false (you should be using the export getItemCount before using this export thats why we have it) either way you dont need to use it this check will secure it
+		if #itemsToRemove == 0 or totalNeeded > 0 then
+			return respond(cb, false)
+		end
+
+		-- remove the items
+		for _, value in ipairs(itemsToRemove) do
+			local item <const> = value.item
+			local removeCount <const> = value.count
+
+			item:quitCount(removeCount)
+			TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
+			if item:getCount() == 0 then
+				UsersInventories.default[identifier][item:getId()] = nil
+				DBService.DeleteItem(sourceCharacter.charIdentifier, item:getId())
+			else
+				DBService.SetItemAmount(sourceCharacter.charIdentifier, item:getId(), item:getCount())
+			end
+		end
+
+		if not allow then
+			-- allow other scripts to detect the item removal and its amount, (count) was added, but id and metadata was removed because there could be multiple stacks with the same name with diferent metadata so we cant send these
+			local data <const> = { name = svItem:getName(), count = amount }
+			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
+		end
 	end
 	return respond(cb, true)
 end
 
 exports("subItem", InventoryAPI.subItem)
+
 
 ---set item metadata with item id
 ---@param player number source
@@ -775,7 +850,7 @@ exports("setItemMetadata", InventoryAPI.setItemMetadata)
 ---@param itemName string item name
 ---@param cb fun(success: boolean)| nil  async or sync callback
 ---@param metadata table | nil? metadata
----@param percentage number? item degradation percentage if 0 then gets expired items if 20 etc will get any item above this number
+---@param percentage number? if 0 then gets expired items if more than 0 then gets any item above this number if nil then gets any item
 ---@return  table | nil
 function InventoryAPI.getItem(source, itemName, cb, metadata, percentage)
 	local _source <const> = source

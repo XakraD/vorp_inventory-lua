@@ -98,6 +98,7 @@ function SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
             end
         end
     else
+        -- this returns the first item that matches the name, not carring for metadata
         for _, item in pairs(userInventory) do
             if name == item:getName() then
                 return item
@@ -108,7 +109,7 @@ function SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
     return nil
 end
 
--- get item with no metadata, instead of getting a random item on the function above that may or may not contain metadata
+-- this is used to get an item that does not contain metadata instead of using the above that just gets a random one if metadata is not passed
 ---@param invId string
 ---@param identifier string
 ---@param name string
@@ -123,25 +124,25 @@ function SvUtils.GetItemNoMetadata(invId, identifier, name)
     return nil
 end
 
-function SvUtils.GetItemCount(invId, identifier, name, excludeExpired)
+function SvUtils.GetItemCount(invId, identifier, name, percentage)
     local userInventory = CustomInventoryInfos[invId].shared and UsersInventories[invId] or UsersInventories[invId][identifier]
 
     if not userInventory then return 0 end
 
-    if excludeExpired then
-        --get all items that are not expired
-        local count = 0
-        for _, item in pairs(userInventory) do
-            if name == item:getName() and item:getPercentage() ~= 0 then
-                count = count + item:getCount()
-            end
-        end
-        return count
-    end
-    -- all items no matter metadata or expired
+    --get item count with no metadata, and by percentage , this allows to control get expired items or at a desired percentage
     local count = 0
     for _, item in pairs(userInventory) do
-        if name == item:getName() then
+        local expiredPercentage = true
+
+        if percentage then
+            if percentage == 0 then
+                expiredPercentage = item:getPercentage() == 0
+            else
+                expiredPercentage = item:getPercentage() >= percentage
+            end
+        end
+
+        if name == item:getName() and expiredPercentage and not next(item:getMetadata()) then
             count = count + item:getCount()
         end
     end
