@@ -21,7 +21,7 @@ end
 
 local function createPrompt()
 	PickUpPrompt = UiPromptRegisterBegin()
-	UiPromptSetControlAction(PickUpPrompt, 0x760A9C6F)
+	UiPromptSetControlAction(PickUpPrompt, Config.PickupKey)
 	UiPromptSetText(PickUpPrompt, VarString(10, "LITERAL_STRING", T.TakeFromFloor))
 	UiPromptSetEnabled(PickUpPrompt, true)
 	UiPromptSetVisible(PickUpPrompt, true)
@@ -33,16 +33,16 @@ end
 
 function PickupsService.CreateObject(objectHash, position, itemType)
 	if itemType == "item_standard" then
-		local objectHash <const> = Config.spawnableProps[objectHash] or Config.spawnableProps.default_box
-		PickupsService.loadModel(objectHash)
-		local entityHandle <const> = CreateObject(joaat(objectHash), position.x, position.y, position.z - 1, false, false, false, false)
+		local model <const> = Config.spawnableProps[objectHash] or Config.spawnableProps.default_box
+		PickupsService.loadModel(model)
+		local entityHandle <const> = CreateObject(joaat(model), position.x, position.y, position.z - 1, false, false, false, false)
 		repeat Wait(0) until DoesEntityExist(entityHandle)
 
 		PlaceObjectOnGroundProperly(entityHandle, false)
 		FreezeEntityPosition(entityHandle, true)
 		SetPickupLight(entityHandle, true)
 		SetEntityCollision(entityHandle, false, true)
-		SetModelAsNoLongerNeeded(objectHash)
+		SetModelAsNoLongerNeeded(model)
 
 		return entityHandle
 	else

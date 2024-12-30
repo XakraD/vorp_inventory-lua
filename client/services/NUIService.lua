@@ -51,6 +51,11 @@ function NUIService.ReloadInventory(inventory, packed)
 			if not item.desc then
 				item.desc = Utils.GetWeaponDefaultDesc(item.name)
 			end
+		else
+			-- for syn scripts where description wasnt saved
+			if not item.desc then
+				item.desc = ClientItems[item.name].desc
+			end
 		end
 	end
 

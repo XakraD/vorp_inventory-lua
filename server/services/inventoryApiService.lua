@@ -170,7 +170,8 @@ function InventoryAPI.getInventory(source, cb)
 				canUse = item:getCanUse(),
 				group = item:getGroup(),
 				weight = item.metadata?.weight or item:getWeight(),
-				percentage = item:getPercentage()
+				percentage = item:getPercentage(),
+				isDegradable = item:getMaxDegradation() ~= 0
 			}
 			table.insert(playerItems, newItem)
 		end
@@ -215,7 +216,7 @@ end
 exports("registerUsableItem", InventoryAPI.registerUsableItem)
 
 
---- Get item count from player inventory
+--- THIS EXPORT SHOULD ONLY BE USED FOR NORMAL ITEMS NOTHING ELSE for items with decay and metadata use the getUserInventoryItems they are unique items
 ---@param source number source
 ---@param cb fun(count: number | nil)? async or sync callback
 ---@param itemName string item name
@@ -250,13 +251,14 @@ function InventoryAPI.getItemCount(source, cb, itemName, metadata, percentage)
 
 	if metadata then
 		metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
-		--if metadata then get only get the item that matches the metadata we are looking for
+		--if metadata then get only the item that matches the metadata we are looking for
 		local item <const> = SvUtils.FindItemByNameAndMetadata("default", identifier, itemName, metadata)
 		if item then return respond(cb, item:getCount()) end
 		return respond(cb, 0)
 	end
 
-	-- get count of all items with or without metadata but can choose to get expired items
+	-- get count of all items but can choose to get expired items, by default will only get normal items
+	-- it will also return items with metadata because people use this export to get them when it doesnt even make sense they are unique items
 	local itemTotalCount <const> = SvUtils.GetItemCount("default", identifier, itemName, percentage)
 
 	return respond(cb, itemTotalCount)
@@ -513,32 +515,28 @@ function InventoryAPI.getItemByMainId(player, mainid, cb)
 	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
 	local userInventory = UsersInventories.default[identifier]
+	if not userInventory then return respond(cb, nil) end
 
-	if userInventory then
-		local itemRequested = {}
-		for _, item in pairs(userInventory) do
-			if mainid == item:getId() then
-				-- for existing scripts we need to check if labels and descriptions exist in metadata to avoid showing the default ones
-				itemRequested = {
-					id = item:getId(),
-					label = item.metadata?.label or item:getLabel(),
-					name = item:getName(),
-					metadata = item:getMetadata(),
-					type = item:getType(),
-					count = item:getCount(),
-					limit = item:getLimit(),
-					canUse = item:getCanUse(),
-					group = item:getGroup(),
-					weight = item.metadata?.weight or item:getWeight(),
-					desc = item.metadata?.description or item:getDesc(),
-					percentage = item:getPercentage()
-				}
-				return respond(cb, itemRequested)
-			end
-		end
-	end
+	local itemRequested = {}
+	local item = userInventory[mainid]
+	if not item then return respond(cb, nil) end
 
-	return respond(cb, nil)
+	-- needs to be like this so we dont inject them to the player inventory
+	itemRequested.id = item:getId()
+	itemRequested.label = item.metadata?.label or item:getLabel()
+	itemRequested.name = item:getName()
+	itemRequested.metadata = item:getMetadata()
+	itemRequested.type = item:getType()
+	itemRequested.count = item:getCount()
+	itemRequested.limit = item:getLimit()
+	itemRequested.canUse = item:getCanUse()
+	itemRequested.group = item:getGroup()
+	itemRequested.weight = item.metadata?.weight or item:getWeight()
+	itemRequested.desc = item.metadata?.description or item:getDesc()
+	itemRequested.percentage = item:getPercentage()
+	itemRequested.isDegradable = item:getMaxDegradation() ~= 0
+
+	return respond(cb, itemRequested)
 end
 
 exports("getItemByMainId", InventoryAPI.getItemByMainId)
@@ -598,8 +596,8 @@ exports("subItemById", InventoryAPI.subItemID)
 ---@param amount number
 ---@param metadata table? metadata
 ---@param cb fun(success: boolean)? async or sync callback
----@param allow boolean? allow to detect item removal false means allow true meand dont allow
----@param percentage number? if 0 then it will delete expired items or will delete item at a desired percentage if nil then it will delete any item
+---@param allow boolean? allow to detect item removal false means allow true means dont allow
+---@param percentage number? if 0 then it will delete expired items or will delete item at a desired percentage or above, if nil then it will delete any item with or without metadata or not normal item or not
 ---@return boolean
 function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percentage)
 	local _source <const> = source
@@ -649,8 +647,8 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 	--* items with no metadata
 	local sortedItems = {}
 	for _, item in pairs(userInventory) do
-		-- dont allow metadata items because metadata was not passed that means we are not looking for these to delete
-		if name == item:getName() and not next(item:getMetadata()) then
+		-- allow items with metadata so we dont break existing scripts because people are using this export to delete random items instead of specific items
+		if name == item:getName() then
 			-- decide which items to get
 			if percentage then
 				if percentage > 0 then
@@ -665,8 +663,11 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 					end
 				end
 			else
-				-- all items
+				-- only items with no decay should be added, currently there was no way to get normal items, if you want to use decay you must pass the argument since its new and optional
+				--if item:getMaxDegradation() == 0 then -- canno use this because people are using this export to delete random items instead of specific items
+				-- this works in conjunction with getItemCount that will only get items without decay, decay is optional
 				table.insert(sortedItems, item)
+				--end
 			end
 		end
 	end
@@ -810,23 +811,22 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 		TriggerClientEvent("vorpCoreClient:subItem", _source, item:getId(), item:getCount())
 		local isExpired = svItem:getMaxDegradation() ~= 0 and os.time() or nil
 		DBService.CreateItem(charId, ServerItems[item.name].id, amountRemove, metadata, item:getName(), isExpired, function(craftedItem)
-			local item = Item:New(
-				{
-					id = craftedItem.id,
-					count = amount or 1,
-					limit = item:getLimit(),
-					label = item:getLabel(),
-					metadata = SharedUtils.MergeTables(item:getMetadata(), metadata),
-					name = item:getName(),
-					type = item:getType(),
-					canUse = true,
-					canRemove = item:getCanRemove(),
-					owner = charId,
-					desc = item:getDesc(),
-					group = item:getGroup(),
-					weight = item:getWeight(),
-					maxDegradation = svItem:getMaxDegradation()
-				})
+			local item = Item:New({
+				id = craftedItem.id,
+				count = amount or 1,
+				limit = item:getLimit(),
+				label = item:getLabel(),
+				metadata = SharedUtils.MergeTables(item:getMetadata(), metadata),
+				name = item:getName(),
+				type = item:getType(),
+				canUse = true,
+				canRemove = item:getCanRemove(),
+				owner = charId,
+				desc = item:getDesc(),
+				group = item:getGroup(),
+				weight = item:getWeight(),
+				maxDegradation = svItem:getMaxDegradation()
+			})
 
 			if svItem:getMaxDegradation() ~= 0 then
 				item.degradation = os.time()
@@ -873,6 +873,7 @@ function InventoryAPI.getItem(source, itemName, cb, metadata, percentage)
 		item.desc = item.metadata?.description or item:getDesc()
 		item.weight = item.metadata?.weight or item:getWeight()
 		item.percentage = item:getPercentage()
+		item.isDegradable = item:getMaxDegradation() ~= 0
 		return item
 	end
 

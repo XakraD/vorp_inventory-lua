@@ -354,20 +354,22 @@ function loadCustomInventoryItemsWeapons(item, index, group) {
 function secondInventorySetup(items, info) {
     $("#inventoryElement").html("");
     $("#secondInventoryElement").html("").data("info", info);
-
     var divCount = 0;
-    $.each(items, function () {
-        divCount = divCount + 1;
-    });
 
-    for (const [index, item] of items.entries()) {
-        count = item.count;
-        const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
-        const limit = item.limit;
-        loadCustomInventoryItems(item, index, group, count, limit);
-        loadCustomInventoryItemsWeapons(item, index, group);
-        addDataToCustomInv(item, index);
-    };
+    if (items.length > 0) {
+        $.each(items, function () {
+            divCount = divCount + 1;
+        });
+
+        for (const [index, item] of items.entries()) {
+            count = item.count;
+            const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
+            const limit = item.limit;
+            loadCustomInventoryItems(item, index, group, count, limit);
+            loadCustomInventoryItemsWeapons(item, index, group);
+            addDataToCustomInv(item, index);
+        };
+    }
 
     /* in here we ensure that at least all divs are filled */
     if (divCount < 14) {

@@ -43,30 +43,39 @@ function InventoryService.UseItem(data)
 	local userInventory <const> = UsersInventories.default[identifier]
 
 	local svItem = SvUtils.DoesItemExist(itemName, "UseItem")
-	if not svItem then
-		return
-	end
-
-	if not UsableItemsFunctions[itemName] then
-		return
-	end
+	if not svItem then return end
 
 	local item = userInventory[itemId]
-	if not item then return end
+	if not item or not UsableItemsFunctions[itemName] then return end
 
+	local arguments <const> = {
+		source = _source,
+		item = {
+			---@deprecated -- same as item.id
+			mainid = itemId,
+			---
+			metadata = item:getMetadata(),
+			percentage = item:getPercentage(),
+			isDegradable = item:getMaxDegradation() ~= 0,
+			id = item:getId(),
+			count = item:getCount(),
+			label = item.metadata?.label or item:getLabel(),
+			name = item:getName(),
+			desc = item.metadata?.description or item:getDesc(),
+			type = item:getType(),
+			limit = item:getLimit(),
+			group = item:getGroup(),
+			weight = item.metadata?.weight or item:getWeight()
+		}
+	}
 
-	local itemArgs <const> = svItem
-	itemArgs.metadata = item:getMetadata()
-	itemArgs.mainid = itemId
-	itemArgs.percentage = item:getPercentage()
-	local arguments <const> = { source = _source, item = itemArgs }
-	--handle degradation items
-	if itemArgs.maxDegradation ~= 0 then
+	-- if its an item that can degrade then check if its expired
+	if arguments.item.isDegradable then
 		local isExpired = item:isItemExpired()
 		if isExpired then
 			local text = "Item is expired and can't be used"
 			if Config.DeleteItemOnUseWhenExpired then
-				InventoryAPI.subItem(_source, item:getName(), 1, item:getMetadata())
+				InventoryAPI.subItemID(_source, item:getId())
 				text = "Item is expired and can't be used, item was removed from your inventory"
 			end
 			Core.NotifyRightTip(_source, text, 3000)
@@ -712,7 +721,7 @@ function InventoryService.shareMoneyPickupServer(data)
 	}
 end
 
-function InventoryService.shareGoldPickupServer(obj, amount, position)
+function InventoryService.shareGoldPickupServer(data)
 	local _source = source
 	local user = Core.getUser(_source)
 	if not user then return end
@@ -720,15 +729,22 @@ function InventoryService.shareGoldPickupServer(obj, amount, position)
 	local Character = user.getUsedCharacter
 	local charname, _, steamname = getSourceInfo(_source)
 	local title = T.WebHookLang.pickedgold
-	local description = "**" .. T.WebHookLang.gold .. ":** `" .. amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+	local description = "**" .. T.WebHookLang.gold .. ":** `" .. data.amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
 	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorpickedgold }
 
-	Character.removeCurrency(1, amount)
+	Character.removeCurrency(1, data.amount)
 
-	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, obj, amount, position, 1)
+	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.handle, data.amount, data.position, 1)
 	SvUtils.SendDiscordWebhook(info)
 	local uid = SvUtils.GenerateUniqueID()
-	GoldPickUps[uid] = { name = T.inventorygoldlabel, obj = obj, amount = amount, inRange = false, coords = position, uuid = uid }
+	GoldPickUps[uid] = {
+		name = T.inventorygoldlabel,
+		obj = data.handle,
+		amount = data.amount,
+		inRange = false,
+		coords = data.position,
+		uuid = uid
+	}
 end
 
 function InventoryService.DropWeapon(weaponId)

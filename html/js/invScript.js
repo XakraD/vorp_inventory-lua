@@ -527,23 +527,24 @@ function inventorySetup(items) {
     $("#inventoryElement").html("");
     var divAmount = 0;
 
-    $.each(items, function () {
-        divAmount = divAmount + 1;
-    });
+    if (items.length > 0) {
 
+        $.each(items, function () {
+            divAmount = divAmount + 1;
+        });
 
+        for (const [index, item] of items.entries()) {
+            if (item) {
+                const count = item.count;
+                const limit = item.limit;
+                const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
 
-    for (const [index, item] of items.entries()) {
-        if (item) {
-            const count = item.count;
-            const limit = item.limit;
-            const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
-
-            loadInventoryItems(item, index, group, count, limit);
-            loadInventoryWeapons(item, index, group, count);
-            addData(index, item);
-        }
-    };
+                loadInventoryItems(item, index, group, count, limit);
+                loadInventoryWeapons(item, index, group, count);
+                addData(index, item);
+            }
+        };
+    }
 
     var gunbelt_item = "gunbelt";
     var gunbelt_label = LANGUAGE.gunbeltlabel;

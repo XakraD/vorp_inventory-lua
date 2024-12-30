@@ -129,21 +129,28 @@ function SvUtils.GetItemCount(invId, identifier, name, percentage)
 
     if not userInventory then return 0 end
 
-    --get item count with no metadata, and by percentage , this allows to control get expired items or at a desired percentage
+    --get item count  by percentage , this allows to control get expired items or at a desired percentage
     local count = 0
     for _, item in pairs(userInventory) do
-        local expiredPercentage = true
-
         if percentage then
+            local expiredPercentage = true
+            -- items with decay detection
             if percentage == 0 then
                 expiredPercentage = item:getPercentage() == 0
             else
                 expiredPercentage = item:getPercentage() >= percentage
             end
-        end
 
-        if name == item:getName() and expiredPercentage and not next(item:getMetadata()) then
-            count = count + item:getCount()
+            if name == item:getName() and expiredPercentage then
+                count = count + item:getCount()
+            end
+        else
+            -- detect any items because if we change this it breaks other scripts that are using it wrong
+            if name == item:getName() then
+                -- by not allowing decay items in here we are getting the count of only normal items
+                -- in conjunction with subItem that will only delete items that dont have decay if decay detection is not passed this allows to function normal as before
+                count = count + item:getCount()
+            end
         end
     end
 

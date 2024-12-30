@@ -39,6 +39,7 @@ Item.group = nil
 Item.degradation = nil
 Item.maxDegradation = nil
 Item.percentage = nil
+
 -- ID
 function Item:setId(id)
 	self.id = id
@@ -54,15 +55,18 @@ function Item:setDegradation(degradation)
 end
 
 function Item:getElapsedTime(maxDegradation, percentage)
-	local isDegradable = maxDegradation and maxDegradation > 0
-	if isDegradable and percentage then
-		local maxDegradeSeconds = maxDegradation * 60
-		local remaining_percent = percentage
-		local degradation_elapsed = maxDegradeSeconds * (1 - remaining_percent / 100)
-		return degradation_elapsed
+	if maxDegradation ~= nil and percentage ~= nil then
+		local isDegradable = maxDegradation > 0
+		if isDegradable then
+			local maxDegradeSeconds = maxDegradation * 60
+			local remaining_percent = percentage
+			local degradation_elapsed = maxDegradeSeconds * (1 - remaining_percent / 100)
+			return degradation_elapsed
+		end
+		return 0
 	end
 
-	isDegradable = self.maxDegradation and self.maxDegradation > 0
+	local isDegradable = self.maxDegradation and self.maxDegradation > 0
 	if isDegradable and self.percentage then
 		local maxDegradeSeconds = self.maxDegradation * 60
 		local remaining_percent = self.percentage
@@ -74,16 +78,20 @@ function Item:getElapsedTime(maxDegradation, percentage)
 end
 
 function Item:getPercentage(maxDegradation, degradation)
-	local isDegradable = maxDegradation and maxDegradation > 0
-	if isDegradable and degradation then
-		local elapsedSeconds = os.time() - degradation
-		local maxDegradeSeconds = maxDegradation * 60
-		local percentage = math.max(0, ((maxDegradeSeconds - elapsedSeconds) / maxDegradeSeconds) * 100)
-		percentage = math.floor(percentage)
-		return percentage
+	if maxDegradation ~= nil and degradation ~= nil then
+		local isDegradable = maxDegradation > 0
+		if isDegradable then
+			local elapsedSeconds = os.time() - degradation
+			local maxDegradeSeconds = maxDegradation * 60
+			local percentage = math.max(0, ((maxDegradeSeconds - elapsedSeconds) / maxDegradeSeconds) * 100)
+			percentage = math.floor(percentage)
+			return percentage
+		end
+
+		return 0
 	end
 
-	isDegradable = self.maxDegradation and self.maxDegradation > 0
+	local isDegradable = self.maxDegradation and self.maxDegradation > 0
 	if isDegradable and self.degradation then
 		local elapsedSeconds = os.time() - self.degradation
 		local maxDegradeSeconds = self.maxDegradation * 60
@@ -108,26 +116,24 @@ function Item:getCurrentPercentage()
 end
 
 function Item:isItemExpired(degradation, maxDegradation)
-	local isDegradable = maxDegradation and maxDegradation > 0
-	if isDegradable and degradation then
-		if not degradation or degradation <= 0 then
+	if maxDegradation ~= nil and degradation ~= nil then
+		if degradation <= 0 then
 			return true
 		end
 
-		local maxDegradeSeconds = maxDegradation * 60
-		local elapsedSeconds = os.time() - degradation
-		return elapsedSeconds >= maxDegradeSeconds
+		local percentage = self:getPercentage(maxDegradation, degradation)
+		if percentage == 0 then return true end
+
+		return false
 	end
 
-	isDegradable = self.maxDegradation and self.maxDegradation > 0
-	if isDegradable and self.degradation then
+	if self.degradation then
 		if self.degradation <= 0 then
 			return true
 		end
 
-		local maxDegradeSeconds = self.maxDegradation * 60
-		local elapsedSeconds = os.time() - self.degradation
-		return elapsedSeconds >= maxDegradeSeconds
+		local percentage = self:getPercentage()
+		if percentage == 0 then return true end
 	end
 
 	return false

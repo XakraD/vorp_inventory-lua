@@ -36,10 +36,12 @@ Config = {
 	DisableDeathInventory      = true,    -- Prevent the ability to access inventory while dead
 
 	OpenKey                    = 0xC1989F95, -- I
+
 	UseFilter                  = true,    -- If true then will use the filter opening inventory
+
 	Filter                     = "OJDominoBlur",
 
-	PickupKey                  = 0xF84FA74F, -- RMB mouse PROMPT PICKUP
+	PickupKey                  = 0x760A9C6F, -- G key PROMPT PICKUP
 
 	discordid                  = true,    -- Turn to true if ur using discord whitelist
 
