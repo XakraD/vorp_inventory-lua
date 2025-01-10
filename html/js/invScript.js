@@ -424,6 +424,7 @@ function addData(index, item) {
 }
 
 function getItemDegradationPercentage(item) {
+    if (item.maxDegradation === 0) return 1;
     const now = TIME_NOW
     const maxDegradeSeconds = item.maxDegradation * 60;
     const elapsedSeconds = now - item.degradation;
@@ -479,15 +480,15 @@ function loadInventoryItems(item, index, group, count, limit) {
  * @param {number} group - The group of the item
  * @param {number} count - The count of the item
  */
-function loadInventoryWeapons(item, index, group, count) {
+function loadInventoryWeapons(item, index, group) {
     if (item.type != "item_weapon") return;
 
-    const weight = item.weight ? LANGUAGE.labels.weight + item.weight.toFixed(2) + " " + Config.WeightMeasure : LANGUAGE.labels.weight + (count / 4).toFixed(2) + " " + Config.WeightMeasure;
+    const weight = getItemWeight(item.weight, 1);
     const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
     const url = imageCache[item.name]
     const label = item.custom_label ? item.custom_label : item.label;
 
-    $("#inventoryElement").append(`<div data-label='${item.label}' data-group='${group}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
+    $("#inventoryElement").append(`<div data-label='${label}' data-group='${group}' style='background-image: ${url} background-size: 4.5vw 7.7vh; background-repeat: no-repeat; background-position: center;' id='item-${index}' class='item' data-tooltip="${weight + info}">
         <div class='equipped-icon' style='display: ${!item.used && !item.used2 ? "none" : "block"};'></div>
     </div> `);
 }
@@ -540,7 +541,7 @@ function inventorySetup(items) {
                 const group = item.type != "item_weapon" ? !item.group ? 1 : item.group : 5;
 
                 loadInventoryItems(item, index, group, count, limit);
-                loadInventoryWeapons(item, index, group, count);
+                loadInventoryWeapons(item, index, group);
                 addData(index, item);
             }
         };

@@ -169,7 +169,7 @@ function NUIService.NUIGetNearPlayers(obj)
 		if player ~= PlayerId() then
 			local playerId = GetPlayerServerId(player)
 			if Config.ShowCharacterNameOnGive then
-				local name = LocalPlayer.state.Character.FirstName .. " " .. LocalPlayer.state.Character.LastName
+				local name = Player(playerId).state.Character.FirstName .. " " .. Player(playerId).state.Character.LastName
 				playerIds[#playerIds + 1] = { label = name, player = playerId }
 			else
 				playerIds[#playerIds + 1] = { label = playerId, player = playerId }

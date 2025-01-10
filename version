@@ -1,3 +1,28 @@
+<4.0>
+- added decay feature for items you need to run sql code look at the commits or get it from the txAdmin recipe or in discord
+- added extra params for exports getItemCount and getItem 
+- refactor pick ups they are now client sided and should not ocupy network pool
+- pickups can be spawn as any objects add the objects in the confgi file
+- weapon pickups spawn as weapon objects , you can spawn a torch and light up a cave for example
+- client side exports are now in lower case and documented (some until testing others) 
+- fix export `getAllItemsFromCustomInventory` it wasnt getting count of items if they were in a stack it should now return properly 
+- added some database await queries to avoid dead locks
+- fixed some typos in respawn.lua made by previous changes 
+- support to get weapon with hash for exports fixed
+- just like items we added weapon images to be preloaded as well 
+- refactor get near by players to give items, it uses statebags now to get player names 
+- give item will not ask for quantity if you only have one item it shows the player name instead
+- support to alter item weight or label using metadata
+- support for context buttons through metadata, this will add buttons to item when right click on them with event support 
+- GlobalState.TimeNow added you can use this on your scripts to get timestamp in your client side, useful for lots of things like display server time on client.
+- getItemByMainId export , was changed to a better name getItemById old name is still supported
+- subItemID export name was changed to subItemById old name still supported extra param added to suppor how many items to remove 
+- getItemCount extra param added for decayed items 
+- getItem extra param added for decayed items
+- option in config to remove items if they have 0 percentage when item is used
+- removed metadata variable from event `OnitemRemoved` since decay is now a thing there will be stacks and each item if not the same will be unique and we cant send a single metadata. but we added count to the event
+- new variables for getting items object `percentage` and `isDegradable` like getItem, registerUsableItem getUserInventoryItems
+- make sure to update all files including fxmanifest to keep version check, for any other questions ask in vorp or create isso in the repo   
 <3.9>
 - fixed an issue with a query that was messing with shared custom inventories (this was added to attepmt to clean up the database)
 - added security check before removing items when players respawn to make sure the event can only be triggered if they are actually deprecated

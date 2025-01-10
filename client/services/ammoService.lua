@@ -72,12 +72,13 @@ CreateThread(function()
             local ammotypes <const> = SharedData.AmmoTypes[wepgroup]
             local isThrownGroup <const> = wepgroup == `GROUP_THROWN`
             local isBowGroup <const> = wepgroup == `GROUP_BOW`
+            local isPetrol <const> = wepgroup == `GROUP_PETROLCAN`
 
-            if ammotypes and (isArmed or isThrownGroup) and not ismelee then
+            if ammotypes and (isArmed or isThrownGroup or isPetrol) and not ismelee then
                 for ammo_name, ammo_data in pairs(ammotypes) do
                     if playerammoinfo.ammo[ammo_name] then -- is ammo valid
                         local ammoQty = GetPedAmmoByType(playerPedId, joaat(ammo_name))
-                        if (isThrownGroup or isBowGroup) and ammoQty == 1 then
+                        if (isThrownGroup or isBowGroup or isPetrol) and ammoQty == 1 then
                             ammoQty = 0
                         end
 

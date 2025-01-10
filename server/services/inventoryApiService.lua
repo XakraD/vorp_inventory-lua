@@ -384,8 +384,9 @@ exports("getItemMatchingMetadata", InventoryAPI.getItemMatchingMetadata)
 ---@param metadata table metadata
 ---@param allow boolean? allow to detect item creation false means allow true meand dont allow
 ---@param degradation number? used for internal purposes moveToPlayer takeFromPlayer its a timestamp items are being exchanged
+---@param percentage number? used for internal purposes for synscripts to support degradation
 ---@param cb fun(success: boolean)? async or sync callback
-function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degradation)
+function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degradation, percentage)
 	local _source = source
 
 	if not _source then
@@ -482,6 +483,12 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 			item.degradation = os.time()
 			item.percentage = 100
 			DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id', { degradation = os.time(), percentage = 100, id = craftedItem.id })
+		end
+
+		if percentage then
+			item.degradation = os.time() - item:getElapsedTime(svItem:getMaxDegradation(), percentage)
+			item.percentage = item:getPercentage(svItem:getMaxDegradation(), degradation)
+			DBService.queryAwait('UPDATE character_inventories SET percentage = @percentage WHERE item_crafted_id = @id', { percentage = item.percentage, id = craftedItem.id })
 		end
 
 		userInventory[craftedItem.id] = item

@@ -157,7 +157,7 @@ Config = {
 		WEAPON_BOW_IMPROVED = true,
 		WEAPON_LASSO = true,
 		WEAPON_LASSO_REINFORCED = true,
-
+		WEAPON_MOONSHINEJUG_MP = true,
 	},
 
 	-- for dropped weapons , some will spawn standing so we modify their rotation

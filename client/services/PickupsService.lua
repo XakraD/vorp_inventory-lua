@@ -30,6 +30,14 @@ local function createPrompt()
 	UiPromptRegisterEnd(PickUpPrompt)
 end
 
+local function getRandomPositionAround(position, radius)
+	local angle = math.random() * 2 * math.pi -- Random angle in radians
+	local dx = radius * math.cos(angle)
+	local dy = radius * math.sin(angle)
+
+	return vector3(position.x + dx, position.y + dy, position.z)
+end
+
 
 function PickupsService.CreateObject(objectHash, position, itemType)
 	if itemType == "item_standard" then
@@ -74,7 +82,8 @@ function PickupsService.createPickup(name, amount, metadata, weaponId, id, degra
 	local playerPed <const> = PlayerPedId()
 	local coords <const>    = GetEntityCoords(playerPed, true, true)
 	local forward <const>   = GetEntityForwardVector(playerPed)
-	local position <const>  = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	local position          = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	position                = getRandomPositionAround(position, 1)
 	local index <const>     = PickupsService.getUniqueId()
 	local data <const>      = { name = name, obj = index, amount = amount, metadata = metadata, weaponId = weaponId, position = position, id = id, degradation = degradation }
 	if weaponId == 1 then
@@ -92,7 +101,8 @@ function PickupsService.createMoneyPickup(amount)
 	local playerPed <const> = PlayerPedId()
 	local coords <const>    = GetEntityCoords(playerPed, true, true)
 	local forward <const>   = GetEntityForwardVector(playerPed)
-	local position <const>  = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	local position          = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	position                = getRandomPositionAround(position, 1)
 	local handle <const>    = PickupsService.getUniqueId()
 	local data <const>      = { handle = handle, amount = amount, position = position }
 	TriggerServerEvent("vorpinventory:shareMoneyPickupServer", data)
@@ -108,7 +118,8 @@ function PickupsService.createGoldPickup(amount)
 	local playerPed <const> = PlayerPedId()
 	local coords <const>    = GetEntityCoords(playerPed, true, true)
 	local forward <const>   = GetEntityForwardVector(playerPed)
-	local position <const>  = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	local position          = vector3(coords.x + forward.x * 1.6, coords.y + forward.y * 1.6, coords.z + forward.z * 1.6)
+	position                = getRandomPositionAround(position, 1)
 	local handle <const>    = PickupsService.getUniqueId()
 	local data <const>      = { handle = handle, amount = amount, position = position }
 	TriggerServerEvent("vorpinventory:shareGoldPickupServer", data)
