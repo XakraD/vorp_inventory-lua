@@ -186,7 +186,7 @@ end
 
 RegisterNetEvent("vorpInventory:shareMoneyPickupClient", PickupsService.shareMoneyPickupClient)
 
-function PickupsService.shareGoldPickupClient(handle, amount, position, value)
+function PickupsService.shareGoldPickupClient(handle, amount, position,uuid, value)
 	if value == 1 then
 		if not WorldPickups[handle] then
 			local pickup <const> = {
@@ -196,6 +196,7 @@ function PickupsService.shareGoldPickupClient(handle, amount, position, value)
 				isMoney = false,
 				isGold = true,
 				coords = position,
+				uuid = uuid,
 				type = "item_standard",
 				name = "gold_bag"
 			}
@@ -290,7 +291,9 @@ CreateThread(function()
 						if pickup.entityId == WorldPickups[key].entityId then
 							if not pressed then
 								pressed = true
+
 								if isAnyPlayerNear() == 0 then
+									print(Config.UseGoldItem, pickup.isGold)
 									if pickup.isMoney then
 										local data = { obj = key, uuid = pickup.uuid }
 										TriggerServerEvent("vorpinventory:onPickupMoney", data)

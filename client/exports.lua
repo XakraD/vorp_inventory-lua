@@ -29,11 +29,11 @@ exports('getWeaponAmmoTypes', function(group)
 end)
 
 exports('getAmmoLabel', function(ammo)
-    return Utils.GetAmmoLabels(ammo)
+    return Utils.GetAmmoLabel(ammo)
 end)
 
 exports('getInventoryItem', function(name)
-    return Utils.GetItem(name)
+    return Utils.GetInventoryItem(name)
 end)
 
 exports('getInventoryItems', function()

@@ -598,12 +598,18 @@ function InventoryService.onPickupGold(data)
 
 	if not SvUtils.InProcessing(_source) then
 		SvUtils.ProcessUser(_source)
+
 		local goldAmount = data.amount
-		TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.obj, goldAmount, data.coords, 2)
+		TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.obj, goldAmount, data.coords, data.uuid, 2)
 		TriggerClientEvent("vorpInventory:playerAnim", _source, data.obj)
 
 		local character = Core.getUser(_source).getUsedCharacter
+		local charname, _, steamname = getSourceInfo(_source)
+		local title = T.WebHookLang.pickedgold
+		local description = "**" .. T.WebHookLang.gold .. ":** `" .. data.amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
+		local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorpickedgold }
 		character.addCurrency(1, goldAmount)
+		SvUtils.SendDiscordWebhook(info)
 		GoldPickUps[data.uuid] = nil
 		SvUtils.Trem(_source, false)
 	end
@@ -727,16 +733,10 @@ function InventoryService.shareGoldPickupServer(data)
 	if not user then return end
 
 	local Character = user.getUsedCharacter
-	local charname, _, steamname = getSourceInfo(_source)
-	local title = T.WebHookLang.pickedgold
-	local description = "**" .. T.WebHookLang.gold .. ":** `" .. data.amount .. "` \n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`\n"
-	local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorpickedgold }
-
 	Character.removeCurrency(1, data.amount)
-
-	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.handle, data.amount, data.position, 1)
-	SvUtils.SendDiscordWebhook(info)
 	local uid = SvUtils.GenerateUniqueID()
+	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.handle, data.amount, data.position, uid, 1)
+
 	GoldPickUps[uid] = {
 		name = T.inventorygoldlabel,
 		obj = data.handle,
@@ -2015,6 +2015,7 @@ function InventoryService.getAllItemsFromCustomInventory(invId)
 
 			if next(itemMetadata) then
 				items[#items + 1] = {
+					crafted_id = value.item_crafted_id,
 					name = value.item_name,
 					amount = value.amount,
 					metadata = itemMetadata,
@@ -2025,6 +2026,7 @@ function InventoryService.getAllItemsFromCustomInventory(invId)
 					itemsMap[value.item_name].amount = itemsMap[value.item_name].amount + value.amount
 				else
 					itemsMap[value.item_name] = {
+						crafted_id = value.item_crafted_id,
 						name = value.item_name,
 						amount = value.amount,
 						metadata = itemMetadata,
