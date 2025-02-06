@@ -990,12 +990,12 @@ function InventoryAPI.getUserWeapon(player, cb, weaponId)
 	weapon.ammo = foundWeapon:getAllAmmo()
 	weapon.desc = foundWeapon:getDesc()
 	weapon.group = 5
-	Weapon.source = foundWeapon:getSource()
-	Weapon.label = foundWeapon:getLabel()
-	Weapon.serial_number = foundWeapon:getSerialNumber()
-	Weapon.custom_label = foundWeapon:getCustomLabel()
-	Weapon.custom_desc = foundWeapon:getCustomDesc()
-	Weapon.weight = foundWeapon:getWeight()
+	weapon.source = foundWeapon:getSource()
+	weapon.label = foundWeapon:getLabel()
+	weapon.serial_number = foundWeapon:getSerialNumber()
+	weapon.custom_label = foundWeapon:getCustomLabel()
+	weapon.custom_desc = foundWeapon:getCustomDesc()
+	weapon.weight = foundWeapon:getWeight()
 
 	return respond(cb, weapon)
 end

@@ -76,13 +76,13 @@ end
 
 function InventoryService.setWeaponCustomLabel(id, label)
 	if UserWeapons[id] then
-		UserWeapons[id]:setLabel(label)
+		UserWeapons[id]:setCustomLabel(label)
 	end
 end
 
 function InventoryService.setWeaponCustomDesc(id, desc)
 	if UserWeapons[id] then
-		UserWeapons[id]:setDesc(desc)
+		UserWeapons[id]:setCustomDesc(desc)
 	end
 end
 
