@@ -53,6 +53,7 @@ function InventoryService.UseItem(data)
 		item = {
 			---@deprecated -- same as item.id
 			mainid = itemId,
+			item = item:getName(), -- for backwards compat
 			---
 			metadata = item:getMetadata(),
 			percentage = item:getPercentage(),
@@ -95,14 +96,15 @@ end
 function InventoryService.DropMoney(amount)
 	local _source <const> = source
 
-	local userCharacter <const> = Core.getUser(_source)
-	if not userCharacter then return end
+	local user <const> = Core.getUser(_source)
+	if not user then return end
 
 	if SvUtils.InProcessing(_source) then return end
 	SvUtils.ProcessUser(_source)
 
-	local userMoney <const> = userCharacter.getUsedCharacter.money
-	local charid <const> = userCharacter.getUsedCharacter.charIdentifier
+	local character = user.getUsedCharacter
+	local userMoney <const> = character.money
+	local charid <const> = character.charIdentifier
 
 	if userMoney < amount then return end
 
@@ -111,7 +113,7 @@ function InventoryService.DropMoney(amount)
 	if not Config.DeleteOnlyDontDrop then
 		TriggerClientEvent("vorpInventory:createMoneyPickup", _source, amount)
 	else
-		userCharacter.removeCurrency(0, amount)
+		character.removeCurrency(0, amount)
 	end
 	local charname <const>, _, steamname <const> = getSourceInfo(_source)
 	local title <const> = T.dropmoney
