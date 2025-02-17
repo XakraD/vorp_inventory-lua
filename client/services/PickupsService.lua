@@ -5,6 +5,8 @@ local PickUpPrompt   = 0
 local group <const>  = GetRandomIntInRange(0, 0xffffff)
 
 function PickupsService.loadModel(model)
+	if not IsModelValid(model) then return print(model, "not a valid model") end
+
 	if not HasModelLoaded(model) then
 		RequestModel(model, false)
 		repeat Wait(0) until HasModelLoaded(model)
@@ -31,7 +33,7 @@ local function createPrompt()
 end
 
 local function getRandomPositionAround(position, radius)
-	local angle = math.random() * 2 * math.pi -- Random angle in radians
+	local angle <const> = math.random() * 2 * math.pi -- Random angle in radians
 	local dx = radius * math.cos(angle)
 	local dy = radius * math.sin(angle)
 
@@ -133,6 +135,9 @@ function PickupsService.sharePickupClient(data, value)
 	if value == 1 then
 		if WorldPickups[data.obj] then return end
 
+		local item <const> = UserInventory[data.id]
+		if not item then return end
+
 		local label <const> = Utils.GetLabel(data.name, data.weaponId, data.metadata)
 		local pickup <const> = {
 			label    = label .. " x " .. tostring(data.amount),
@@ -143,6 +148,12 @@ function PickupsService.sharePickupClient(data, value)
 			name     = data.name,
 		}
 		WorldPickups[data.obj] = pickup
+
+		item:quitCount(data.amount)
+		if item:getCount() == 0 then
+			UserInventory[data.id] = nil
+		end
+		NUIService.LoadInv()
 	else
 		local pickup <const> = WorldPickups[data.obj]
 		if pickup then
@@ -186,7 +197,7 @@ end
 
 RegisterNetEvent("vorpInventory:shareMoneyPickupClient", PickupsService.shareMoneyPickupClient)
 
-function PickupsService.shareGoldPickupClient(handle, amount, position,uuid, value)
+function PickupsService.shareGoldPickupClient(handle, amount, position, uuid, value)
 	if value == 1 then
 		if not WorldPickups[handle] then
 			local pickup <const> = {
@@ -261,56 +272,55 @@ CreateThread(function()
 	local pressed = false
 	while true do
 		local sleep = 1000
-		if not InInventory then
-			local playerPed <const> = PlayerPedId()
-			local isDead <const> = IsEntityDead(playerPed)
+
+		local playerPed <const> = PlayerPedId()
+		local isDead <const> = IsEntityDead(playerPed)
 
 
-			for key, pickup in pairs(WorldPickups) do
-				local dist <const> = #(GetEntityCoords(playerPed) - pickup.coords)
+		for key, pickup in pairs(WorldPickups) do
+			local dist <const> = #(GetEntityCoords(playerPed) - pickup.coords)
 
-				if dist < 80.0 then
-					if pickup.entityId == 0 or not DoesEntityExist(pickup.entityId) then
-						pickup.entityId = PickupsService.CreateObject(pickup.name, pickup.coords, pickup.type)
-					end
-				else
-					if DoesEntityExist(pickup.entityId) then
-						DeleteEntity(pickup.entityId)
-						pickup.entityId = 0
-					end
+			if dist < 80.0 then
+				if pickup.entityId == 0 or not DoesEntityExist(pickup.entityId) then
+					pickup.entityId = PickupsService.CreateObject(pickup.name, pickup.coords, pickup.type)
 				end
+			else
+				if DoesEntityExist(pickup.entityId) then
+					DeleteEntity(pickup.entityId)
+					pickup.entityId = 0
+				end
+			end
 
-				UiPromptSetVisible(PickUpPrompt, not isDead)
+			UiPromptSetVisible(PickUpPrompt, not isDead)
 
-				if dist <= 1.0 then
-					sleep = 0
-					local label = VarString(10, "LITERAL_STRING", pickup.label)
-					UiPromptSetActiveGroupThisFrame(group, label, 0, 0, 0, 0)
+			if dist <= 1.0 and not InInventory then
+				sleep = 0
+				local label = VarString(10, "LITERAL_STRING", pickup.label)
+				UiPromptSetActiveGroupThisFrame(group, label, 0, 0, 0, 0)
 
-					if UiPromptHasHoldModeCompleted(PickUpPrompt) then
-						if pickup.entityId == WorldPickups[key].entityId then
-							if not pressed then
-								pressed = true
+				if UiPromptHasHoldModeCompleted(PickUpPrompt) then
+					if pickup.entityId == WorldPickups[key].entityId then
+						if not pressed then
+							pressed = true
 
-								if isAnyPlayerNear() == 0 then
-									print(Config.UseGoldItem, pickup.isGold)
-									if pickup.isMoney then
-										local data = { obj = key, uuid = pickup.uuid }
-										TriggerServerEvent("vorpinventory:onPickupMoney", data)
-									elseif Config.UseGoldItem and pickup.isGold then
-										local data = { obj = key, uuid = pickup.uuid }
-										TriggerServerEvent("vorpinventory:onPickupGold", data)
-									else
-										local data = { uid = pickup.uid, obj = key }
-										TriggerServerEvent("vorpinventory:onPickup", data)
-									end
-									TaskLookAtEntity(playerPed, pickup.entityId, 1000, 2048, 3, 0)
+							if isAnyPlayerNear() == 0 then
+								print(Config.UseGoldItem, pickup.isGold)
+								if pickup.isMoney then
+									local data = { obj = key, uuid = pickup.uuid }
+									TriggerServerEvent("vorpinventory:onPickupMoney", data)
+								elseif Config.UseGoldItem and pickup.isGold then
+									local data = { obj = key, uuid = pickup.uuid }
+									TriggerServerEvent("vorpinventory:onPickupGold", data)
+								else
+									local data = { uid = pickup.uid, obj = key }
+									TriggerServerEvent("vorpinventory:onPickup", data)
 								end
-
-								SetTimeout(4000, function()
-									pressed = false
-								end)
+								TaskLookAtEntity(playerPed, pickup.entityId, 1000, 2048, 3, 0)
 							end
+
+							SetTimeout(4000, function()
+								pressed = false
+							end)
 						end
 					end
 				end

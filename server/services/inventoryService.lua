@@ -106,9 +106,9 @@ function InventoryService.DropMoney(amount)
 	local userMoney <const> = character.money
 	local charid <const> = character.charIdentifier
 
-	if userMoney < amount then return end
+	if userMoney < amount then return SvUtils.Trem(_source) end
 
-	if not InventoryService.CheckNewPlayer(_source, charid) then return end
+	if not InventoryService.CheckNewPlayer(_source, charid) then return SvUtils.Trem(_source) end
 
 	if not Config.DeleteOnlyDontDrop then
 		TriggerClientEvent("vorpInventory:createMoneyPickup", _source, amount)
@@ -686,6 +686,8 @@ function InventoryService.sharePickupServerItem(data)
 
 	if not item and data.weaponId == 1 then return end
 
+	if data.amount > item:getCount() then return end
+
 	local result = InventoryService.subItem(_source, "default", data.id, data.amount)
 	if not result then return end
 
@@ -715,6 +717,9 @@ function InventoryService.shareMoneyPickupServer(data)
 	local amount = data.amount
 	local position = data.position
 	local handle = data.handle
+	local money = Character.money
+
+	if amount > money then return end
 
 	Character.removeCurrency(0, amount)
 	local uid = SvUtils.GenerateUniqueID()
@@ -735,6 +740,9 @@ function InventoryService.shareGoldPickupServer(data)
 	if not user then return end
 
 	local Character = user.getUsedCharacter
+	local gold = Character.gold
+	if data.amount > gold then return end
+
 	Character.removeCurrency(1, data.amount)
 	local uid = SvUtils.GenerateUniqueID()
 	TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.handle, data.amount, data.position, uid, 1)
@@ -755,6 +763,8 @@ function InventoryService.DropWeapon(weaponId)
 		SvUtils.ProcessUser(_source)
 		local userWeapons = UsersWeapons.default
 		local weapon = userWeapons[weaponId]
+		if not weapon then return SvUtils.Trem(_source) end
+
 		local wepName = weapon:getName()
 		if not Config.DeleteOnlyDontDrop then
 			TriggerClientEvent("vorpInventory:createPickup", _source, wepName, 1, {}, weaponId)
@@ -766,17 +776,32 @@ function InventoryService.DropWeapon(weaponId)
 end
 
 function InventoryService.DropItem(itemName, itemId, amount, metadata, degradation)
-	local _source = source
-	if not SvUtils.InProcessing(_source) then
-		SvUtils.ProcessUser(_source)
+	local _source <const> = source
 
-		if not Config.DeleteOnlyDontDrop then
-			TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, metadata, 1, itemId, degradation)
-		else
-			InventoryService.subItem(_source, "default", itemId, amount)
-		end
-		SvUtils.Trem(_source)
+	local doesExist <const> = SvUtils.DoesItemExist(itemName, "InventoryService.DropItem")
+	if not doesExist then return end
+
+	local user <const> = Core.getUser(_source)
+	if not user then return end
+
+	local character <const> = user.getUsedCharacter
+	local sourceInventory <const> = UsersInventories.default[character.identifier]
+	if not sourceInventory then return end
+
+	local item <const> = sourceInventory[itemId]
+	if not item then return end
+
+	if item:getCount() < amount then return end
+
+	if SvUtils.InProcessing(_source) then return end
+	SvUtils.ProcessUser(_source)
+
+	if not Config.DeleteOnlyDontDrop then
+		TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, metadata, 1, itemId, degradation)
+	else
+		InventoryService.subItem(_source, "default", itemId, amount)
 	end
+	SvUtils.Trem(_source)
 end
 
 function InventoryService.GiveWeapon(weaponId, target)

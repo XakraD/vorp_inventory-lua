@@ -54,7 +54,11 @@ function NUIService.ReloadInventory(inventory, packed)
 		else
 			-- for syn scripts where description wasnt saved
 			if not item.desc then
-				item.desc = ClientItems[item.name].desc
+				if not ClientItems[item.name] then
+					print("Item,", item.name, " no longer exist did you delete from database? or name was modified?")
+				else
+					item.desc = ClientItems[item.name].desc
+				end
 			end
 		end
 	end
@@ -274,20 +278,11 @@ function NUIService.NUIDropItem(obj)
 		if type == "item_standard" then
 			if aux.number ~= nil and aux.number ~= '' then
 				local item = UserInventory[itemId]
-				if not item then
-					return
-				end
+				if not item then return end
 
-				if qty <= 0 or qty > item:getCount() then
-					return
-				end
+				if qty <= 0 or qty > item:getCount() then return end
 
 				TriggerServerEvent("vorpinventory:serverDropItem", itemName, itemId, qty, metadata, degradation)
-
-				item:quitCount(qty)
-				if item:getCount() == 0 then
-					UserInventory[itemId] = nil
-				end
 			end
 		end
 
