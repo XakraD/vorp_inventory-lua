@@ -1834,7 +1834,7 @@ function InventoryService.TakeFromPlayer(obj)
 			if res then
 				InventoryAPI.giveWeapon(_source, item.id, target, function(result)
 					if result then
-						InventoryService.reloadInventory(target, "default", "player", source)
+						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Take")
 					end
 				end)
@@ -1856,7 +1856,7 @@ function InventoryService.TakeFromPlayer(obj)
 			if res then
 				InventoryAPI.subItem(target, item.name, amount, item.metadata, function(result)
 					if result then
-						InventoryService.reloadInventory(target, "default", "player", source)
+						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 						Core.NotifyRightTip(_source, T.takenFromPlayer .. " " .. amount .. " " .. item.label, 2000)
 						Core.NotifyRightTip(target, T.itemsTakenFromPlayer .. " " .. item.label, 2000)
