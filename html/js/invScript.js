@@ -365,7 +365,6 @@ function addData(index, item) {
         data.push({
             text: LANGUAGE.give,
             action: function () {
-                console.log(item.count);
                 giveGetHowMany(item.name, item.type, item.hash, item.id, item.metadata, item.count);
             },
         });

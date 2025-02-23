@@ -269,3 +269,7 @@ function CustomInventoryAPI:updateCustomInvData(data)
     self.limitedWeapons = data.limitedWeapons or self.limitedWeapons
     self.webhook = data.webhook or self.webhook
 end
+
+function CustomInventoryAPI:getCustomInvData()
+    return self
+end
