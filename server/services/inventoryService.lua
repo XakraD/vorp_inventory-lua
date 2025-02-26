@@ -640,7 +640,7 @@ function InventoryService.sharePickupServerWeapon(data)
 	local _source = source
 	local weapon = UsersWeapons.default[data.weaponId]
 
-	if not weapon and data.weaponId > 1 then
+	if not weapon then
 		return
 	end
 
@@ -1489,7 +1489,13 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 	local footerlogo = Logs.WebHook.cusfooterlogo
 	local avatar = Logs.WebHook.cusavatar
 	local names = Logs.WebHook.cuswebhookname
-	local webhook = CustomInventoryInfos[inventory]:getWebhook()
+	local webhook = CustomInventoryInfos[inventory]
+
+	if webhook then
+		local wh = webhook:getWebhook()
+		webhook = (wh and wh ~= "") and wh or false
+	end
+
 	if type == "Move" then
 		webhook = webhook or Logs.WebHook.CustomInventoryMoveTo
 		local description = "**Player:**`" .. playerName .. "`\n **Moved to:** `" .. inventory .. "` \n**Weapon** `" .. itemName .. "`\n **Count:** `" .. amount .. "`"
