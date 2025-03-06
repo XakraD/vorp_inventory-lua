@@ -47,7 +47,11 @@ function PostAction(eventName, itemData, id, propertyName, info) {
             },
 
             validate: function (value, item, type) {
-                if (!value || value <= 0 || value > 200 || !isInt(value)) {
+                if (!value || value <= 0 || value > Config.MaxItemTransferAmount || !isInt(value)) {
+                    $.post(`https://${GetParentResourceName()}/TransferLimitExceeded`, JSON.stringify({
+                        max: Config.MaxItemTransferAmount
+                    }));
+                                    
                     dialog.close();
                 } else {
                     PostActionPostQty(eventName, itemData, id, propertyName, value, info);

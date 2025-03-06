@@ -13,6 +13,8 @@ RegisterNUICallback("TakeFromPlayer", NUIService.NUITakeFromPlayer)
 RegisterNUICallback("MoveToPlayer", NUIService.NUIMoveToPlayer)
 RegisterNUICallback('getActionsConfig', NUIService.getActionsConfig)
 RegisterNUICallback('ContextMenu', NUIService.ContextMenu)
+RegisterNUICallback('TransferLimitExceeded', NUIService.TransferLimitExceeded)
+
 --========================================================================--
 -- shared
 RegisterNetEvent("vorp_inventory:CloseInv")

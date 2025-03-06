@@ -95,6 +95,7 @@ TranslationInv.Langs = {
         ToNew                     = "To new Still in cool down",
         BothonCool                = "You can't open the inventory due to cooldown on both weapons and items.",
         SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
         labels                    = {
             weight = "Weight ",
             serial = "Serial no ",
@@ -220,6 +221,8 @@ TranslationInv.Langs = {
         NoSerial                  = "Número de Série não definido",
         ToNew                     = "Para novo, ainda em cooldown",
         BothonCool                = "Você não pode abrir o inventário devido ao cooldown em armas e itens.",
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
 
         labels                    = {
             weight = "Peso ",
@@ -352,7 +355,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Número de Série não definido",
         ToNew                     = "Para novo, ainda em cooldown",
         BothonCool                = "Você não pode abrir o inventário devido ao cooldown em armas e itens.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Peso ",
             serial = "Número de Série ",
@@ -479,7 +484,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Numéro de série non défini",
         ToNew                     = "Trop nouveau, toujours en recharge",
         BothonCool                = "Vous ne pouvez pas ouvrir l'inventaire en raison de la recharge sur les armes et les objets.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Poids ",
             serial = "Numéro de série ",
@@ -604,7 +611,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Seriennummer nicht festgelegt",
         ToNew                     = "Zu neu, immer noch in der Abkühlzeit",
         BothonCool                = "Sie können das Inventar nicht öffnen, da die Abkühlzeit für Waffen und Gegenstände läuft.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Gewicht ",
             serial = "Seriennummer ",
@@ -732,7 +741,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Número de serie no establecido",
         ToNew                     = "Demasiado nuevo, aún en enfriamiento",
         BothonCool                = "No puedes abrir el inventario debido al enfriamiento en armas y artículos.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Peso ",
             serial = "Número de serie ",
@@ -858,7 +869,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Numero di serie non impostato",
         ToNew                     = "Troppo nuovo, ancora in recupero",
         BothonCool                = "Non puoi aprire l'inventario a causa del recupero su armi e oggetti.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Peso ",
             serial = "Numero seriale ",
@@ -988,7 +1001,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Serienummer niet ingesteld",
         ToNew                     = "Te nieuw, nog in cooldown",
         BothonCool                = "Je kunt de inventaris niet openen vanwege cooldown op zowel wapens als items.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Gewicht ",
             serial = "Serienummer ",
@@ -1114,7 +1129,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Serienummer ikkje sett",
         ToNew                     = "For nytt, framleis i cooldown",
         BothonCool                = "Du kan ikkje opne lageret på grunn av cooldown på både våpen og gjenstandar.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Vekt ",
             serial = "Serienummer ",
@@ -1238,7 +1255,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Seri numarası ayarlanmadı",
         ToNew                     = "Çok yeni, hala soğuma süresinde",
         BothonCool                = "Silahlar ve öğelerde soğuma süresi nedeniyle envanteri açamazsınız.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Ağırlık ",
             serial = "Seri numarası ",
@@ -1365,7 +1384,9 @@ TranslationInv.Langs = {
         NoSerial                  = "Număr de serie neatribuit",
         ToNew                     = "Prea nou, încă în cooldown",
         BothonCool                = "Nu poți deschide inventarul din cauza cooldown-ului atât pe arme cât și pe obiecte.",
-
+        SomeoneUseing             = "someone is using this stash, wait for your turn",
+        MaxItemTransfer           = "You cannot transfer more than %s items!",
+        
         labels                    = {
             weight = "Greutate ",
             serial = "Numar de serie ",

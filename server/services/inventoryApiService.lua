@@ -586,6 +586,7 @@ function InventoryAPI.subItemID(player, id, cb, allow, amount)
 	end
 	amount = amount or 1
 	item:quitCount(amount)
+	local itemName = item:getName()
 
 	if item:getCount() == 0 then
 		DBService.DeleteItem(charIdentifier, item:getId())
@@ -597,7 +598,7 @@ function InventoryAPI.subItemID(player, id, cb, allow, amount)
 	end
 
 	if not allow then
-		local data = { name = item:getName(), count = amount }
+		local data = { name = itemName, count = amount }
 		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 	end
 	return respond(cb, true)
@@ -644,6 +645,7 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 			return respond(cb, false)
 		end
 
+		local itemName <const> = itemFound:getName()
 
 		itemFound:quitCount(amount)
 		TriggerClientEvent("vorpCoreClient:subItem", _source, itemFound:getId(), itemFound:getCount())
@@ -655,7 +657,7 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 		end
 
 		if not allow then
-			local data <const> = { name = itemFound:getName(), count = amount }
+			local data <const> = { name = itemName, count = amount }
 			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		end
 		return respond(cb, true)
@@ -701,6 +703,7 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 
 	if exactMatchItem then
 		-- if an exact match is found, use this instance
+		local itemName <const> = exactMatchItem:getName()
 		exactMatchItem:quitCount(amount)
 		TriggerClientEvent("vorpCoreClient:subItem", _source, exactMatchItem:getId(), exactMatchItem:getCount())
 		if exactMatchItem:getCount() == 0 then
@@ -711,7 +714,7 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 		end
 
 		if not allow then
-			local data <const> = { name = exactMatchItem:getName(), count = amount }
+			local data <const> = { name = itemName, count = amount }
 			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		end
 	else
@@ -754,7 +757,7 @@ function InventoryAPI.subItem(source, name, amount, metadata, cb, allow, percent
 
 		if not allow then
 			-- allow other scripts to detect the item removal and its amount, (count) was added, but id and metadata was removed because there could be multiple stacks with the same name with diferent metadata so we cant send these
-			local data <const> = { name = svItem:getName(), count = amount }
+			local data <const> = { name = name, count = amount }
 			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		end
 	end

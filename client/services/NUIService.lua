@@ -121,6 +121,12 @@ function NUIService.NUITakeFromPlayer(obj)
 	TriggerServerEvent("vorp_inventory:TakeFromPlayer", json.encode(obj))
 end
 
+function NUIService.TransferLimitExceeded(maxValue)
+    local message = string.format(T.MaxItemTransfer, maxValue.max)
+    Core.NotifyRightTip(message, 4000)
+end
+
+
 function NUIService.CloseInv()
 	if Config.UseFilter then
 		AnimpostfxStop(Config.Filter)

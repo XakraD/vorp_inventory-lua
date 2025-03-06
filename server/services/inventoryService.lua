@@ -259,9 +259,9 @@ function InventoryService.subItem(source, invId, itemId, amount)
 	local identifier <const> = sourceCharacter.identifier
 	local userInventory <const> = CustomInventoryInfos[invId].shared and UsersInventories[invId] or UsersInventories[invId][identifier]
 
-	if not userInventory then return false end
-
-	if not userInventory[itemId] then return false end
+	if not userInventory then
+		return false
+	end
 
 	local item <const> = userInventory[itemId]
 	if not item then
@@ -799,7 +799,7 @@ function InventoryService.DropItem(itemName, itemId, amount, metadata, degradati
 	if not Config.DeleteOnlyDontDrop then
 		TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, metadata, 1, itemId, degradation)
 	else
-		InventoryService.subItem(_source, "default", itemId, amount)
+		InventoryAPI.subItemID(_source,itemId, nil,false, amount)
 	end
 	SvUtils.Trem(_source)
 end
