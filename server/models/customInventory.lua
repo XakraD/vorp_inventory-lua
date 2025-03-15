@@ -262,6 +262,8 @@ function CustomInventoryAPI:updateCustomInvData(data)
     self.whitelistItems = data.whitelistItems or self.whitelistItems
     self.PermissionTakeFrom = data.PermissionTakeFrom or self.PermissionTakeFrom
     self.PermissionMoveTo = data.PermissionMoveTo or self.PermissionMoveTo
+    self.CharIdPermissionTakeFrom = data.CharIdPermissionTakeFrom or self.CharIdPermissionTakeFrom
+    self.CharIdPermissionMoveTo = data.CharIdPermissionMoveTo or self.CharIdPermissionMoveTo
     self.UsePermissions = data.UsePermissions or self.UsePermissions
     self.UseBlackList = data.UseBlackList or self.UseBlackList
     self.BlackListItems = data.BlackListItems or self.BlackListItems

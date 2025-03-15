@@ -799,7 +799,7 @@ function InventoryService.DropItem(itemName, itemId, amount, metadata, degradati
 	if not Config.DeleteOnlyDontDrop then
 		TriggerClientEvent("vorpInventory:createPickup", _source, itemName, amount, metadata, 1, itemId, degradation)
 	else
-		InventoryAPI.subItemID(_source,itemId, nil,false, amount)
+		InventoryAPI.subItemID(_source, itemId, nil, false, amount)
 	end
 	SvUtils.Trem(_source)
 end
@@ -1433,33 +1433,25 @@ end
 
 --* CUSTOM INVENTORY *--
 
-function InventoryService.DoesHavePermission(invId, job, grade, Table)
+function InventoryService.DoesHavePermission(invId, jobPerm, charidPerm)
 	if not CustomInventoryInfos[invId]:isPermEnabled() then
 		return true
 	end
 
-	if not Table or not next(Table) then
+	if not next(jobPerm.data) and not next(charidPerm.data) then
 		return true
 	end
 
-	if Table[job] and Table[job] >= grade then
-		return true
+	if next(jobPerm.data) then
+		if jobPerm.data[jobPerm.job] and jobPerm.data[jobPerm.job] >= jobPerm.grade then
+			return true
+		end
 	end
 
-	return false
-end
-
-function InventoryService.DoesCharIdHavePermission(invId, charid, Table)
-	if not CustomInventoryInfos[invId]:isPermEnabled() then
-		return true
-	end
-
-	if not Table or not next(Table) then
-		return true
-	end
-
-	if Table[charid] then
-		return true
+	if next(charidPerm.data) then
+		if charidPerm.data[charidPerm.charid] then
+			return true
+		end
 	end
 
 	return false
@@ -1555,9 +1547,10 @@ function InventoryService.MoveToCustom(obj)
 	local job = sourceCharacter.job
 	local grade = sourceCharacter.jobGrade
 	local sourceCharIdentifier = sourceCharacter.charIdentifier
-	local Table, Table1 = CustomInventoryInfos[invId]:getPermissionMoveTo()
-	local CanMove = InventoryService.DoesHavePermission(invId, job, grade, Table)
-	local CanMove1 = InventoryService.DoesCharIdHavePermission(invId, sourceCharIdentifier, Table1)
+	local tableJobs, tableCharIds = CustomInventoryInfos[invId]:getPermissionMoveTo()
+	local jobPerm = { data = tableJobs, job = job, grade = grade }
+	local charidPerm = { data = tableCharIds, charid = sourceCharIdentifier }
+	local CanMove = InventoryService.DoesHavePermission(invId, jobPerm, charidPerm)
 	local IsBlackListed = InventoryService.CheckIsBlackListed(invId, string.lower(item.name)) -- lower so we can checkitems and weapons
 
 
@@ -1569,7 +1562,7 @@ function InventoryService.MoveToCustom(obj)
 		return Core.NotifyObjective(_source, T.itemBlackListed, 5000)
 	end
 
-	if not CanMove and not CanMove1 then -- either job or char id
+	if not CanMove then
 		return Core.NotifyObjective(_source, T.noPermissionStorage, 5000)
 	end
 
@@ -1637,11 +1630,12 @@ function InventoryService.TakeFromCustom(obj)
 	local sourceCharIdentifier = sourceCharacter.charIdentifier
 	local job = sourceCharacter.job
 	local grade = sourceCharacter.jobGrade
-	local Table, Table1 = CustomInventoryInfos[invId]:getPermissionTakeFrom()
-	local CanMove = InventoryService.DoesHavePermission(invId, job, grade, Table)
-	local CanMove1 = InventoryService.DoesCharIdHavePermission(invId, sourceCharIdentifier, Table1)
+	local tableJobs, tableCharIds = CustomInventoryInfos[invId]:getPermissionTakeFrom()
+	local jobPerm = { data = tableJobs, job = job, grade = grade }
+	local charidPerm = { data = tableCharIds, charid = sourceCharIdentifier }
+	local CanMove = InventoryService.DoesHavePermission(invId, jobPerm, charidPerm)
 
-	if not CanMove and not CanMove1 then
+	if not CanMove then
 		return Core.NotifyObjective(_source, T.noPermissionTake, 5000)
 	end
 
@@ -1943,6 +1937,7 @@ function InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
 		local serial_number = value.serial_number or SvUtils.GenerateSerialNumber(value.name)
 		local custom_label = value.custom_label or SvUtils.GenerateWeaponLabel(value.name)
 		local weight = SvUtils.GetWeaponWeight(value.name)
+		local components = value.components and next(value.components) and value.components or {}
 		local params = {
 			curr_inv = id,
 			charidentifier = charid,
@@ -1950,16 +1945,18 @@ function InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
 			serial_number = serial_number,
 			label = label,
 			custom_label = custom_label,
-			custom_desc = value.custom_desc or nil
+			custom_desc = value.custom_desc or nil,
+			comps = json.encode(components)
 		}
 
-		DBService.insertAsync("INSERT INTO loadout (identifier, curr_inv, charidentifier, name,serial_number,label,custom_label,custom_desc) VALUES ('', @curr_inv, @charidentifier, @name, @serial_number, @label, @custom_label, @custom_desc)", params, function(result)
+		DBService.insertAsync("INSERT INTO loadout (identifier, curr_inv, charidentifier, name,serial_number,label,custom_label,custom_desc,comps) VALUES ('', @curr_inv, @charidentifier, @name, @serial_number, @label, @custom_label, @custom_desc, @comps)", params, function(result)
 			local weaponId = result
 			local newWeapon = Weapon:New({
 				id = weaponId,
 				propietary = "",
 				name = value.name,
 				ammo = {},
+				comps = components,
 				used = false,
 				used2 = false,
 				charId = charid,

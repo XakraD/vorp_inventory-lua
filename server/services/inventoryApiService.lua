@@ -1656,7 +1656,11 @@ local function canContinue(id, jobName, grade, charid)
 		return false
 	end
 
-	if not jobName and not grade and not charid then
+	if charid then
+		return true
+	end
+
+	if not jobName and not grade then
 		return false
 	end
 
