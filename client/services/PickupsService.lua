@@ -135,13 +135,14 @@ RegisterNetEvent("vorpInventory:createGoldPickup", PickupsService.createGoldPick
 function PickupsService.sharePickupClient(data, value)
 	if value == 1 then
 		if WorldPickups[data.obj] then return end
-		
+
 		if data.type == "item_standard" then
 			local item <const> = UserInventory[data.id]
-			if not item then return end
-			item:quitCount(data.amount)
-			if item:getCount() == 0 then
-				UserInventory[data.id] = nil
+			if item then
+				item:quitCount(data.amount)
+				if item:getCount() == 0 then
+					UserInventory[data.id] = nil
+				end
 			end
 		end
 
