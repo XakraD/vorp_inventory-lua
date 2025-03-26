@@ -183,19 +183,14 @@ end
 ---@param id number user id
 function SvUtils.ProcessUser(id)
     TriggerClientEvent("vorp_inventory:transactionStarted", id)
-    table.insert(processingUser, id)
+    processingUser[id] = true
 end
 
 --- is user in processing transaction
 ---@param id number user id
 ---@return boolean
 function SvUtils.InProcessing(id)
-    for _, v in pairs(processingUser) do
-        if v == id then
-            return true
-        end
-    end
-    return false
+    return processingUser[id]
 end
 
 --- Transaction Ended
@@ -203,11 +198,9 @@ end
 ---@param keepInventoryOpen? boolean keep inventory open
 function SvUtils.Trem(id, keepInventoryOpen)
     keepInventoryOpen = keepInventoryOpen == nil and true or keepInventoryOpen
-    for k, v in pairs(processingUser) do
-        if v == id then
-            TriggerClientEvent("vorp_inventory:transactionCompleted", id, keepInventoryOpen)
-            table.remove(processingUser, k)
-        end
+    if processingUser[id] then
+        TriggerClientEvent("vorp_inventory:transactionCompleted", id, keepInventoryOpen)
+        processingUser[id] = nil
     end
 end
 
@@ -279,3 +272,10 @@ function SvUtils.GetWeaponWeight(name)
     end
     return SharedData.Weapons[weaponName] and SharedData.Weapons[weaponName].Weight or 1
 end
+
+AddEventHandler("playerDropped", function()
+    local _source = source
+    if processingUser[_source] then
+        processingUser[_source] = nil
+    end
+end)

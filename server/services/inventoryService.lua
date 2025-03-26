@@ -1364,29 +1364,7 @@ end
 
 function InventoryService.canStoreWeapon(identifier, charIdentifier, invId, name, amount)
 	local invData = CustomInventoryInfos[invId]
-
-	if invData:getLimit() > 0 then
-		local sourceInventoryItemCount = InventoryService.getInventoryTotalCount(identifier, charIdentifier, invId)
-		sourceInventoryItemCount = sourceInventoryItemCount + amount
-		if sourceInventoryItemCount > invData:getLimit() then
-			return false
-		end
-	end
-
-	if invData:isWeaponInList(name) then
-		local weapons = SvUtils.FindAllWeaponsByName(invId, name)
-		local weaponCount = #weapons + amount
-		if weaponCount > invData:getWeaponLimit(name) then
-			return false
-		end
-	elseif invData:iswhitelistWeaponsEnabled() then
-		return false
-	end
-	return true
-end
-
-function InventoryService.canStoreItem(identifier, charIdentifier, invId, name, amount)
-	local invData = CustomInventoryInfos[invId]
+	if not invData then return false end
 
 
 	if invData:getLimit() > 0 then
@@ -1397,38 +1375,67 @@ function InventoryService.canStoreItem(identifier, charIdentifier, invId, name, 
 		end
 	end
 
-	if invData:isItemInList(name) then
-		local items = SvUtils.FindAllItemsByName(invId, identifier, name)
-
-		if #items ~= 0 then
-			local itemCount = 0
-			for _, item in pairs(items) do
-				itemCount = itemCount + item:getCount()
+	if invData:iswhitelistWeaponsEnabled() then
+		if invData:isWeaponInList(name) then
+			local weapons = SvUtils.FindAllWeaponsByName(invId, name)
+			local weaponCount = #weapons + amount
+			if weaponCount > invData:getWeaponLimit(name) then
+				return false, "Weapon limit reached"
 			end
-			local totalAmount = amount + itemCount
-
-			if totalAmount > invData:getItemLimit(name) then
-				return false, "Item limit reached"
-			end
-		elseif amount > invData:getItemLimit(name) then
-			return false, "Item limit reached"
+		else
+			return false, "Weapon not allowed"
 		end
-		return true
-	elseif invData:iswhitelistItemsEnabled() then
-		return false, "Item not in whitelist"
+	end
+
+	return true
+end
+
+function InventoryService.canStoreItem(identifier, charIdentifier, invId, name, amount)
+	local invData = CustomInventoryInfos[invId]
+
+	if invData:getLimit() > 0 then
+		local sourceInventoryItemCount = InventoryService.getInventoryTotalCount(identifier, charIdentifier, invId)
+		sourceInventoryItemCount = sourceInventoryItemCount + amount
+		if sourceInventoryItemCount > invData:getLimit() then
+			return false, "Inventory limit reached"
+		end
+	end
+
+	if invData:iswhitelistItemsEnabled() then
+		if invData:isItemInList(name) then
+			local items = SvUtils.FindAllItemsByName(invId, identifier, name)
+
+			if #items > 0 then
+				local itemCount = 0
+				for _, item in pairs(items) do
+					itemCount = itemCount + item:getCount()
+				end
+				local totalAmount = amount + itemCount
+
+				if totalAmount > invData:getItemLimit(name) then
+					return false, "Item limit reached"
+				end
+			else
+				if amount > invData:getItemLimit(name) then
+					return false, "Item limit reached"
+				end
+			end
+		end
+		--return true -- item is allowed to be stored it didnt reach limit wanted, but we still need to check if the stack is ignored or not
 	end
 
 	if not invData:getIgnoreItemStack() then
 		local item = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, nil)
-		if item ~= nil then
-			local totalCount = item:getCount() + amount
+		if not item then return false, "Item not found" end
 
-			if totalCount > item:getLimit() then
-				return false, "Item limit reached"
-			end
+		local totalCount = item:getCount() + amount -- count how many items there is in custom inv + what we want to allow
+		if totalCount > item:getLimit() then  -- check if stack is full
+			return false, "Item limit reached"
 		end
 	end
-	return true, nil
+
+
+	return true, ""
 end
 
 --* CUSTOM INVENTORY *--
@@ -1566,13 +1573,21 @@ function InventoryService.MoveToCustom(obj)
 		return Core.NotifyObjective(_source, T.noPermissionStorage, 5000)
 	end
 
+	if SvUtils.InProcessing(_source) then
+		return
+	end
+	SvUtils.ProcessUser(_source)
+
 	if item.type == "item_weapon" then
 		if not CustomInventoryInfos[invId]:doesAcceptWeapons() then
+			SvUtils.Trem(_source)
 			return Core.NotifyRightTip(_source, T.storageNoWeapons, 2000)
 		end
 
-		if not InventoryService.canStoreWeapon(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount) then
-			return Core.NotifyRightTip(_source, T.inventoryFull, 2000)
+		local canStore, message = InventoryService.canStoreWeapon(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount)
+		if not canStore then
+			SvUtils.Trem(_source)
+			return Core.NotifyObjective(_source, message, 2000)
 		end
 
 		local query = "UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
@@ -1592,17 +1607,24 @@ function InventoryService.MoveToCustom(obj)
 			Icon = item.name
 		end
 		Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
+		SvUtils.Trem(_source)
 	else
 		if item.count and amount and item.count < amount then
+			SvUtils.Trem(_source)
 			return print(T.itemExceedsLimit)
 		end
+
 		local result, message = InventoryService.canStoreItem(sourceIdentifier, sourceCharIdentifier, invId, item.name, amount)
 		if not result then
-			return Core.NotifyRightTip(_source, message, 2000)
+			SvUtils.Trem(_source)
+			return Core.NotifyObjective(_source, message, 2000)
 		end
+
+
 		local info = { degradation = item.degradation, isPickup = false }
 		InventoryService.addItem(_source, invId, item.name, amount, item.metadata, info, function(itemAdded)
 			if not itemAdded then
+				SvUtils.Trem(_source)
 				return print(T.cantAddItem)
 			end
 
@@ -1611,6 +1633,7 @@ function InventoryService.MoveToCustom(obj)
 			Core.NotifyRightTip(_source, T.movedToStorage .. " " .. amount .. " " .. item.label, 2000)
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
+			SvUtils.Trem(_source)
 		end)
 	end
 end
@@ -1639,11 +1662,17 @@ function InventoryService.TakeFromCustom(obj)
 		return Core.NotifyObjective(_source, T.noPermissionTake, 5000)
 	end
 
+	if SvUtils.InProcessing(_source) then
+		return
+	end
+	SvUtils.ProcessUser(_source)
+
 	if item.type == "item_weapon" then
 		local canCarryWeapon = InventoryAPI.canCarryAmountWeapons(_source, 1, nil, item.name)
 
 		if not canCarryWeapon then
-			return Core.NotifyRightTip(_source, T.fullInventory, 2000)
+			SvUtils.Trem(_source)
+			return Core.NotifyObjective(_source, T.fullInventory, 2000)
 		end
 
 		local query = "UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
@@ -1675,30 +1704,36 @@ function InventoryService.TakeFromCustom(obj)
 		end
 
 		Core.NotifyAvanced(_source, text, "inventory_items", Icon, "COLOR_PURE_WHITE", 4000)
+		SvUtils.Trem(_source)
 	else
 		if item.count and amount > item.count then
+			SvUtils.Trem(_source)
 			return print(T.itemExceedsLimit)
 		end
 
 		local canCarryItem = InventoryAPI.canCarryItem(_source, item.name, amount)
 		if not canCarryItem then
-			return Core.NotifyRightTip(_source, T.cantCarryItemStack, 2000)
+			SvUtils.Trem(_source)
+			return Core.NotifyObjective(_source, T.cantCarryItemStack, 2000)
 		end
 		local info = { degradation = item.degradation, isPickup = false, percentage = item.percentage }
 		InventoryService.addItem(_source, "default", item.name, amount, item.metadata, info, function(itemAdded)
 			if not itemAdded then
-				return print(T.cantAddItem)
+				SvUtils.Trem(_source)
+				return Core.NotifyObjective(_source, T.cantAddItem, 2000)
 			end
 
 			local result = InventoryService.subItem(_source, invId, item.id, amount)
 			if not result then
-				return print(T.cantRemoveItem)
+				SvUtils.Trem(_source)
+				return Core.NotifyObjective(_source, T.cantRemoveItem, 2000)
 			end
 
 			TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount, itemAdded:getMetadata(), itemAdded:getDegradation(), itemAdded:getPercentage())
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 			Core.NotifyRightTip(_source, T.takenFromStorage .. " " .. amount .. " " .. item.label, 2000)
+			SvUtils.Trem(_source)
 		end)
 	end
 end
@@ -1760,6 +1795,11 @@ function InventoryService.MoveToPlayer(obj)
 		return
 	end
 
+	if SvUtils.InProcessing(_source) then
+		return
+	end
+	SvUtils.ProcessUser(_source)
+
 	if item.type == "item_weapon" then
 		InventoryAPI.canCarryAmountWeapons(target, 1, function(res)
 			if res then
@@ -1770,20 +1810,24 @@ function InventoryService.MoveToPlayer(obj)
 					end
 				end)
 			else
+				SvUtils.Trem(_source)
 				return Core.NotifyObjective(_source, T.cantweapons, 2000)
 			end
 		end, item.name)
 	else
 		if not item.count or not amount then
+			SvUtils.Trem(_source)
 			return
 		end
 
 		local res = InventoryAPI.canCarryItem(target, item.name, amount)
 		if not res then
+			SvUtils.Trem(_source)
 			return Core.NotifyObjective(_source, T.cantCarryItemStack, 2000)
 		end
 
 		if amount > item.count then
+			SvUtils.Trem(_source)
 			return Core.NotifyObjective(_source, T.notEnoughItems, 2000)
 		end
 
@@ -1796,9 +1840,14 @@ function InventoryService.MoveToPlayer(obj)
 							InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
 							Core.NotifyRightTip(_source, T.movedToPlayer .. amount .. " " .. item.label, 2000)
 							Core.NotifyRightTip(target, T.itemGivenToPlayer .. " " .. item.label, 2000)
+							SvUtils.Trem(_source)
 						end)
+					else
+						SvUtils.Trem(_source)
 					end
 				end, true)
+			else
+				SvUtils.Trem(_source)
 			end
 		end, true, item.degradation)
 	end
@@ -1829,6 +1878,11 @@ function InventoryService.TakeFromPlayer(obj)
 		return
 	end
 
+	if SvUtils.InProcessing(_source) then
+		return
+	end
+	SvUtils.ProcessUser(_source)
+
 	if item.type == "item_weapon" then
 		InventoryAPI.canCarryAmountWeapons(_source, 1, function(res)
 			if res then
@@ -1836,19 +1890,25 @@ function InventoryService.TakeFromPlayer(obj)
 					if result then
 						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Take")
+						SvUtils.Trem(_source)
+					else
+						SvUtils.Trem(_source)
 					end
 				end)
 			else
+				SvUtils.Trem(_source)
 				Core.NotifyObjective(_source, T.cantweapons, 2000)
 			end
 		end, item.name)
 	else
 		local res = InventoryAPI.canCarryItem(_source, item.name, amount)
 		if not res then
+			SvUtils.Trem(_source)
 			return Core.NotifyObjective(_source, T.cantCarryItemStack, 2000)
 		end
 
 		if amount > item.count then
+			SvUtils.Trem(_source)
 			return Core.NotifyObjective(_source, T.notEnoughItems, 2000)
 		end
 
@@ -1860,8 +1920,13 @@ function InventoryService.TakeFromPlayer(obj)
 						InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 						Core.NotifyRightTip(_source, T.takenFromPlayer .. " " .. amount .. " " .. item.label, 2000)
 						Core.NotifyRightTip(target, T.itemsTakenFromPlayer .. " " .. item.label, 2000)
+						SvUtils.Trem(_source)
+					else
+						SvUtils.Trem(_source)
 					end
 				end, true)
+			else
+				SvUtils.Trem(_source)
 			end
 		end, true, item.degradation)
 	end
