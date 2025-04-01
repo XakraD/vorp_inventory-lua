@@ -1592,7 +1592,7 @@ function InventoryService.MoveToCustom(obj)
 
 		local query = "UPDATE loadout SET identifier = '',curr_inv = @invId WHERE charidentifier = @charid AND id = @weaponId"
 		local params = { invId = invId, charid = sourceCharIdentifier, weaponId = item.id }
-		DBService.updateAsync(query, params, function(r) end)
+		DBService.updateAsync(query, params)
 		UsersWeapons.default[item.id]:setCurrInv(invId)
 		UsersWeapons[invId][item.id] = UsersWeapons.default[item.id]
 		UsersWeapons.default[item.id] = nil

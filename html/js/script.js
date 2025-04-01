@@ -289,4 +289,4 @@ window.addEventListener("offline", function () {
     closeInventory()
 });
 
-//for gold cash and ID
+
