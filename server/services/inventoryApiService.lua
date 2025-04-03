@@ -827,6 +827,14 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 			DBService.SetItemMetadata(charId, item.id, metadata)
 			item:setMetadata(metadata)
 			TriggerClientEvent("vorpCoreClient:SetItemMetadata", _source, itemId, metadata)
+			-- allow to update image cache for images that dont have items.
+			if metadata and metadata.image and type(metadata.image) == "string" then
+				local image = {
+					[metadata.image] = metadata.image
+				}
+				local packedImage = msgpack.pack(image) -- just to reuse the event
+				TriggerClientEvent("vorp_inventory:server:CacheImages", _source, packedImage)
+			end
 		end
 	else
 		item:quitCount(amountRemove)
