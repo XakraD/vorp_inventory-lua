@@ -471,6 +471,7 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 		isExpired = degradation >= os.time() and 0 or degradation
 	end
 
+	local promise = promise.new()
 	DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata or {}, name, isExpired, function(craftedItem)
 		local item = Item:New({
 			id = craftedItem.id,
@@ -508,9 +509,11 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 			local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
 			TriggerEvent("vorp_inventory:Server:OnItemCreated", data, _source)
 		end
-
-		return respond(cb, true)
+		promise:resolve(true)
 	end, "default")
+
+	Citizen.Await(promise)
+	return respond(cb, true)
 end
 
 exports("addItem", InventoryAPI.addItem)

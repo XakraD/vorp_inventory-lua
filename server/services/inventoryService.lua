@@ -7,7 +7,6 @@ InventoryService = {}
 ItemPickUps      = {}
 MoneyPickUps     = {}
 GoldPickUps      = {}
-ItemUids         = {}
 
 
 function InventoryService.CheckNewPlayer(_source, charid)
@@ -494,7 +493,6 @@ function InventoryService.onPickup(data)
 		InventoryService.addItem(_source, "default", pickup.name, pickup.amount, pickup.metadata, info, function(item)
 			if item ~= nil and ItemPickUps[uid] then
 				ItemPickUps[uid] = nil
-				ItemUids[uid] = nil
 
 				TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
 				TriggerClientEvent("vorpInventory:receiveItem", _source, pickup.name, item:getId(), pickup.amount, pickup.metadata, item.degradation, item.percentage)
@@ -619,7 +617,6 @@ end
 
 local function shareData(data)
 	local uid = SvUtils.GenerateUniqueID()
-	ItemUids[uid] = uid
 
 	ItemPickUps[uid] = {
 		name = data.name,
@@ -633,6 +630,17 @@ local function shareData(data)
 	}
 	data.uid = uid
 	TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 1)
+
+	if not Config.DeletePickups.Enable then
+		return
+	end
+
+	SetTimeout(Config.DeletePickups.Time * 60000, function()
+		if ItemPickUps[uid] then
+			TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
+			ItemPickUps[uid] = nil
+		end
+	end)
 end
 
 
@@ -732,6 +740,17 @@ function InventoryService.shareMoneyPickupServer(data)
 		coords = position,
 		uuid = uid
 	}
+
+	if not Config.DeletePickups.Enable then
+		return
+	end
+
+	SetTimeout(Config.DeletePickups.Time * 60000, function()
+		if MoneyPickUps[uid] then
+			TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, MoneyPickUps[uid].obj, nil, nil, nil, 2)
+			MoneyPickUps[uid] = nil
+		end
+	end)
 end
 
 function InventoryService.shareGoldPickupServer(data)
@@ -755,6 +774,17 @@ function InventoryService.shareGoldPickupServer(data)
 		coords = data.position,
 		uuid = uid
 	}
+
+	if not Config.DeletePickups.Enable then
+		return
+	end
+
+	SetTimeout(Config.DeletePickups.Time * 60000, function()
+		if GoldPickUps[uid] then
+			TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, GoldPickUps[uid].obj, nil, nil, nil, 2)
+			GoldPickUps[uid] = nil
+		end
+	end)
 end
 
 function InventoryService.DropWeapon(weaponId)
@@ -1490,7 +1520,7 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 	local names = Logs.WebHook.cuswebhookname
 	local webhook = CustomInventoryInfos[inventory]
 
-	if webhook then
+	if webhook and inventory ~= "default" then
 		local wh = webhook:getWebhook()
 		webhook = (wh and wh ~= "") and wh or false
 	end

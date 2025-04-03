@@ -53,6 +53,11 @@ Config = {
 
 	DeleteItemOnUseWhenExpired = false,   -- if true items on use that are expired will be deleted
 
+	DeletePickups              = {
+		Enable = false, -- if true it will add timer to delete pickups
+		Time = 10, -- after this time pick up wll be deleted, IN MINUTES
+	},
+
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD ===================== --
 
 	UseClearAll                = false, -- If you want to use the clear item function
