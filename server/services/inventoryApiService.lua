@@ -2059,8 +2059,7 @@ function InventoryAPI.addItemsToCustomInventory(id, items, charid, callback)
 	end
 
 	if not charid or charid == 0 then
-		local msg = "InventoryAPI.addItemsToCustomInventory: charid is not valid %s"
-		print((msg):format(id))
+		print(("InventoryAPI.addItemsToCustomInventory: charid is not valid %s"):format(id))
 		return respond(callback, false)
 	end
 

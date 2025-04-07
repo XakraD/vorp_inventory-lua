@@ -1,3 +1,23 @@
+<4.1>
+- fixed customInventory permissions using charids and jobs
+- fixed customInventory IgnoreStack limit (would delete the items instead of ignoring them)
+- fixed openPlayerInventory that would error when a method was invalid (getWebhook is only available for custom invs not default ones)
+- fixed addItem export that was returning nil because of async call (this was not an issue unless you checked the return value)
+- added support to wait for all operations to finish when it comes to move and take from custom inv (players were disconnecting inv to dupe items)
+- image from metadata is is now updating the images cache to display properly (images were only cached if there was an item associated with it)
+- added pick ups delete logic based on time (server side)
+- optimise processing users by using tables instead of arrays
+- add support to pass weapons components when using export addWeaponsToCustomInventory (optional)
+- fixed DeleteOnly when it was true in config for  pickups
+- add config for max items can move or take in js file and translation error for it (default is 200 and there was no error message for it)
+- changed logic for pick ups so it removes items only after all operations are done 
+- fixed typo in getUserWeapon export
+- fixed client side setCustomWeapon descriptions (was not updating)
+- added extra param to registerUsableItem to pass resource name to help users identifying to know where the item is in case its something wrong with it
+- added crafted_items id to getAllItemsFromCustomInventory to allow use it in other exports 
+- fix serial weapon numbers that would regenerate after drop weapon 
+- added drop items to spawn around the player and not one on top of the other
+- added logic to allow use WEAPON_MOONSHINEJUG_MP 
 <4.0>
 - added decay feature for items you need to run sql code look at the commits or get it from the txAdmin recipe or in discord
 - added extra params for exports getItemCount and getItem 

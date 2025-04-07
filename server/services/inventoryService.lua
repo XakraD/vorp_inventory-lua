@@ -1406,14 +1406,14 @@ function InventoryService.canStoreWeapon(identifier, charIdentifier, invId, name
 	end
 
 	if invData:iswhitelistWeaponsEnabled() then
-		if invData:isWeaponInList(name) then
-			local weapons = SvUtils.FindAllWeaponsByName(invId, name)
-			local weaponCount = #weapons + amount
-			if weaponCount > invData:getWeaponLimit(name) then
-				return false, "Weapon limit reached"
-			end
-		else
+		if not invData:isWeaponInList(name) then
 			return false, "Weapon not allowed"
+		end
+
+		local weapons = SvUtils.FindAllWeaponsByName(invId, name)
+		local weaponCount = #weapons + amount
+		if weaponCount > invData:getWeaponLimit(name) then
+			return false, "Weapon limit reached"
 		end
 	end
 
@@ -1432,26 +1432,27 @@ function InventoryService.canStoreItem(identifier, charIdentifier, invId, name, 
 	end
 
 	if invData:iswhitelistItemsEnabled() then
-		if invData:isItemInList(name) then
-			local items = SvUtils.FindAllItemsByName(invId, identifier, name)
+		if not invData:isItemInList(name) then
+			return false, "Item not allowed"
+		end
 
-			if #items > 0 then
-				local itemCount = 0
-				for _, item in pairs(items) do
-					itemCount = itemCount + item:getCount()
-				end
-				local totalAmount = amount + itemCount
+		local items = SvUtils.FindAllItemsByName(invId, identifier, name)
 
-				if totalAmount > invData:getItemLimit(name) then
-					return false, "Item limit reached"
-				end
-			else
-				if amount > invData:getItemLimit(name) then
-					return false, "Item limit reached"
-				end
+		if #items > 0 then
+			local itemCount = 0
+			for _, item in pairs(items) do
+				itemCount = itemCount + item:getCount()
+			end
+			local totalAmount = amount + itemCount
+
+			if totalAmount > invData:getItemLimit(name) then
+				return false, "Item limit reached"
+			end
+		else
+			if amount > invData:getItemLimit(name) then
+				return false, "Item limit reached"
 			end
 		end
-		--return true -- item is allowed to be stored it didnt reach limit wanted, but we still need to check if the stack is ignored or not
 	end
 
 	if not invData:getIgnoreItemStack() then
@@ -1480,7 +1481,7 @@ function InventoryService.DoesHavePermission(invId, jobPerm, charidPerm)
 	end
 
 	if next(jobPerm.data) then
-		if jobPerm.data[jobPerm.job] and jobPerm.data[jobPerm.job] >= jobPerm.grade then
+		if jobPerm.data[jobPerm.job] and jobPerm.grade >= jobPerm.data[jobPerm.job] then
 			return true
 		end
 	end
