@@ -186,8 +186,14 @@ end
 
 function Utils.GetLabel(hash, id, metadata)
 	if id <= 1 then
-		if metadata?.label then return metadata.label end
-		if ClientItems[hash] then return ClientItems[hash].label end
+		if metadata?.label then
+			if type(metadata.label) == "string" then
+				return metadata.label
+			end
+		end
+		if ClientItems[hash] then
+			return ClientItems[hash].label
+		end
 	else
 		return Utils.GetWeaponDefaultLabel(hash)
 	end

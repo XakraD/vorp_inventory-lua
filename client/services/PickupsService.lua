@@ -147,8 +147,11 @@ function PickupsService.sharePickupClient(data, value)
 		end
 
 		local label <const> = Utils.GetLabel(data.name, data.weaponId, data.metadata)
+		if not label then
+			print("label not found for ", data.name)
+		end
 		local pickup <const> = {
-			label    = label .. " x " .. tostring(data.amount),
+			label    = (label or data.name) .. " x " .. tostring(data.amount),
 			entityId = 0,
 			coords   = data.position,
 			uid      = data.uid,
