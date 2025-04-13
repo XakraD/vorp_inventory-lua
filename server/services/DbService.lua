@@ -34,41 +34,38 @@ function DBService.SetItemMetadata(sourceCharIdentifier, itemCraftedId, metadata
 end
 
 function DBService.DeleteItem(sourceCharIdentifier, itemCraftedId)
-    MySQL.query("DELETE FROM character_inventories WHERE character_id = @charid AND item_crafted_id = @itemid;", {
-        charid = tonumber(sourceCharIdentifier),
-        itemid = tonumber(itemCraftedId)
-    })
-    MySQL.query("DELETE FROM items_crafted WHERE id = @itemid;", { itemid = tonumber(itemCraftedId) })
+    local queries = {
+        {
+            query = "DELETE FROM character_inventories WHERE character_id = ? AND item_crafted_id = ?",
+            values = { tonumber(sourceCharIdentifier), tonumber(itemCraftedId) }
+        },
+        {
+            query = "DELETE FROM items_crafted WHERE id = ?",
+            values = { tonumber(itemCraftedId) }
+        }
+    }
+
+    MySQL.transaction.await(queries)
 end
 
 function DBService.CreateItem(sourceCharIdentifier, itemId, amount, metadata, name, degradation, cb, invId)
-    MySQL.insert.await("INSERT INTO items_crafted (character_id, item_id, metadata,item_name) VALUES (@charid, @itemid, @metadata,@item_name);", {
+    local resultId = MySQL.insert.await("INSERT INTO items_crafted (character_id, item_id, metadata,item_name) VALUES (@charid, @itemid, @metadata,@item_name);", {
         charid = tonumber(sourceCharIdentifier),
         itemid = tonumber(itemId),
         metadata = json.encode(metadata),
         item_name = name,
     })
 
-    local result = MySQL.query.await("SELECT id FROM items_crafted WHERE character_id = @charid AND item_id = @itemid AND JSON_CONTAINS(metadata, @metadata);", {
+    MySQL.insert.await("INSERT INTO character_inventories (character_id, item_crafted_id, amount, inventory_type,item_name, degradation) VALUES (@charid, @itemid, @amount, @invId,@item_name, @degradation);", {
         charid = tonumber(sourceCharIdentifier),
-        itemid = tonumber(itemId),
-        metadata = json.encode(metadata)
+        itemid = resultId,
+        amount = tonumber(amount),
+        invId = invId or "default",
+        item_name = name,
+        degradation = degradation
     })
 
-    if result and result[1] then
-        local item = result[#result]
-
-        MySQL.insert.await("INSERT INTO character_inventories (character_id, item_crafted_id, amount, inventory_type,item_name, degradation) VALUES (@charid, @itemid, @amount, @invId,@item_name, @degradation);", {
-            charid = tonumber(sourceCharIdentifier),
-            itemid = item.id,
-            amount = tonumber(amount),
-            invId = invId or "default",
-            item_name = name,
-            degradation = degradation
-        })
-
-        cb({ id = item.id })
-    end
+    cb({ id = resultId })
 end
 
 function DBService.GetTotalItemsInCustomInventory(id)
