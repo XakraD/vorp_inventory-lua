@@ -73,9 +73,16 @@ function SharedUtils.MergeTables(a, b)
     for key, value in pairs(a) do
         newTable[key] = value
     end
+
+    if type(b) ~= "table" then
+        print("item metadata was not table")
+        return {}
+    end
+
     for key, value in pairs(b) do
         newTable[key] = value
     end
+
     return newTable
 end
 
