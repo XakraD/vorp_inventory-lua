@@ -374,8 +374,9 @@ local function useWeapon(data)
 	local isWeaponOneHanded = Citizen.InvokeNative(0xD955FEE4B87AFA07, weapName)
 	local isArmed = Citizen.InvokeNative(0xCB690F680A3EA971, ped, 4)
 	local notdual = false
-
-	if (isWeaponAGun and isWeaponOneHanded) and isArmed then
+	if (isWeaponAGun and isWeaponOneHanded) and isArmed and not Config.DuelWield then
+		return
+	elseif (isWeaponAGun and isWeaponOneHanded) and isArmed and Config.DuelWield then
 		addWardrobeInventoryItem("CLOTHING_ITEM_M_OFFHAND_000_TINT_004", 0xF20B6B4A)
 		addWardrobeInventoryItem("UPGRADE_OFFHAND_HOLSTER", 0x39E57B01)
 		UserWeapons[weaponId]:setUsed2(true)

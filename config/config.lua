@@ -58,6 +58,8 @@ Config = {
 		Time = 10, -- after this time pick up wll be deleted, IN MINUTES
 	},
 
+	DuelWield				   = true,   -- If true duel wielding will be allowed.
+
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD ===================== --
 
 	UseClearAll                = false, -- If you want to use the clear item function

@@ -122,7 +122,9 @@ function Item:isItemExpired(degradation, maxDegradation)
 		end
 
 		local percentage = self:getPercentage(maxDegradation, degradation)
-		if percentage == 0 then return true end
+		if percentage == 0 then
+			return true
+		end
 
 		return false
 	end
@@ -133,7 +135,9 @@ function Item:isItemExpired(degradation, maxDegradation)
 		end
 
 		local percentage = self:getPercentage()
-		if percentage == 0 then return true end
+		if percentage == 0 then
+			return true
+		end
 	end
 
 	return false
@@ -209,7 +213,7 @@ function Item:getCount()
 end
 
 function Item:addCount(amount, ignoreStackLimit)
-	if (self.count + amount <= self.limit) or ignoreStackLimit then
+	if self.limit == -1 or (self.count + amount <= self.limit) or ignoreStackLimit then
 		self.count = self.count + amount
 		return true
 	end
