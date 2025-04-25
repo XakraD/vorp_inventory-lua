@@ -86,7 +86,6 @@ end
 ---@return nil | table
 function SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
     local userInventory = CustomInventoryInfos[invId].shared and UsersInventories[invId] or UsersInventories[invId][identifier]
-
     if not userInventory then
         return nil
     end

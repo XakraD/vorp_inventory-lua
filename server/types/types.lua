@@ -237,11 +237,13 @@ function exports.vorp_inventory:deleteWeapon(source, weaponId, callback) end
 ---@param ammo table ammo
 ---@param components table? weapon components
 ---@param comps table? weapon components
+---@param callback fun(boolean:boolean)? callback function async or sync leave nil
+---@param wepid number? this is not to be used, and is internal only. leave nil
 ---@param custom_serial string? weapon serial number
 ---@param custom_label string? weapon custom label
 ---@param custom_desc? string? weapon custom description
----@param callback fun(boolean:boolean)? callback function async or sync leave nil
-function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback, custom_serial, custom_label, custom_desc) end
+
+function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback,wepid, custom_serial, custom_label, custom_desc) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- give weapon

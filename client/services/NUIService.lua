@@ -463,10 +463,10 @@ local function loadItems()
 					if item.name == v.name then
 						if item.metadata.description ~= nil then
 							item.metadata.orgdescription = item.metadata.description
-							item.metadata.description = item.metadata.description .. "<br><span style=color:Green;>" .. T.cansell .. v.price .. "</span>"
+							item.metadata.description = T.cansell .."<span style=color:Green;>" .. v.price .. "</span>"
 						else
 							item.metadata.orgdescription = ""
-							item.metadata.description = "<span style=color:Green;>" .. T.cansell .. v.price .. "</span>"
+							item.metadata.description = T.cansell .."<span style=color:Green;>" .. v.price .. "</span>"
 						end
 					end
 				end

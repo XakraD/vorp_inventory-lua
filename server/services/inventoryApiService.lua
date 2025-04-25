@@ -71,6 +71,16 @@ local function respond(cb, result)
 	return result
 end
 
+local function checkMetadataImage(source, metadata)
+	if metadata and next(metadata) and metadata.image and type(metadata.image) == "string" then
+		local image = {
+			[metadata.image] = metadata.image
+		}
+		local packedImage = msgpack.pack(image) -- just to reuse the event
+		TriggerClientEvent("vorp_inventory:server:CacheImages", source, packedImage)
+	end
+end
+
 ---private function to check if item exist
 function InventoryAPI.canCarryAmountItem(player, amount, cb)
 	local _source = player
@@ -502,8 +512,11 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 			DBService.queryAwait('UPDATE character_inventories SET percentage = @percentage WHERE item_crafted_id = @id', { percentage = item.percentage, id = craftedItem.id })
 		end
 
+		checkMetadataImage(_source, item:getMetadata())
+
 		userInventory[craftedItem.id] = item
 		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
+
 
 		if not allow then
 			local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
@@ -828,13 +841,7 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 			item:setMetadata(metadata)
 			TriggerClientEvent("vorpCoreClient:SetItemMetadata", _source, itemId, metadata)
 			-- allow to update image cache for images that dont have items.
-			if metadata and metadata.image and type(metadata.image) == "string" then
-				local image = {
-					[metadata.image] = metadata.image
-				}
-				local packedImage = msgpack.pack(image) -- just to reuse the event
-				TriggerClientEvent("vorp_inventory:server:CacheImages", _source, packedImage)
-			end
+			checkMetadataImage(_source, metadata)
 		end
 	else
 		item:quitCount(amountRemove)
@@ -2053,7 +2060,8 @@ end
 ---@param items table items
 ---@param charid number charidentifier of the owner of the storage if custom inv is not shared , if its shared can be any characteridentifer
 ---@param callback fun(success: boolean)? async or sync callback
-function InventoryAPI.addItemsToCustomInventory(id, items, charid, callback)
+---@param identifier string? identifier of the owner of the storage if custom inv is not shared , if its shared dont need one
+function InventoryAPI.addItemsToCustomInventory(id, items, charid, callback, identifier)
 	if not CustomInventoryInfos[id] then
 		return respond(callback, false)
 	end
@@ -2084,7 +2092,7 @@ function InventoryAPI.addItemsToCustomInventory(id, items, charid, callback)
 		return respond(callback, false)
 	end
 
-	InventoryService.addItemsToCustomInventory(id, items, charid)
+	InventoryService.addItemsToCustomInventory(id, items, charid, identifier)
 
 	return respond(callback, true)
 end
@@ -2252,13 +2260,14 @@ exports("removeCustomInventoryWeaponById", InventoryAPI.removeWeaponByIdFromCust
 ---@param metadata table? metadata
 ---@param amount number? amount
 ---@param callback fun(success: boolean)? async or sync callback
+---@param identifier string? identifier of the owner of the storage if custom inv is not shared , if its shared dont need one
 ---@return boolean
-function InventoryAPI.updateItemInCustomInventory(id, item_id, metadata, amount, callback)
+function InventoryAPI.updateItemInCustomInventory(id, item_id, metadata, amount, callback, identifier)
 	if not CustomInventoryInfos[id] then
 		return respond(callback, false)
 	end
 
-	if InventoryService.updateItemInCustomInventory(id, item_id, metadata, amount) then
+	if InventoryService.updateItemInCustomInventory(id, item_id, metadata, amount, identifier) then
 		return respond(callback, true)
 	end
 
