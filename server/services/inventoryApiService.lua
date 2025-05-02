@@ -1789,6 +1789,20 @@ end
 
 exports("updateCustomInventorySlots", InventoryAPI.updateCustomInventorySlots)
 
+--- get custom inventory slots (you can do this in your scripts though each script manages their own slots)
+--- @param id string inventory id
+--- @param cb fun(slots: number)? async or sync callback
+function InventoryAPI.getCustomInventorySlots(id, cb)
+	if not CustomInventoryInfos[id] then
+		return respond(cb, false)
+	end
+
+	local slots = CustomInventoryInfos[id]:getLimit()
+	return respond(cb, slots)
+end
+
+exports("getCustomInventorySlots", InventoryAPI.getCustomInventorySlots)
+
 ---set custom inventory item limit
 ---@param id string inventory id
 ---@param itemName string item name
