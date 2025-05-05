@@ -1517,7 +1517,7 @@ function InventoryService.CheckIsBlackListed(invId, ItemName)
 	return true
 end
 
-function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, type)
+function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, action)
 	local title = Logs.WebHook.custitle
 	local color = Logs.WebHook.cuscolor
 	local logo = Logs.WebHook.cuslogo
@@ -1531,14 +1531,14 @@ function InventoryService.DiscordLogs(inventory, itemName, amount, playerName, t
 		webhook = (wh and wh ~= "") and wh or false
 	end
 
-	if type == "Move" then
-		webhook = webhook or Logs.WebHook.CustomInventoryMoveTo
+	if action == "Move" then
+		webhook = (type(webhook) == "string") and webhook or Logs.WebHook.CustomInventoryMoveTo
 		local description = "**Player:**`" .. playerName .. "`\n **Moved to:** `" .. inventory .. "` \n**Weapon** `" .. itemName .. "`\n **Count:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end
 
-	if type == "Take" then
-		webhook = webhook or Logs.WebHook.CustomInventoryTakeFrom
+	if action == "Take" then
+		webhook = (type(webhook) == "string") and webhook or Logs.WebHook.CustomInventoryTakeFrom
 		local description = "**Player:**`" .. playerName .. "`\n **Took from:** `" .. inventory .. "`\n **item** `" .. itemName .. "`\n **amount:** `" .. amount .. "`"
 		Core.AddWebhook(title, webhook, description, color, names, logo, footerlogo, avatar)
 	end
@@ -1713,7 +1713,7 @@ function InventoryService.TakeFromCustom(obj)
 
 		local query = "UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
 		local params = { identifier = sourceIdentifier, weaponId = item.id, charid = sourceCharIdentifier }
-		DBService.updateAsync(query, params, function(r) end)
+		DBService.updateAsync(query, params)
 		UsersWeapons[invId][item.id]:setCurrInv("default")
 		UsersWeapons.default[item.id] = UsersWeapons[invId][item.id]
 		UsersWeapons.default[item.id].propietary = sourceIdentifier
@@ -1844,6 +1844,7 @@ function InventoryService.MoveToPlayer(obj)
 						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Move")
 					end
+					SvUtils.Trem(_source)
 				end)
 			else
 				SvUtils.Trem(_source)
@@ -1926,10 +1927,8 @@ function InventoryService.TakeFromPlayer(obj)
 					if result then
 						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs("default", item.name, amount, sourceName, "Take")
-						SvUtils.Trem(_source)
-					else
-						SvUtils.Trem(_source)
 					end
+					SvUtils.Trem(_source)
 				end)
 			else
 				SvUtils.Trem(_source)
@@ -1956,10 +1955,8 @@ function InventoryService.TakeFromPlayer(obj)
 						InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
 						Core.NotifyRightTip(_source, T.takenFromPlayer .. " " .. amount .. " " .. item.label, 2000)
 						Core.NotifyRightTip(target, T.itemsTakenFromPlayer .. " " .. item.label, 2000)
-						SvUtils.Trem(_source)
-					else
-						SvUtils.Trem(_source)
 					end
+					SvUtils.Trem(_source)
 				end, true)
 			else
 				SvUtils.Trem(_source)
