@@ -1255,7 +1255,7 @@ function InventoryService.LoadAllAmmo()
 	local query = "SELECT ammo FROM characters WHERE charidentifier=@charidentifier"
 	local params = { charidentifier = charidentifier }
 	DBService.queryAsync(query, params, function(result)
-		if result[1] then
+		if result[1] and result[1].ammo then
 			local ammo = json.decode(result[1].ammo)
 			AmmoData[_source] = { charidentifier = charidentifier, ammo = ammo }
 			if next(ammo) then
