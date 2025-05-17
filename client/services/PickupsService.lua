@@ -56,7 +56,6 @@ function PickupsService.CreateObject(objectHash, position, itemType)
 
 		return entityHandle
 	else
-		print("spawn")
 		if not SharedData.Weapons[objectHash] then
 			return PickupsService.CreateObject("default_box", position, "item_standard")
 		end
@@ -135,6 +134,7 @@ RegisterNetEvent("vorpInventory:createGoldPickup", PickupsService.createGoldPick
 function PickupsService.sharePickupClient(data, value)
 	if value == 1 then
 		if WorldPickups[data.obj] then return end
+		local id = 1
 
 		if data.type == "item_standard" then
 			local item <const> = UserInventory[data.id]
@@ -144,11 +144,12 @@ function PickupsService.sharePickupClient(data, value)
 					UserInventory[data.id] = nil
 				end
 			end
+			id = 2
 		end
 
-		local label <const> = Utils.GetLabel(data.name, data.weaponId, data.metadata)
+		local label <const> = Utils.GetLabel(data.name, id, data.metadata)
 		if not label then
-			print("label not found for ", data.name)
+			print(("label not found for %s %s"):format(data.name, id))
 		end
 		local pickup <const> = {
 			label    = (label or data.name) .. " x " .. tostring(data.amount),

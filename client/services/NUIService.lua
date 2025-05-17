@@ -122,10 +122,9 @@ function NUIService.NUITakeFromPlayer(obj)
 end
 
 function NUIService.TransferLimitExceeded(maxValue)
-    local message = string.format(T.MaxItemTransfer, maxValue.max)
-    Core.NotifyRightTip(message, 4000)
+	local message = string.format(T.MaxItemTransfer, maxValue.max)
+	Core.NotifyRightTip(message, 4000)
 end
-
 
 function NUIService.CloseInv()
 	if Config.UseFilter then
@@ -402,7 +401,7 @@ local function useWeapon(data)
 		local serial = UserWeapons[weaponId]:getSerialNumber()
 		local info = { weaponId = weaponId, serialNumber = serial }
 		local key = string.format("GetEquippedWeaponData_%d", weapName)
-		LocalPlayer.state:set(key, info, false)
+		LocalPlayer.state:set(key, info, true)
 	end
 	NUIService.LoadInv()
 end
@@ -463,10 +462,10 @@ local function loadItems()
 					if item.name == v.name then
 						if item.metadata.description ~= nil then
 							item.metadata.orgdescription = item.metadata.description
-							item.metadata.description = T.cansell .."<span style=color:Green;>" .. v.price .. "</span>"
+							item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 						else
 							item.metadata.orgdescription = ""
-							item.metadata.description = T.cansell .."<span style=color:Green;>" .. v.price .. "</span>"
+							item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 						end
 					end
 				end

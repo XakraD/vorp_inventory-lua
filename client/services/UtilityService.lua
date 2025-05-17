@@ -185,7 +185,7 @@ function Utils.TableRemoveByKey(table, key)
 end
 
 function Utils.GetLabel(hash, id, metadata)
-	if id <= 1 then
+	if id == 2 then
 		if metadata?.label then
 			if type(metadata.label) == "string" then
 				return metadata.label

@@ -310,8 +310,6 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 
 	metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
 	local userInventory <const> = CustomInventoryInfos[invId].shared and UsersInventories[invId] or UsersInventories[invId][identifier]
-
-
 	if not userInventory then return cb(nil) end
 
 
@@ -1966,9 +1964,9 @@ function InventoryService.TakeFromPlayer(obj)
 end
 
 -- to update custom inv cache
-local function updateItem(itemcraftedid, value, item, charid, isExpired, id, identifier)
+local function updateItem(itemcrafted, value, item, charid, isExpired, id, identifier)
 	local item_add <const> = Item:New({
-		id = itemcraftedid,
+		id = itemcrafted.id,
 		count = value.amount,
 		limit = item:getLimit(),
 		label = item:getLabel(),
@@ -1986,41 +1984,81 @@ local function updateItem(itemcraftedid, value, item, charid, isExpired, id, ide
 
 	local isShared <const> = CustomInventoryInfos[id]:isShared()
 	if isShared then
-		local customInventory <const> = CustomInventoryInfos[id]
-		customInventory[itemcraftedid] = item_add
+		local customInventory <const> = UsersInventories[id]
+		if not customInventory then
+			return print("shared inventory does not exist with id update item " .. id)
+		end
+
+		customInventory[itemcrafted.id] = item_add
 	else
 		if not identifier then
 			return print("inventory is not shared and you didnt pass identifier")
 		end
 
-		local customInventory <const> = CustomInventoryInfos[id][identifier]
+		local customInventory <const> = UsersInventories[id][identifier]
 		if not customInventory then
 			return print("non shared inventory does not exist for this identifier")
 		end
-		customInventory[itemcraftedid] = item_add
+		customInventory[itemcrafted.id] = item_add
 	end
 end
 
-local function updateItemAmount(id, identifier, amount, itemcraftedid, metadata)
+local function updateItemAmount(id, identifier, amount, itemcraftedid, metadata, name)
 	local isShared <const> = CustomInventoryInfos[id]:isShared()
 	if isShared then
-		local customInventory <const> = CustomInventoryInfos[id]
-		customInventory[itemcraftedid].amount = customInventory[itemcraftedid].amount + amount
+		local customInventory <const> = UsersInventories[id]
+
+		if not customInventory[itemcraftedid] then
+			return print("item crafted id does not exist")
+		end
+
+		customInventory[itemcraftedid].count = customInventory[itemcraftedid].count + amount
 		if metadata then
 			customInventory[itemcraftedid].metadata = metadata
 		end
 	else
-		if not identifier then
-			return print("inventory is not shared and you didnt pass identifier")
+		local customInventory <const> = UsersInventories[id][identifier]
+
+		if not customInventory[itemcraftedid] then
+			return print("item crafted id does not exist 2")
 		end
 
-		local customInventory <const> = CustomInventoryInfos[id][identifier]
-		if not customInventory then
-			return print("non shared inventory does not exist for this identifier")
-		end
-		customInventory[itemcraftedid].amount = customInventory[itemcraftedid].amount + amount
+		customInventory[itemcraftedid].count = customInventory[itemcraftedid].count + amount
 		if metadata then
 			customInventory[itemcraftedid].metadata = metadata
+		end
+	end
+	DBService.updateAsync("UPDATE character_inventories SET amount = amount + @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = amount, itemname = name, inventory_type = id })
+end
+
+local function updateItemInCustomInventory(id, identifier, itemCraftedId, amount, metadata, value, item, charid, isExpired, name)
+	local existingItem = nil
+
+	local customInventory <const> = UsersInventories[id]
+	if not customInventory then
+		return print("shared inventory does not exist with id " .. id)
+	end
+
+	if CustomInventoryInfos[id]:isShared() then
+		existingItem = UsersInventories[id][itemCraftedId]
+	else
+		if identifier then
+			existingItem = UsersInventories[id][identifier] and UsersInventories[id][identifier][itemCraftedId]
+		end
+	end
+
+	if existingItem then
+		updateItemAmount(id, identifier, value.amount, itemCraftedId, metadata, name)
+	else
+		-- If the item doesn't exist in memory, we need to add it because we dont have a loader on server start, we miss some data in the database, like is shared and identifiers
+		local result3 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id = @id", { id = itemCraftedId })
+		if result3[1] then
+			local itemData = {
+				name = value.name,
+				amount = amount + value.amount,
+				metadata = json.decode(result3[1].metadata) or {}
+			}
+			updateItem({ id = itemCraftedId }, itemData, item, charid, isExpired, id, identifier)
 		end
 	end
 end
@@ -2045,6 +2083,7 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 			if item and value.amount > 0 then
 				local itemMetadata = value.metadata or {}
 				local result1 = DBService.queryAwait("SELECT amount, item_crafted_id FROM character_inventories WHERE item_name =@itemname AND inventory_type = @inventory_type", { itemname = value.name, inventory_type = id })
+
 				local isExpired = item:getMaxDegradation() ~= 0 and item:getDegradation() or nil
 				if not result1[1] then
 					DBService.CreateItem(charid, item:getId(), value.amount, itemMetadata, value.name, isExpired, function(itemcraftedid)
@@ -2066,8 +2105,8 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 								updateItem(itemcraftedid, value, item, charid, isExpired, id, identifier)
 							end, id)
 						else
-							DBService.updateAsync("UPDATE character_inventories SET amount = amount + @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = value.amount, itemname = value.name, inventory_type = id })
-							updateItemAmount(id, identifier, value.amount, result1[1].item_crafted_id)
+							local itemCraftedId = result1[1].item_crafted_id
+							updateItemInCustomInventory(id, identifier, itemCraftedId, value.amount, itemMetadata, value, item, charid, isExpired, value.name)
 						end
 					else
 						for _, v in ipairs(resulItems) do
@@ -2084,9 +2123,8 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 								updateItem(itemcraftedid, value, item, charid, isExpired, id, identifier)
 							end, id)
 						else
-							-- means we have a match so we update the amount
-							DBService.updateAsync("UPDATE character_inventories SET amount = amount + @amount WHERE item_name = @itemname AND inventory_type = @inventory_type", { amount = value.amount, itemname = value.name, inventory_type = id })
-							updateItemAmount(id, identifier, value.amount, result1[1].item_crafted_id)
+							local itemCraftedId = result1[1].item_crafted_id
+							updateItemInCustomInventory(id, identifier, itemCraftedId, value.amount, itemMetadata, value, item, charid, isExpired, value.name)
 						end
 					end
 				end
