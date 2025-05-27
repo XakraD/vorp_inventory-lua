@@ -1,3 +1,17 @@
+<4.2>
+- added logs to server for security (update as soon as possible)
+- added option to spawn weapons with old boxes
+- added event to reset fishing state when you remove fishing rod with inventory (this was breaking vorp_fishing when i bait was left in the rod) update fishing tool
+- fixed addItemsToCustomInventory export
+- GetEquippedWeaponData statebag is now replicated 
+- fixed error when using openPlayerInventory exports and logs
+- added getCustomInventorySlots export (only to whats in cache slots are not saved)
+- fixed ignore stack item for custom inventories 
+- updateItemInCustomInventory has a new variable to pass 
+- items with metadata with and image name now updates inventory cache so it displays the custom images as long they are in the imgs folder
+- config to disable dual wielding
+- ensure metadata label is displayed on pickups
+- added some images for items
 <4.1>
 - fixed customInventory permissions using charids and jobs
 - fixed customInventory IgnoreStack limit (would delete the items instead of ignoring them)

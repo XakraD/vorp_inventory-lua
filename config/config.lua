@@ -58,7 +58,7 @@ Config = {
 		Time = 10, -- after this time pick up wll be deleted, IN MINUTES
 	},
 
-	DuelWield				   = true,   -- If true duel wielding will be allowed.
+	DuelWield                  = true, -- If true duel wielding will be allowed.
 
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD ===================== --
 
@@ -167,6 +167,7 @@ Config = {
 		WEAPON_MOONSHINEJUG_MP = true,
 	},
 
+	UseWeaponModels            = true, -- If true, weapons will spawn with a model other wise they default to the default_box prop
 	-- for dropped weapons , some will spawn standing so we modify their rotation
 	weaponAdjustments          = {
 		WEAPON_MELEE_KNIFE = 90.0,

@@ -60,6 +60,10 @@ function PickupsService.CreateObject(objectHash, position, itemType)
 			return PickupsService.CreateObject("default_box", position, "item_standard")
 		end
 
+		if not Config.UseWeaponModels then
+			return PickupsService.CreateObject("default_box", position, "item_standard")
+		end
+
 		Citizen.InvokeNative(0x72D4CB5DB927009C, joaat(objectHash), 1, true) -- request weapon asset
 		repeat Wait(0) until Citizen.InvokeNative(0xFF07CF465F48B830, joaat(objectHash))
 		local object <const> = CreateWeaponObject(joaat(objectHash), 0, position.x, position.y, position.z, true, 1.0)

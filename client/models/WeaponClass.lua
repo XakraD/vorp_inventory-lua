@@ -122,6 +122,10 @@ function Weapon:UnequipWeapon()
 end
 
 function Weapon:RemoveWeaponFromPed()
+	if joaat(self.name) == `WEAPON_FISHINGROD` then
+		TriggerEvent("vorp_fishing:resetFishing")
+	end
+
 	local isWeaponAGun = Citizen.InvokeNative(0x705BE297EEBDB95D, joaat(self.name))
 	local isWeaponOneHanded = Citizen.InvokeNative(0xD955FEE4B87AFA07, joaat(self.name))
 	local move = false
