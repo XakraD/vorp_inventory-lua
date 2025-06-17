@@ -126,7 +126,7 @@ function Utils.GetAmmoLabel(ammo)
 		return false
 	end
 
-	for key, value in pairs(SharedData.AmmoLabels) do
+	for _, value in pairs(SharedData.AmmoLabels) do
 		if joaat(value) == ammo then
 			return value
 		end
@@ -201,4 +201,26 @@ end
 
 function Utils.filterWeaponsSerialNumber(name)
 	return Config.noSerialNumber[name]
+end
+
+function Utils.GetItemData(data)
+	if not data then
+		return false
+	end
+
+	if type(data) == "string" then
+		return ClientItems[data]
+	end
+
+	if type(data) == "table" then
+		local items = {}
+		for _, item in ipairs(data) do
+			if ClientItems[item] then
+				table.insert(items, ClientItems[item])
+			end
+		end
+		return items
+	end
+
+	return false
 end

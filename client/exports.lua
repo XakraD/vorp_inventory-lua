@@ -39,3 +39,8 @@ end)
 exports('getInventoryItems', function()
     return Utils.GetInventoryItems()
 end)
+
+-- get items data from client side, like label, weight, description, etc
+exports("getItemData", function(data)
+    return Utils.GetItemData(data)
+end)
