@@ -68,7 +68,7 @@
 - added new exports to get all items and all weapons from custom inventory without sepcifying the items or weapons name
 - added new exports update items in custom inventories, their amount and metadata remove items by item id, remove weapons by id 
 - added new exports to clear all items or weapons from custom inventories
-- added new statebag IsInvOpen to detect if the inventory is open or closed and an event has also been added to detect when the inventory is open or closed client side only che check docs
+- added new statebag IsInvActive to detect if the inventory is open or closed and an event has also been added to detect when the inventory is open or closed client side only che check docs
 - added image preload cache feature to ensure images are loaded only once and added a default image incase image doesnt exist
 - removed serial number from descriptions since its already displaying on the tool tip
 - removed items/weapons drop on death feature (this was causing crashes when you had many items, wasnt also working  unless youwere in area and contributes to net obj pool)

@@ -624,16 +624,17 @@ function NUIService.initiateData()
 	})
 end
 
+local blockInventory = false
 -- Main loo
 CreateThread(function()
-	local controlVar = false                     -- best to use variable than to check statebag every frame
-	LocalPlayer.state:set("IsInvOpen", false, true) -- init
+	local controlVar = false -- best to use variable than to check statebag every frame
+
 	repeat Wait(2000) until LocalPlayer.state.IsInSession
 	NUIService.initiateData()
 
 	while true do
 		local sleep = 1000
-		if not InInventory then
+		if not InInventory and not blockInventory then
 			sleep = 0
 			if IsControlJustReleased(1, Config.OpenKey) then
 				local player = PlayerPedId()
@@ -669,6 +670,15 @@ CreateThread(function()
 	end
 end)
 
+-- prevent player from opening inventory from server or client
+RegisterNetEvent("vorp_inventory:blockInventory")
+AddEventHandler("vorp_inventory:blockInventory", function(state)
+	blockInventory = state
+	if InInventory then
+		NUIService.CloseInv()
+	end
+end)
+
 -- Prevent Spam
 CreateThread(function()
 	repeat Wait(2000) until LocalPlayer.state.IsInSession
@@ -690,7 +700,7 @@ function NUIService.DisableInventory(param)
 	InventoryIsDisabled = param
 end
 
-function NUIService.getActionsConfig(obj, cb)
+function NUIService.getActionsConfig(_, cb)
 	cb(Actions)
 end
 

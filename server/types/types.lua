@@ -168,11 +168,11 @@ function exports.vorp_inventory:setWeaponCustomDesc(weaponId, desc, callback) en
 function exports.vorp_inventory:addItem(source, item, amount, metadata, callback) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
---- get item by main id
+--- get item by id
 ---@param source integer player id
----@param mainid number main id
+---@param id number item id
 ---@param callback fun(item:table)? callback function async or sync leave nil
-function exports.vorp_inventory:getItemByMainId(source, mainid, callback) end
+function exports.vorp_inventory:getItemById(source, id, callback) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- sun item by item id
@@ -243,7 +243,7 @@ function exports.vorp_inventory:deleteWeapon(source, weaponId, callback) end
 ---@param custom_label string? weapon custom label
 ---@param custom_desc? string? weapon custom description
 
-function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback,wepid, custom_serial, custom_label, custom_desc) end
+function exports.vorp_inventory:createWeapon(source, weaponName, ammo, components, comps, callback, wepid, custom_serial, custom_label, custom_desc) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- give weapon

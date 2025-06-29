@@ -203,7 +203,7 @@ function Utils.filterWeaponsSerialNumber(name)
 	return Config.noSerialNumber[name]
 end
 
-function Utils.GetItemData(data)
+function Utils.GetServerItem(data)
 	if not data then
 		return false
 	end
