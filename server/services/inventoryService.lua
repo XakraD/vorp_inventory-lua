@@ -2181,8 +2181,16 @@ function InventoryService.addWeaponsToCustomInventory(id, weapons, charid)
 end
 
 --todo allow metadata to be passed
-function InventoryService.removeItemFromCustomInventory(invId, item_name, amount)
-	local result = DBService.queryAwait("SELECT amount, item_crafted_id FROM character_inventories WHERE item_name = @itemname AND inventory_type = @inventory_type ORDER BY amount DESC", { itemname = item_name, inventory_type = invId })
+function InventoryService.removeItemFromCustomInventory(invId, item_name, amount, item_crafted_id)
+	local query = "SELECT amount, item_crafted_id FROM character_inventories WHERE item_name = @itemname AND inventory_type = @inventory_type ORDER BY amount DESC"
+	local arguments = { itemname = item_name, inventory_type = invId }
+
+	if item_crafted_id then
+		query = "SELECT amount, item_crafted_id FROM character_inventories WHERE item_crafted_id = @item_crafted_id AND inventory_type = @inventory_type ORDER BY amount DESC"
+		arguments = { item_crafted_id = item_crafted_id, inventory_type = invId }
+	end
+
+	local result = DBService.queryAwait(query, arguments)
 	if not result[1] then
 		return false
 	end
@@ -2216,6 +2224,7 @@ function InventoryService.removeItemFromCustomInventory(invId, item_name, amount
 	end
 	return true
 end
+
 
 function InventoryService.removeWeaponFromCustomInventory(invId, weapon_name)
 	local result = DBService.queryAwait("SELECT id FROM loadout WHERE curr_inv = @invId AND name = @name", { invId = invId, name = weapon_name })
@@ -2251,7 +2260,10 @@ function InventoryService.getAllItemsFromCustomInventory(invId)
 					amount = value.amount,
 					metadata = itemMetadata,
 					percentage = value.percentage,
-					charid = value.character_id
+					charid = value.character_id,
+					label = itemMetadata.label or item:getLabel(),
+					desc = itemMetadata.description or item:getDesc(),
+					weight = itemMetadata.weight or item:getWeight(),
 				}
 			else
 				if itemsMap[value.item_name] then
@@ -2264,6 +2276,9 @@ function InventoryService.getAllItemsFromCustomInventory(invId)
 						metadata = itemMetadata,
 						percentage = value.percentage,
 						charid = value.character_id,
+						label = itemMetadata.label or item:getLabel(),
+						desc = itemMetadata.description or item:getDesc(),
+						weight = itemMetadata.weight or item:getWeight(),
 					}
 					items[#items + 1] = itemsMap[value.item_name]
 				end

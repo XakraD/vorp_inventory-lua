@@ -6,7 +6,7 @@ let imageCache = {};
  */
 function preloadImages(images) {
 
-    $.each(images, function (index, image) {
+    $.each(images, function (_, image) {
         const img = new Image();
         img.onload = () => {
             imageCache[image] = `url("img/items/${image}.png");`;
@@ -213,8 +213,8 @@ function action(type, param, inv) {
 
 /* FILTER ITEMS BY TYPE */
 function showItemsByType(itemTypesToShow, inv) {
-    var itemDiv = 0;
-    var itemEmpty = 0;
+    let itemDiv = 0;
+    let itemEmpty = 0;
     $(`#${inv} .item`).each(function () {
         const group = $(this).data("group");
 
@@ -237,7 +237,7 @@ function showItemsByType(itemTypesToShow, inv) {
             }
         }
         /* if itemDiv is less than 12 then create the rest od the divs */
-        let emptySlots = 16 - itemDiv;
+        const emptySlots = 16 - itemDiv;
         for (let i = 0; i < emptySlots; i++) {
             $(`#${inv}`).append(`<div data-group="0" class="item"></div>`);
         }
@@ -251,16 +251,16 @@ $(document).ready(function () {
 
         if ($(this).data('tooltip') && !stopTooltip) {
 
-            var tooltipText = $(this).data('tooltip');
-            var $tooltip = $('<div></div>')
+            const tooltipText = $(this).data('tooltip');
+            const $tooltip = $('<div></div>')
                 .addClass('tooltip')
                 .css('pointer-events', 'none')
                 .html(tooltipText)
                 .appendTo('body');
 
-            var itemOffset = $(this).offset();
-            var tooltipTop = itemOffset.top + $(this).outerHeight() + 10;
-            var tooltipLeft = itemOffset.left;
+            const itemOffset = $(this).offset();
+            const tooltipTop = itemOffset.top + $(this).outerHeight() + 10;
+            const tooltipLeft = itemOffset.left;
 
             $tooltip.css({
                 'top': tooltipTop,
@@ -277,7 +277,7 @@ $(document).ready(function () {
 });
 
 function moveInventory(inv) {
-    var inventoryHud = document.getElementById('inventoryHud');
+    const inventoryHud = document.getElementById('inventoryHud');
     if (inv === 'main') {
         inventoryHud.style.left = '25%';
     } else if (inv === 'second') {
@@ -292,7 +292,7 @@ function addData(index, item) {
     $("#item-" + index).data("item", item);
     $("#item-" + index).data("inventory", "main");
 
-    var data = [];
+    const data = [];
 
     if (Config.DoubleClickToUse) {
 
@@ -387,7 +387,7 @@ function addData(index, item) {
     }
 
     if (item.metadata?.context) {
-        contextMenuData.forEach(option => {
+        item.metadata.context.forEach(option => {
             data.push({
                 text: option.text,
                 action: function () {
@@ -483,7 +483,7 @@ function loadInventoryWeapons(item, index, group) {
     if (item.type != "item_weapon") return;
 
     const weight = getItemWeight(item.weight, 1);
-    const info = item.serial_number ? "<br>" + LANGUAGE.labels.ammo + item.count + "<br>" + LANGUAGE.labels.serial + item.serial_number : "";
+    const info = item.serial_number ? "<br>" + (LANGUAGE.labels?.ammo ?? "Ammo") + item.count + "<br>" + (LANGUAGE.labels?.serial ?? "Serial") + item.serial_number : "";
     const url = imageCache[item.name]
     const label = item.custom_label ? item.custom_label : item.label;
 
@@ -525,7 +525,7 @@ function inventorySetup(items) {
 
 
     $("#inventoryElement").html("");
-    var divAmount = 0;
+    let divAmount = 0;
 
     if (items.length > 0) {
 
@@ -546,9 +546,9 @@ function inventorySetup(items) {
         };
     }
 
-    var gunbelt_item = "gunbelt";
-    var gunbelt_label = LANGUAGE.gunbeltlabel;
-    var gunbelt_desc = LANGUAGE.gunbeltdescription;
+    const gunbelt_item = "gunbelt";
+    const gunbelt_label = LANGUAGE.gunbeltlabel;
+    const gunbelt_desc = LANGUAGE.gunbeltdescription;
     var data = [];
 
     let empty = true;
@@ -598,9 +598,9 @@ function inventorySetup(items) {
     isOpen = true;
     initDivMouseOver();
     //AddMoney
-    var m_item = "money";
-    var m_label = LANGUAGE.inventorymoneylabel;
-    var m_desc = LANGUAGE.inventorymoneydescription;
+    const m_item = "money";
+    const m_label = LANGUAGE.inventorymoneylabel;
+    const m_desc = LANGUAGE.inventorymoneydescription;
 
     var data = [];
 
@@ -647,11 +647,11 @@ function inventorySetup(items) {
 
     if (Config.UseGoldItem) {
         //AddGold
-        var g_item = "gold";
-        var g_label = LANGUAGE.inventorygoldlabel;
-        var g_desc = LANGUAGE.inventorygolddescription;
+        const g_item = "gold";
+        const g_label = LANGUAGE.inventorygoldlabel;
+        const g_desc = LANGUAGE.inventorygolddescription;
 
-        var data = [];
+        let data = [];
 
         data.push({
             text: LANGUAGE.givegold,
@@ -697,13 +697,13 @@ function inventorySetup(items) {
 
     /* in here we ensure that at least all divs are filled */
     if (divAmount < 12 && divAmount > 0) {
-        var emptySlots = 14 - divAmount;
-        for (var i = 0; i < emptySlots; i++) {
+        const emptySlots = 14 - divAmount;
+        for (let i = 0; i < emptySlots; i++) {
             $("#inventoryElement").append(`<div class='item' data-group='0'></div>`);
         }
     } else if (divAmount == 0) {
-        var emptySlots = 14 - divAmount;
-        for (var i = 0; i < emptySlots; i++) {
+        const emptySlots = 14 - divAmount;
+        for (let i = 0; i < emptySlots; i++) {
             $("#inventoryElement").append(`<div class='item' data-group='0'></div>`);
         }
 

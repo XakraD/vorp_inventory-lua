@@ -440,7 +440,6 @@ function NUIService.NUIFocusOff()
 	PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)
 	NUIService.CloseInv()
 end
-
 local function loadItems()
 	local items = {}
 	if not StoreSynMenu then
@@ -449,24 +448,28 @@ local function loadItems()
 		end
 	elseif StoreSynMenu then
 		for _, item in pairs(UserInventory) do
-			if item.metadata ~= nil and item.metadata.description ~= nil and item.metadata.orgdescription ~= nil then
+			if item.metadata ~= nil and item.metadata.orgdescription ~= nil then
 				item.metadata.description = item.metadata.orgdescription
 				item.metadata.orgdescription = nil
 			end
 		end
 
-		if GenSynInfo.buyitems and next(GenSynInfo.buyitems) then
-			local buyitems = GenSynInfo.buyitems
+		
+		local buyitems = GenSynInfo.buyitems
+		if buyitems and next(buyitems) then
 			for _, item in pairs(UserInventory) do
 				for k, v in ipairs(buyitems) do
 					if item.name == v.name then
-						if item.metadata.description ~= nil then
-							item.metadata.orgdescription = item.metadata.description
-							item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
+						item.metadata = item.metadata or {}
+						if item.metadata.orgdescription == nil then
+							if item.metadata.description ~= nil then
+								item.metadata.orgdescription = item.metadata.description
+							else
+								item.metadata.orgdescription = ""
+							end
 						else
-							item.metadata.orgdescription = ""
-							item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 						end
+						item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 					end
 				end
 				table.insert(items, item)
@@ -538,6 +541,8 @@ function NUIService.LoadInv()
 	local payload = {}
 
 	Core.Callback.TriggerAsync("vorpinventory:get_slots", function(result)
+		if not result then return end
+		
 		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", result.totalInvWeight), info = string.format("%.1f", result.slots) })
 		SendNUIMessage({
 			action = "updateStatusHud",

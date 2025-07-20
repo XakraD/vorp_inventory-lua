@@ -2151,29 +2151,49 @@ end
 
 exports("addWeaponsToCustomInventory", InventoryAPI.addWeaponsToCustomInventory)
 
-function InventoryAPI.getCustomInventoryItemCount(id, item_name)
+--- get custom inventory item count
+---@param id string inventory id
+---@param item_name string item name
+---@param item_crafted_id number? item crafted id if defined will return the amount of the item crafted id
+---@param callback fun(amount: number)? async or sync callback
+---@return number
+function InventoryAPI.getCustomInventoryItemCount(id, item_name, item_crafted_id, callback)
 	if not CustomInventoryInfos[id] then
-		return 0
+		return respond(callback, 0)
 	end
-	local result = DBService.queryAwait("SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;", { invType = id, item_name = item_name })
+
+	local query = "SELECT SUM(amount) as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_name = @item_name;"
+	local arguments = { invType = id, item_name = item_name }
+	if item_crafted_id then
+		query = "SELECT amount as total_amount FROM character_inventories WHERE inventory_type = @invType AND item_crafted_id = @item_crafted_id;"
+		arguments = { invType = id, item_crafted_id = item_crafted_id }
+	end
+
+	local result = DBService.queryAwait(query, arguments)
 	if result[1] and result[1].total_amount then
-		return tonumber(result[1].total_amount)
+		return respond(callback, tonumber(result[1].total_amount))
 	end
-	return 0
+
+	return respond(callback, 0)
 end
 
 exports('getCustomInventoryItemCount', InventoryAPI.getCustomInventoryItemCount)
 
-function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name)
+--- get custom inventory weapon count
+---@param id string inventory id
+---@param weapon_name string weapon name
+---@param callback fun(amount: number)? async or sync callback
+---@return number
+function InventoryAPI.getCustomInventoryWeaponCount(id, weapon_name, callback)
 	if not CustomInventoryInfos[id] then
-		return 0
+		return respond(callback, 0)
 	end
 
 	local result = DBService.queryAwait("SELECT COUNT(*) as total_count FROM loadout WHERE curr_inv = @invType AND weapon = @weapon_name", { invType = id, weapon_name = weapon_name })
 	if result[1] and result[1].total_count then
-		return tonumber(result[1].total_count)
+		return respond(callback, tonumber(result[1].total_count))
 	end
-	return 0
+	return respond(callback, 0)
 end
 
 exports('getCustomInventoryWeaponCount', InventoryAPI.getCustomInventoryWeaponCount)
@@ -2183,14 +2203,15 @@ exports('getCustomInventoryWeaponCount', InventoryAPI.getCustomInventoryWeaponCo
 ---@param id string inventory id
 ---@param item_name string item name
 ---@param amount number amount to remove
+---@param item_crafted_id number? item crafted id if defined will remove by the id and not the name
 ---@param callback fun(success: boolean)? async or sync callback
 ---@return boolean
-function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, callback)
+function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, item_crafted_id,callback)
 	if not CustomInventoryInfos[id] then
 		return respond(callback, false)
 	end
 
-	if InventoryService.removeItemFromCustomInventory(id, item_name, amount) then
+	if InventoryService.removeItemFromCustomInventory(id, item_name, amount, item_crafted_id) then
 		return respond(callback, true)
 	end
 
@@ -2198,6 +2219,7 @@ function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, callb
 end
 
 exports("removeItemFromCustomInventory", InventoryAPI.removeItemFromCustomInventory)
+
 
 -- remove weapon from inventory
 ---@param id string inventory id

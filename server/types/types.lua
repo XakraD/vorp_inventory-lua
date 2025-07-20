@@ -382,9 +382,10 @@ function exports.vorp_inventory:addWeaponsToCustomInventory(invId, weapons, char
 --- get amount of item in custom inventory
 ---@param invId string inventory id
 ---@param item string item name
+---@param itemCraftedId number? item crafted id if defined will return the amount of the item crafted id
 ---@param callback fun(amount:number)? callback function async or sync leave nil
 ---@return number
-function exports.vorp_inventory:getCustomInventoryItemCount(invId, item, callback) end
+function exports.vorp_inventory:getCustomInventoryItemCount(invId, item, itemCraftedId, callback) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- get amount weapon in custom inventory
@@ -399,17 +400,10 @@ function exports.vorp_inventory:getCustomInventoryWeaponCount(invId, weaponName,
 ---@param invid string inventory id
 ---@param itemName string item name
 ---@param amount number amount to remove
+---@param itemCraftedId number? item crafted id if defined will remove by the id and not the name
 ---@param callback fun(result:number)? async or sync callback
 ---@return boolean
-function exports.vorp_inventory:removeItemFromCustomInventory(invid, itemName, amount, callback) end
-
---- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
---- remove weapon from custom inventory
----@param invid string inventory id
----@param weaponName string weapon name
----@param callback fun(result:number)? async or sync callback
----@return boolean
-function exports.vorp_inventory:removeWeaponFromCustomInventory(invid, weaponName, callback) end
+function exports.vorp_inventory:removeItemFromCustomInventory(invid, itemName, amount, itemCraftedId, callback) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- get all items in custom inventory
@@ -435,13 +429,6 @@ function exports.vorp_inventory:getCustomInventoryWeapons(invId, callback) end
 --- @return boolean
 function exports.vorp_inventory:updateCustomInventoryItem(invId, item_id, metadata, amount, callback) end
 
---- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
---- remove/update item/amount from custom inventory by item id
---- @param invId string inventory id
---- @param item_id number item id
---- @param callback fun(success:boolean)? async or sync callback
---- @return boolean
-function exports.vorp_inventory:removeCustomInventoryItemById(invId, item_id, callback) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- remove weapon from custom inventory by weapon id
@@ -450,3 +437,18 @@ function exports.vorp_inventory:removeCustomInventoryItemById(invId, item_id, ca
 --- @param callback fun(success:boolean)? async or sync callback
 --- @return boolean
 function exports.vorp_inventory:removeCustomInventoryWeaponById(invId, weapon_id, callback) end
+
+--- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
+--- remove weapon from custom inventory
+---@param invid string inventory id
+---@param weaponName string weapon name
+---@param callback fun(result:number)? async or sync callback
+---@return boolean
+function exports.vorp_inventory:removeWeaponFromCustomInventory(invid, weaponName, callback) end
+
+--- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
+--- delete custom inventory
+---@param invId string inventory id
+---@param callback fun(success:boolean)? async or sync callback
+---@return boolean
+function exports.vorp_inventory:deleteCustomInventory(invId, callback) end
