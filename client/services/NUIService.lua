@@ -96,7 +96,7 @@ function NUIService.NUITakeFromCustom(obj)
 	TriggerServerEvent("vorp_inventory:TakeFromCustom", json.encode(obj))
 end
 
-function NUIService.OpenPlayerInventory(name, id)
+function NUIService.OpenPlayerInventory(name, id, type)
 	CanOpen = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
 	if not CanOpen then return end
 
@@ -106,7 +106,7 @@ function NUIService.OpenPlayerInventory(name, id)
 	SetNuiFocus(true, true)
 	SendNUIMessage({
 		action = "display",
-		type = "player",
+		type = type,
 		title = name,
 		id = id,
 	})

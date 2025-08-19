@@ -88,12 +88,8 @@ end
 ---@param charid number @charid
 ---@param state boolean | nil  remove add or update
 function CustomInventoryAPI:AddCharIdPermissionMoveTo(charid, state)
-    if self.CharIdPermissionMoveTo[charid] then
-        self.CharIdPermissionMoveTo[charid] = state
-    else
-        if state == nil then state = true end
-        self.CharIdPermissionMoveTo[charid] = state
-    end
+    state = state ~= nil and state or true
+    self.CharIdPermissionMoveTo[charid] = state
 end
 
 --- set custom item limit
