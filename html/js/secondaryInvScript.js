@@ -109,7 +109,7 @@ function takeFromStoreWithPrice(itemData, qty) {
 
 function initSecondaryInventoryHandlers() {
     $("#inventoryElement").droppable({
-        drop: function (event, ui) {
+        drop: function (_, ui) {
             itemData = ui.draggable.data("item");
             itemInventory = ui.draggable.data("inventory");
             var info = $("#secondInventoryElement").data("info");
@@ -140,7 +140,7 @@ function initSecondaryInventoryHandlers() {
                                 autofocus: "true",
                             },
 
-                            validate: function (value, item, type) {
+                            validate: function (value) {
                                 if (!value) {
                                     dialog.close();
                                     return;
@@ -226,7 +226,7 @@ function initSecondaryInventoryHandlers() {
     }
 
     $("#secondInventoryElement").droppable({
-        drop: function (event, ui) {
+        drop: function (_, ui) {
             itemData = ui.draggable.data("item");
             itemInventory = ui.draggable.data("inventory");
             var info = $(this).data("info");

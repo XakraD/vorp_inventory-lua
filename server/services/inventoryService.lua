@@ -245,7 +245,7 @@ end
 function InventoryService.usedWeapon(id, _used, _used2)
 	local query <const> = 'UPDATE loadout SET used = @used, used2 = @used2 WHERE id = @id'
 	local params <const> = { used = _used and 1 or 0, used2 = _used2 and 1 or 0, id = id }
-	DBService.updateAsync(query, params, function(r) end)
+	DBService.updateAsync(query, params)
 end
 
 function InventoryService.subItem(source, invId, itemId, amount)
@@ -310,12 +310,15 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 
 	metadata = SharedUtils.MergeTables(svItem.metadata, metadata or {})
 	local userInventory <const> = CustomInventoryInfos[invId].shared and UsersInventories[invId] or UsersInventories[invId][identifier]
-	if not userInventory then return cb(nil) end
+	if not userInventory then
+		return cb(nil)
+	end
 
 
 	local function createItem()
 		local degrade <const> = svItem:getMaxDegradation()
-		local isExpired = degrade ~= 0 and os.time() or nil
+		local isExpired <const> = degrade ~= 0 and os.time() or nil
+
 		DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, name, isExpired, function(craftedItem)
 			local item <const> = Item:New({
 				id = craftedItem.id,
@@ -340,7 +343,7 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 						if data.degradation > 0 then
 							if data.isPickup then
 								if not item:isItemExpired(data.degradation, degrade) then
-									local elapsedTime = os.time() - data.degradation
+									local elapsedTime <const> = os.time() - data.degradation
 									item.degradation = os.time() - elapsedTime
 									item.percentage = item:getPercentage(degrade, item.degradation)
 								else
@@ -351,16 +354,22 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 								item.degradation = os.time() - item:getElapsedTime(degrade, data.percentage)
 								item.percentage = item:getPercentage(degrade, item.degradation)
 							end
-							DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id', { degradation = item.degradation, percentage = item.percentage, id = craftedItem.id })
+							DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id',
+								{ degradation = item.degradation, percentage = item.percentage, id = craftedItem.id }
+							)
 						else
 							item.degradation = 0
 							item.percentage = 0
-							DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id', { degradation = 0, percentage = 0, id = craftedItem.id })
+							DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id',
+								{ degradation = 0, percentage = 0, id = craftedItem.id }
+							)
 						end
 					else
 						item.degradation = os.time()
 						item.percentage = 100
-						DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id', { degradation = os.time(), percentage = 100, id = craftedItem.id })
+						DBService.queryAwait('UPDATE character_inventories SET degradation = @degradation, percentage = @percentage WHERE item_crafted_id = @id',
+							{ degradation = os.time(), percentage = 100, id = craftedItem.id }
+						)
 					end
 				end
 			else
@@ -373,41 +382,49 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 						item.degradation = os.time()
 					end
 					-- custom invs need to be updated everytime
-					DBService.queryAwait('UPDATE character_inventories SET percentage = @percentage, degradation = @degradation WHERE item_crafted_id = @id', { percentage = item.percentage, degradation = item.degradation, id = craftedItem.id })
+					DBService.queryAwait('UPDATE character_inventories SET percentage = @percentage, degradation = @degradation WHERE item_crafted_id = @id',
+						{ percentage = item.percentage, degradation = item.degradation, id = craftedItem.id }
+					)
 				end
 			end
 
 
 			userInventory[craftedItem.id] = item
 			if invId == "default" then
-				local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
-				TriggerEvent("vorp_inventory:Server:OnItemCreated", data, _source)
+				TriggerEvent("vorp_inventory:Server:OnItemCreated", { name = item:getName(), count = amount, metadata = item:getMetadata() }, _source)
 			end
 
 			return cb(item)
 		end, invId)
 	end
 
-
+	-- item exists in inventory by name and metadata?
 	local item <const> = SvUtils.FindItemByNameAndMetadata(invId, identifier, name, metadata)
 	if item then
+		-- items exists with the same name and metadata
+		-- amount is greater than 0 for error
 		if amount > 0 then
+			-- if item is not a degradation item
 			if svItem:getMaxDegradation() == 0 then
 				item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
 				DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
 				return cb(item)
 			else
-				if item:getPercentage() == data.percentage and item:getDegradation() == data.degradation then
+				-- if item is degradation item
+				-- if is the correct item with the same values increase amount
+				if item:getPercentage() == data.percentage then
 					item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
 					DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
 					return cb(item)
 				end
 			end
+			-- create new item
 			return createItem()
 		end
+		-- error
 		return cb(nil)
 	end
-
+	-- item does not exist in inventory, or metadata is different create new item
 	return createItem()
 end
 
@@ -545,7 +562,7 @@ function InventoryService.onPickup(data)
 					if serialNumber == nil then
 						serialNumber = "Serial Number not set"
 					end
-					local charname, scourceidentifier, steamname = getSourceInfo(_source)
+					local charname, _, steamname = getSourceInfo(_source)
 					local title = T.weppickup
 					local description = "**" .. T.WebHookLang.Weapontype .. ":** `" .. weaponName .. "`\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.WebHookLang.Desc .. "** `" .. weaponCustomDesc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 					local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorweppickupd }
@@ -1317,7 +1334,7 @@ function InventoryService.reloadInventory(player, id, type, source)
 					id            = weaponId,
 					count         = 1,
 					name          = weapon.name,
-					label         = weapon.custom_label or weapon.name,
+					label         = weapon.name,
 					limit         = 1,
 					type          = "item_weapon",
 					desc          = weapon.desc,
@@ -1336,7 +1353,7 @@ function InventoryService.reloadInventory(player, id, type, source)
 					id            = weaponId,
 					count         = 1,
 					name          = weapon.name,
-					label         = weapon.custom_label or weapon.name,
+					label         = weapon.name,
 					limit         = 1,
 					type          = "item_weapon",
 					desc          = weapon.desc,
@@ -1661,10 +1678,11 @@ function InventoryService.MoveToCustom(obj)
 				SvUtils.Trem(_source)
 				return print(T.cantAddItem)
 			end
-
+			local metadataLabel = item.metadata?.label or item.label
 			InventoryService.subItem(_source, "default", item.id, amount)
 			TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
-			Core.NotifyRightTip(_source, T.movedToStorage .. " " .. amount .. " " .. item.label, 2000)
+			Core.NotifyRightTip(_source, T.movedToStorage .. " " .. amount .. " " .. metadataLabel, 2000)
+
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
 			SvUtils.Trem(_source)
@@ -1750,6 +1768,7 @@ function InventoryService.TakeFromCustom(obj)
 			SvUtils.Trem(_source)
 			return Core.NotifyObjective(_source, T.cantCarryItemStack, 2000)
 		end
+
 		local info = { degradation = item.degradation, isPickup = false, percentage = item.percentage }
 		InventoryService.addItem(_source, "default", item.name, amount, item.metadata, info, function(itemAdded)
 			if not itemAdded then
@@ -1766,7 +1785,9 @@ function InventoryService.TakeFromCustom(obj)
 			TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount, itemAdded:getMetadata(), itemAdded:getDegradation(), itemAdded:getPercentage())
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
-			Core.NotifyRightTip(_source, T.takenFromStorage .. " " .. amount .. " " .. item.label, 2000)
+
+			local metadataLabel = item.metadata?.label or item.label
+			Core.NotifyRightTip(_source, T.takenFromStorage .. " " .. amount .. " " .. metadataLabel, 2000)
 			SvUtils.Trem(_source)
 		end)
 	end
@@ -1866,15 +1887,16 @@ function InventoryService.MoveToPlayer(obj)
 			return Core.NotifyObjective(_source, T.notEnoughItems, 2000)
 		end
 
-		InventoryAPI.addItem(target, item.name, amount, item.metadata, function(res)
-			if res then
-				InventoryAPI.subItem(_source, item.name, amount, item.metadata, function(result)
-					if result then
+		InventoryAPI.addItem(target, item.name, amount, item.metadata, function(result)
+			if result then
+				InventoryAPI.subItem(_source, item.name, amount, item.metadata, function(result2)
+					if result2 then
 						SetTimeout(400, function()
 							InventoryService.reloadInventory(target, "default", "player", _source)
 							InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Move")
-							Core.NotifyRightTip(_source, T.movedToPlayer .. amount .. " " .. item.label, 2000)
-							Core.NotifyRightTip(target, T.itemGivenToPlayer .. " " .. item.label, 2000)
+							local metadataLabel = item.metadata?.label or item.label
+							Core.NotifyRightTip(_source, T.movedToPlayer .. amount .. " " .. metadataLabel, 2000)
+							Core.NotifyRightTip(target, T.itemGivenToPlayer .. " " .. metadataLabel, 2000)
 							SvUtils.Trem(_source)
 						end)
 					else
@@ -1945,14 +1967,15 @@ function InventoryService.TakeFromPlayer(obj)
 			return Core.NotifyObjective(_source, T.notEnoughItems, 2000)
 		end
 
-		InventoryAPI.addItem(_source, item.name, amount, item.metadata, function(res)
-			if res then
-				InventoryAPI.subItem(target, item.name, amount, item.metadata, function(result)
-					if result then
+		InventoryAPI.addItem(_source, item.name, amount, item.metadata, function(result)
+			if result then
+				InventoryAPI.subItem(target, item.name, amount, item.metadata, function(result2)
+					if result2 then
 						InventoryService.reloadInventory(target, "default", "player", _source)
 						InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
-						Core.NotifyRightTip(_source, T.takenFromPlayer .. " " .. amount .. " " .. item.label, 2000)
-						Core.NotifyRightTip(target, T.itemsTakenFromPlayer .. " " .. item.label, 2000)
+						local metadataLabel = item.metadata?.label or item.label
+						Core.NotifyRightTip(_source, T.takenFromPlayer .. " " .. amount .. " " .. metadataLabel, 2000)
+						Core.NotifyRightTip(target, T.itemsTakenFromPlayer .. " " .. metadataLabel, 2000)
 					end
 					SvUtils.Trem(_source)
 				end, true)
@@ -2091,7 +2114,7 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 					end, id)
 				else
 					local resulItems = {}
-					for k, v in ipairs(result1) do -- if there is more than one apple we need to check which ones have metadata
+					for _, v in ipairs(result1) do -- if there is more than one apple we need to check which ones have metadata
 						local result2 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id =@id", { id = v.item_crafted_id })
 						local hasMetadata = result2[1] and json.decode(result2[1].metadata) or {}
 						if next(hasMetadata) then
@@ -2224,7 +2247,6 @@ function InventoryService.removeItemFromCustomInventory(invId, item_name, amount
 	end
 	return true
 end
-
 
 function InventoryService.removeWeaponFromCustomInventory(invId, weapon_name)
 	local result = DBService.queryAwait("SELECT id FROM loadout WHERE curr_inv = @invId AND name = @name", { invId = invId, name = weapon_name })
