@@ -51,3 +51,30 @@ CreateThread(function()
         Wait(1000)
     end
 end)
+
+
+-- ENABLE PUSH TO TALK
+CreateThread(function()
+	repeat Wait(5000) until LocalPlayer.state.IsInSession
+	local isNuiFocused = false
+
+	while true do
+		local sleep = 0
+		if InInventory then
+			if not isNuiFocused then
+				SetNuiFocusKeepInput(true)
+				isNuiFocused = true
+			end
+
+			DisableAllControlActions(0)
+			EnableControlAction(0, `INPUT_PUSH_TO_TALK`, true)
+		else
+			sleep = 1000
+			if isNuiFocused then
+				SetNuiFocusKeepInput(false)
+				isNuiFocused = false
+			end
+		end
+		Wait(sleep)
+	end
+end)
