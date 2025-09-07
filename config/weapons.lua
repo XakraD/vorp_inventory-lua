@@ -1,4 +1,4 @@
-SharedData = {}
+SharedData = SharedData or {}
 
 SharedData.Weapons = {
     WEAPON_LASSO = {

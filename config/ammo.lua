@@ -1,4 +1,6 @@
 -- max ammo allowed to transfer between players
+SharedData            = SharedData or {}
+
 SharedData.MaxAmmo    = {
     AMMO_PISTOL = 100,
     AMMO_PISTOL_EXPRESS = 100,

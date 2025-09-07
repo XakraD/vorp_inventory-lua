@@ -3,19 +3,17 @@ if Config.DevMode then
         if (GetCurrentResourceName() ~= resourceName) then
             return
         end
-        print('loading resource ^1DEV MODE IS ENABLED')
-        SetNuiFocus(false, false)
+  
         SendNUIMessage({ action = "hide" })
         TriggerServerEvent("DEV:loadweapons")
-        print("Loading Inventory")
         TriggerServerEvent("vorpinventory:getItemsTable")
         Wait(1000)
         TriggerServerEvent("vorpinventory:getInventory")
         Wait(1000)
         TriggerServerEvent("vorpCore:LoadAllAmmo")
-        print("inventory loaded")
         Wait(100)
         TriggerEvent("vorpinventory:loaded")
+        print("^1WARNING: Dev mode is enabled^7 do not use this in production live servers")
     end)
 end
 
@@ -27,54 +25,46 @@ CreateThread(function()
 
     repeat Wait(2000) until LocalPlayer.state.IsInSession
 
-    local function checkLanterns(hash)
-        local lanterns <const> = { "WEAPON_MELEE_LANTERN", "WEAPON_MELEE_LANTERN_HALLOWEEN", "WEAPON_MELEE_DAVY_LANTERN", "WEAPON_MELEE_LANTERN_ELECTRIC" }
-        for i = 1, #lanterns do
-            if hash == joaat(lanterns[i]) then
-                return true
-            end
-        end
-        return false
-    end
     local lastLantern = 0
     while true do
-        local weaponHeld = GetPedCurrentHeldWeapon(PlayerPedId())
-        local isLantern = IsWeaponLantern(weaponHeld) == 1 or IsWeaponLantern(weaponHeld) == true
+        local pedid = PlayerPedId()
+        local weaponHeld <const> = GetPedCurrentHeldWeapon(pedid)
+        local isLantern <const> = IsWeaponLantern(weaponHeld) == 1 -- assuming it will return all lanterns to true
         if isLantern then
             lastLantern = weaponHeld
         end
 
-        if lastLantern ~= 0 and not checkLanterns(weaponHeld) then
-            SetCurrentPedWeapon(PlayerPedId(), lastLantern, true, 12, false, false)
+        if lastLantern ~= 0 and not isLantern then
+            SetCurrentPedWeapon(pedid, lastLantern, true, 12, false, false)
             lastLantern = 0
         end
-        Wait(1000)
+        Wait(500)
     end
 end)
 
 
 -- ENABLE PUSH TO TALK
 CreateThread(function()
-	repeat Wait(5000) until LocalPlayer.state.IsInSession
-	local isNuiFocused = false
+    repeat Wait(5000) until LocalPlayer.state.IsInSession
+    local isNuiFocused = false
 
-	while true do
-		local sleep = 0
-		if InInventory then
-			if not isNuiFocused then
-				SetNuiFocusKeepInput(true)
-				isNuiFocused = true
-			end
+    while true do
+        local sleep = 0
+        if InInventory then
+            if not isNuiFocused then
+                SetNuiFocusKeepInput(true)
+                isNuiFocused = true
+            end
 
-			DisableAllControlActions(0)
-			EnableControlAction(0, `INPUT_PUSH_TO_TALK`, true)
-		else
-			sleep = 1000
-			if isNuiFocused then
-				SetNuiFocusKeepInput(false)
-				isNuiFocused = false
-			end
-		end
-		Wait(sleep)
-	end
+            DisableAllControlActions(0)
+            EnableControlAction(0, `INPUT_PUSH_TO_TALK`, true)
+        else
+            sleep = 1000
+            if isNuiFocused then
+                SetNuiFocusKeepInput(false)
+                isNuiFocused = false
+            end
+        end
+        Wait(sleep)
+    end
 end)

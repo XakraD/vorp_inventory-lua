@@ -429,7 +429,9 @@ exports("useItem", useItem) -- not tested yet
 
 
 function NUIService.NUISound()
-	PlaySoundFrontend("BACK", "RDRO_Character_Creator_Sounds", true, 0)
+	if Config.SFX.ItemHover then
+		PlaySoundFrontend("BACK", "RDRO_Character_Creator_Sounds", true, 0)
+	end
 end
 
 function NUIService.NUIFocusOff()
@@ -437,7 +439,9 @@ function NUIService.NUIFocusOff()
 		AnimpostfxStop(Config.Filter)
 	end
 	DisplayRadar(true)
-	PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)
+	if Config.SFX.CloseInventory then
+		PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)
+	end
 	NUIService.CloseInv()
 end
 local function loadItems()
@@ -564,7 +568,9 @@ end
 function NUIService.OpenInv()
 	ApplyPosfx()
 	DisplayRadar(false)
-	PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)
+	if Config.SFX.OpenInventory then
+		PlaySoundFrontend("SELECT", "RDRO_Character_Creator_Sounds", true, 0)
+	end
 	SetNuiFocus(true, true)
 	SendNUIMessage({
 		action = "display",

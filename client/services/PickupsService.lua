@@ -98,7 +98,9 @@ function PickupsService.createPickup(name, amount, metadata, weaponId, id, degra
 		TriggerServerEvent("vorpinventory:sharePickupServerWeapon", data)
 	end
 	Wait(1000)
-	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	if Config.SFX.ItemDrop then
+		PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	end
 end
 
 RegisterNetEvent("vorpInventory:createPickup", PickupsService.createPickup)
@@ -113,7 +115,9 @@ function PickupsService.createMoneyPickup(amount)
 	local data <const>      = { handle = handle, amount = amount, position = position }
 	TriggerServerEvent("vorpinventory:shareMoneyPickupServer", data)
 	Wait(1000)
-	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	if Config.SFX.MoneyDrop then
+		PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	end
 end
 
 RegisterNetEvent("vorpInventory:createMoneyPickup", PickupsService.createMoneyPickup)
@@ -130,7 +134,9 @@ function PickupsService.createGoldPickup(amount)
 	local data <const>      = { handle = handle, amount = amount, position = position }
 	TriggerServerEvent("vorpinventory:shareGoldPickupServer", data)
 	Wait(1000)
-	PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	if Config.SFX.GoldDrop then
+		PlaySoundFrontend("show_info", "Study_Sounds", true, 0)
+	end
 end
 
 RegisterNetEvent("vorpInventory:createGoldPickup", PickupsService.createGoldPickup)
@@ -251,7 +257,9 @@ function PickupsService.playerAnim()
 
 	TaskPlayAnim(playerPed, animDict, "exit_front", 1.0, 8.0, -1, 1, 0, false, false, false)
 	Wait(1200)
-	PlaySoundFrontend("CHECKPOINT_PERFECT", "HUD_MINI_GAME_SOUNDSET", true, 1)
+	if Config.SFX.PickUp then
+		PlaySoundFrontend("CHECKPOINT_PERFECT", "HUD_MINI_GAME_SOUNDSET", true, 1)
+	end
 	Wait(1000)
 	ClearPedTasks(playerPed, true, true)
 end

@@ -1236,8 +1236,8 @@ function InventoryService.serverGiveAmmo(ammotype, amount, target, maxcount)
 	local query = "UPDATE characters Set ammo=@ammo WHERE charidentifier=@charidentifier"
 	local params = { charidentifier = charidentifier, ammo = json.encode(AmmoData[_source].ammo) }
 	local params2 = { charidentifier = charidentifier2, ammo = json.encode(AmmoData[target].ammo) }
-	DBService.updateAsync(query, params, function(r) end)
-	DBService.updateAsync(query, params2, function(r) end)
+	DBService.updateAsync(query, params)
+	DBService.updateAsync(query, params2)
 
 	TriggerClientEvent("vorpinventory:updateuiammocount", _source, AmmoData[_source].ammo)
 	TriggerClientEvent("vorpinventory:updateuiammocount", target, AmmoData[target].ammo)

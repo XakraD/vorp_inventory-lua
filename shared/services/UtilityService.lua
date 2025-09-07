@@ -70,8 +70,8 @@ function SharedUtils.MergeTables(a, b)
     b = type(b) == 'string' and json.decode(b) or b
 
     local newTable = {}
-    if type(a) == "string" then
-        print("item metadata was not table a", a)
+    if type(a) == "string" or type(a) == "number" then
+        print("item metadata was not a table A: ", a)
         return {}
     end
 
@@ -79,8 +79,8 @@ function SharedUtils.MergeTables(a, b)
         newTable[key] = value
     end
 
-    if type(b) == "string" then
-        print("item metadata was not table b", b)
+    if type(b) == "string" or type(b) == "number" then
+        print("item metadata was not a table B: ", b)
         return {}
     end
 
