@@ -411,7 +411,7 @@ exports("useWeapon", useWeapon)
 local function useItem(data)
 	if timerUse <= 0 then
 		TriggerServerEvent("vorp_inventory:useItem", data)
-		timerUse = 2000
+		timerUse = Config.SpamDelay
 	else
 		Core.NotifyRightTip(T.slow, 5000)
 	end
@@ -444,6 +444,7 @@ function NUIService.NUIFocusOff()
 	end
 	NUIService.CloseInv()
 end
+
 local function loadItems()
 	local items = {}
 	if not StoreSynMenu then
@@ -458,7 +459,7 @@ local function loadItems()
 			end
 		end
 
-		
+
 		local buyitems = GenSynInfo.buyitems
 		if buyitems and next(buyitems) then
 			for _, item in pairs(UserInventory) do
@@ -546,7 +547,7 @@ function NUIService.LoadInv()
 
 	Core.Callback.TriggerAsync("vorpinventory:get_slots", function(result)
 		if not result then return end
-		
+
 		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", result.totalInvWeight), info = string.format("%.1f", result.slots) })
 		SendNUIMessage({
 			action = "updateStatusHud",
@@ -727,9 +728,9 @@ function NUIService.ContextMenu(data)
 		NUIService.CloseInv()
 	end
 
-	if data.event.client then
-		TriggerEvent(data.event.client, data.arguments)
-	elseif data.event.server then
-		TriggerServerEvent(data.event.server, data.arguments)
+	if data.event?.client then
+		TriggerEvent(data.event.client, data.event?.arguments)
+	elseif data.event?.server then
+		TriggerServerEvent(data.event.server, data.event?.arguments)
 	end
 end

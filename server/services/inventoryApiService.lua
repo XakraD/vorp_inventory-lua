@@ -71,15 +71,6 @@ local function respond(cb, result)
 	return result
 end
 
-local function checkMetadataImage(source, metadata)
-	if metadata and next(metadata) and metadata.image and type(metadata.image) == "string" then
-		local image = {
-			[metadata.image] = metadata.image
-		}
-		local packedImage = msgpack.pack(image) -- just to reuse the event
-		TriggerClientEvent("vorp_inventory:server:CacheImages", source, packedImage)
-	end
-end
 
 ---private function to check if item exist
 function InventoryAPI.canCarryAmountItem(player, amount, cb)
@@ -512,8 +503,6 @@ function InventoryAPI.addItem(source, name, amount, metadata, cb, allow, degrada
 			DBService.queryAwait('UPDATE character_inventories SET percentage = @percentage WHERE item_crafted_id = @id', { percentage = item.percentage, id = craftedItem.id })
 		end
 
-		checkMetadataImage(_source, item:getMetadata())
-
 		userInventory[craftedItem.id] = item
 		TriggerClientEvent("vorpCoreClient:addItem", _source, item)
 
@@ -840,8 +829,6 @@ function InventoryAPI.setItemMetadata(player, itemId, metadata, amount, cb)
 			DBService.SetItemMetadata(charId, item.id, metadata)
 			item:setMetadata(metadata)
 			TriggerClientEvent("vorpCoreClient:SetItemMetadata", _source, itemId, metadata)
-			-- allow to update image cache for images that dont have items.
-			checkMetadataImage(_source, metadata)
 		end
 	else
 		item:quitCount(amountRemove)
@@ -2206,7 +2193,7 @@ exports('getCustomInventoryWeaponCount', InventoryAPI.getCustomInventoryWeaponCo
 ---@param item_crafted_id number? item crafted id if defined will remove by the id and not the name
 ---@param callback fun(success: boolean)? async or sync callback
 ---@return boolean
-function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, item_crafted_id,callback)
+function InventoryAPI.removeItemFromCustomInventory(id, item_name, amount, item_crafted_id, callback)
 	if not CustomInventoryInfos[id] then
 		return respond(callback, false)
 	end

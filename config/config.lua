@@ -60,6 +60,8 @@ Config = {
 
 	DuelWield                  = true, 	  -- If true duel wielding will be allowed.
 
+	SpamDelay				   = 2000,    -- ms | The minimum time that must elapse between using one item and being able to use another item in the inventory.
+
 	-- ==================== SOUND CONFIGURATION ==================== --
 	SFX = {								  -- Inventory Sound Effects
 		OpenInventory = true,			  -- The sound effect when open the inventory

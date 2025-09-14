@@ -73,6 +73,15 @@ function getColorForDegradation(degradation) {
     }
 }
 
+function cacheImage(item) {
+    if (item.type === "item_weapon") return;
+
+    const image = item.metadata?.image;
+    if (image && imageCache[image] == null) {
+        preloadImages([image]);
+    }
+}
+
 
 /**
  * replaces default data with custom data
@@ -82,6 +91,9 @@ function getColorForDegradation(degradation) {
  * @returns {{ tooltipData: string, degradation: string, image: string, label: string, weight: number, description: string}}
  */
 function getItemMetadataInfo(item, isCustom) {
+
+    cacheImage(item);
+
     const tooltipData = item.metadata?.tooltip ? "<br>" + item.metadata.tooltip : "";
 
     const degradation = isCustom ? getDegradationCustom(item) : getDegradationMain(item);

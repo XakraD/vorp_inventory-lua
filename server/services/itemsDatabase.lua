@@ -86,10 +86,11 @@ MySQL.ready(function()
 	DBService.queryAsync("SELECT * FROM items", {}, function(result)
 		for _, db_item in pairs(result) do
 			if db_item.id then
+				local meta = type(db_item.metadata) == "string" and json.decode(db_item.metadata) or db_item.metadata or {}
 				local item = Item:New({
 					id = db_item.id,
 					item = db_item.item,
-					metadata = db_item.metadata or {},
+					metadata = meta,
 					label = db_item.label,
 					limit = db_item.limit,
 					type = db_item.type,
@@ -122,7 +123,7 @@ local function cacheImages()
 		newtable[k] = v.item
 	end
 	-- all weapon images from config because items folder can contain duplicates or unused images
-	for k, v in pairs(SharedData.Weapons) do
+	for k, _ in pairs(SharedData.Weapons) do
 		newtable[k] = k
 	end
 	local packed = msgpack.pack(newtable)
