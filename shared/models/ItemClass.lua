@@ -225,6 +225,10 @@ function Item:quitCount(amount)
 		return
 	end
 	self.count = self.count - amount
+
+	if self.count <= 0 then
+		self.count = 0
+	end
 end
 
 -- LIMIT

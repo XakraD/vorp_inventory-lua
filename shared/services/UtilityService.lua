@@ -61,31 +61,35 @@ function SharedUtils.Table_contains(o1, o2)
     return true
 end
 
---- merge two tables together
----@param a any
----@param b any
----@return table
+-- helper function to convert json string to pure lua table
+local function to_table(v)
+    if v == nil then return {} end
+
+    if type(v) == "string" then
+        local ok, decoded = pcall(json.decode, v)
+        if ok then v = decoded else return {} end
+    end
+
+    if type(v) == "table" or type(v) == "userdata" then
+        local t = {}
+        for k, val in pairs(v) do t[k] = val end
+        return t
+    end
+
+    return {}
+end
+
+--merge tables
 function SharedUtils.MergeTables(a, b)
-    a = type(a) == 'string' and json.decode(a) or a
-    b = type(b) == 'string' and json.decode(b) or b
+    local A = to_table(a)
+    local B = to_table(b)
 
     local newTable = {}
-    if type(a) == "string" or type(a) == "number" then
-        print("item metadata was not a table A: ", a)
-        return {}
+    for k, v in pairs(A) do
+        newTable[k] = v
     end
-
-    for key, value in pairs(a) do
-        newTable[key] = value
-    end
-
-    if type(b) == "string" or type(b) == "number" then
-        print("item metadata was not a table B: ", b)
-        return {}
-    end
-
-    for key, value in pairs(b) do
-        newTable[key] = value
+    for k, v in pairs(B) do
+        newTable[k] = v
     end
 
     return newTable
