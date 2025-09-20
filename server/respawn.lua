@@ -43,14 +43,19 @@ RegisterNetEvent("vorp:PlayerForceRespawn", function()
     if value.Items.AllItems then
         if not SharedUtils.IsValueInArray(job, value.Items.JobLock) then
             InventoryAPI.getInventory(_source, function(Userinventory)
-                for i, item in pairs(Userinventory) do
+                for _, item in pairs(Userinventory) do
+                    local keep = false
+
                     if next(value.Items.itemWhiteList) then
-                        for index, v in ipairs(value.Items.itemWhiteList) do
-                            if item.name ~= v then
-                                InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
+                        for _, v in ipairs(value.Items.itemWhiteList) do
+                            if item.name == v then
+                                keep = true
+                                break
                             end
                         end
-                    else
+                    end
+
+                    if not keep then
                         InventoryAPI.subItem(_source, item.name, item.count, item.metadata)
                     end
                 end
