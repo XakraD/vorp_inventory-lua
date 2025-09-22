@@ -89,7 +89,6 @@ function InventoryService.UseItem(data)
 	TriggerEvent("vorp_inventory:Server:OnItemUse", arguments)
 
 	local success <const>, result <const> = pcall(UsableItemsFunctions[itemName], arguments)
-
 	if not success then
 		return print("Function call failed with error:", result, "a usable item :", itemName, " have an error in the callback function")
 	end

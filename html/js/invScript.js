@@ -386,11 +386,13 @@ function addData(index, item) {
         });
     }
 
+
     if (item.metadata?.context) {
         item.metadata.context.forEach(option => {
             data.push({
                 text: option.text,
                 action: function () {
+                    option.itemid = item.id;
                     $.post(`https://${GetParentResourceName()}/ContextMenu`,
                         JSON.stringify(option)
                     );
