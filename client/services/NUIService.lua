@@ -403,6 +403,8 @@ local function useWeapon(data)
 		local key = string.format("GetEquippedWeaponData_%d", weapName)
 		LocalPlayer.state:set(key, info, true)
 	end
+	TriggerServerEvent("vorpinventory:setUsedWeapon", weaponId, UserWeapons[weaponId]:getUsed(), UserWeapons[weaponId]:getUsed2())
+
 	NUIService.LoadInv()
 end
 

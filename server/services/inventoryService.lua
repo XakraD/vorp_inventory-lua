@@ -244,10 +244,15 @@ function InventoryService.setWeaponBullets(weaponId, type, amount)
 	end
 end
 
-function InventoryService.usedWeapon(id, _used, _used2)
+function InventoryService.usedWeapon(id, used, used2)
 	local query <const> = 'UPDATE loadout SET used = @used, used2 = @used2 WHERE id = @id'
-	local params <const> = { used = _used and 1 or 0, used2 = _used2 and 1 or 0, id = id }
+	local params <const> = { used = used and 1 or 0, used2 = used2 and 1 or 0, id = id }
 	DBService.updateAsync(query, params)
+	local userWeapons <const> = UsersWeapons.default
+	if userWeapons[id] then
+		userWeapons[id]:setUsed(used)
+		userWeapons[id]:setUsed2(used2)
+	end
 end
 
 function InventoryService.subItem(source, invId, itemId, amount)
