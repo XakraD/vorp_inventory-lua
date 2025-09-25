@@ -17,6 +17,7 @@
 ---@field degradation number @Item degradation
 ---@field maxDegradation number @Item max degradation
 ---@field percentage number @Item percentage
+---@field useExpired boolean @Item use expired
 Item = {}
 
 Item.id = nil
@@ -39,7 +40,7 @@ Item.group = nil
 Item.degradation = nil
 Item.maxDegradation = nil
 Item.percentage = nil
-
+Item.useExpired = false
 -- ID
 function Item:setId(id)
 	self.id = id
@@ -47,6 +48,11 @@ end
 
 function Item:getId()
 	return self.id
+end
+
+-- USE EXPIRED
+function Item:canUseExpiredItem()
+	return self.useExpired
 end
 
 -- DEGRADATION
