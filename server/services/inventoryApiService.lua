@@ -1027,6 +1027,7 @@ function InventoryAPI.getUserWeapon(player, cb, weaponId)
 	weapon.id = foundWeapon:getId()
 	weapon.propietary = foundWeapon:getPropietary()
 	weapon.used = foundWeapon:getUsed()
+	weapon.used2 = foundWeapon:getUsed2()
 	weapon.ammo = foundWeapon:getAllAmmo()
 	weapon.desc = foundWeapon:getDesc()
 	weapon.group = 5
@@ -1065,6 +1066,7 @@ function InventoryAPI.getUserWeapons(player, cb)
 				id = currentWeapon:getId(),
 				propietary = currentWeapon:getPropietary(),
 				used = currentWeapon:getUsed(),
+				used2 = currentWeapon:getUsed2(),
 				ammo = currentWeapon:getAllAmmo(),
 				desc = currentWeapon:getDesc(),
 				group = 5,

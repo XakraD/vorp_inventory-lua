@@ -403,6 +403,8 @@ local function useWeapon(data)
 		local key = string.format("GetEquippedWeaponData_%d", weapName)
 		LocalPlayer.state:set(key, info, true)
 	end
+	TriggerServerEvent("vorpinventory:setUsedWeapon", weaponId, UserWeapons[weaponId]:getUsed(), UserWeapons[weaponId]:getUsed2())
+
 	NUIService.LoadInv()
 end
 
@@ -729,8 +731,8 @@ function NUIService.ContextMenu(data)
 	end
 
 	if data.event?.client then
-		TriggerEvent(data.event.client, data.event?.arguments)
+		TriggerEvent(data.event.client, data.event?.arguments, data.itemid)
 	elseif data.event?.server then
-		TriggerServerEvent(data.event.server, data.event?.arguments)
+		TriggerServerEvent(data.event.server, data.event?.arguments, data.itemid)
 	end
 end
