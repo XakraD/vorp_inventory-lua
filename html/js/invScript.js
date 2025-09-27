@@ -388,6 +388,7 @@ function addData(index, item) {
             data.push({
                 text: LANGUAGE.copyserial || "Copy Serial",
                 action: function () {
+                    // Credits to ox_lib for this snippet
                     const clipElem = document.createElement('textarea');
                     clipElem.value = item.serial_number;
                     document.body.appendChild(clipElem);
