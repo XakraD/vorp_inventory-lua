@@ -624,6 +624,7 @@ function NUIService.initiateData()
 			use = T.use,
 			give = T.give,
 			drop = T.drop,
+			copyserial = T.copyserial,
 			labels = T.labels
 		},
 		config = {

@@ -384,6 +384,19 @@ function addData(index, item) {
                 );
             },
         });
+        if (Config.EnableCopySerial && item.type == "item_weapon" && item.serial_number) {
+            data.push({
+                text: LANGUAGE.copyserial,
+                action: function () {
+                    const clipElem = document.createElement('textarea');
+                    clipElem.value = item.serial_number;
+                    document.body.appendChild(clipElem);
+                    clipElem.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(clipElem);
+                },
+            });
+        }
     }
 
 
