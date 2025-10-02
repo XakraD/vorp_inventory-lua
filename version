@@ -1,3 +1,23 @@
+<4.3>
+- added copy serial number button for weapons (configurable)
+- added new item column useExpired to flag items that can be used when expired (new column on sql code needed)
+- fixed server side getUsed variable when using export to get a weapon (if weapon was equipped)
+- added support for getUsed2 (for dual wielding) when using weapon export
+- context metadata events 3rd param sends the id of the item so you can identify it
+- fixed ClearAll whitelist items
+- refactor set metadata see (ac0127c) commit for more info
+- fixed MergeTables function to handle json string/numbers and also tables/arrays
+- removed update old add serial name etc when they didnt exist. this was added just for old servers.
+- support read metadata from default items table so you can set metadata for default items
+- cached images are now more efficient, and loading images from metadata at run time
+- added feature topush to talk while inventory is open
+- added new events to detect items moved removed from custom inventories
+- fixed notifications where it wouldnt show custom item labels through metadata
+- fixes item stacks,lowering the stack amount only using percentage check and not time for items that are degradable 
+- new custom inventory exports now support async operations and more data (6e68672
+) see more here in the commits
+- new event to block players from opening inventory, server and client side 
+- client side getItemData this returns the item from items database, you can use this export to get descriptions and labels instead of adding configs and make users duplicate labels and descriptions 
 <4.2>
 - added logs to server for security (update as soon as possible)
 - added option to spawn weapons with old boxes
