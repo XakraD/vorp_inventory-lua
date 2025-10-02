@@ -9,7 +9,7 @@
 - fixed MergeTables function to handle json string/numbers and also tables/arrays
 - removed update old add serial name etc when they didnt exist. this was added just for old servers.
 - support read metadata from default items table so you can set metadata for default items
-- cached images are not more efficient, and loading images from metadata at run time
+- cached images are now more efficient, and loading images from metadata at run time
 - added feature topush to talk while inventory is open
 - added new events to detect items moved removed from custom inventories
 - fixed notifications where it wouldnt show custom item labels through metadata
