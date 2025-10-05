@@ -96,7 +96,7 @@ MySQL.ready(function()
 					group = db_item.groupId,
 					weight = db_item.weight,
 					maxDegradation = db_item.degradation,
-					useExpired = db_item.useExpired,
+					useExpired = db_item.useExpired == 0 and false or true,
 				})
 				ServerItems[item.item] = item
 			end
