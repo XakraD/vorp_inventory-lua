@@ -1100,7 +1100,8 @@ function InventoryService.getItemsTable()
 
 	if ServerItems then
 		local data = msgpack.pack(ServerItems)
-		TriggerClientEvent("vorpInventory:giveItemsTable", _source, data)
+		-- some people have thousands of items so use latent events.
+		TriggerLatentClientEvent("vorpInventory:giveItemsTable", _source, 500000, data)
 	end
 end
 
