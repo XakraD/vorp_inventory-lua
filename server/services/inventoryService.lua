@@ -1035,7 +1035,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 				limit = svItem:getLimit(),
 				label = svItem:getLabel(),
 				name = itemName,
-				type = "item_inventory",
+				type = "item_standard",
 				metadata = item:getMetadata(),
 				canUse = svItem:getCanUse(),
 				canRemove = svItem:getCanRemove(),
