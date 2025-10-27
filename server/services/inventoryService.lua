@@ -280,7 +280,7 @@ function InventoryService.subItem(source, invId, itemId, amount)
 
 	if item:getCount() == 0 then
 		if invId == "default" then
-			local data = { name = item:getName(), count = amount }
+			local data = { name = item:getName(), count = amount, metadata = item:getMetadata() }
 			TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		end
 		userInventory[itemId] = nil
@@ -998,6 +998,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 
 	local item = sourceInventory[itemId]
 	local itemName = item:getName()
+	local itemMetadata = item:getMetadata()
 	local svItem = ServerItems[itemName]
 	if not svItem or not item then
 		return
@@ -1017,7 +1018,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 	local function updateClient(addedItem)
 		TriggerClientEvent("vorpInventory:receiveItem", _target, itemName, addedItem:getId(), amount, item:getMetadata(), item:getDegradation(), item:getPercentage())
 		TriggerClientEvent("vorpInventory:removeItem", _source, itemName, item:getId(), amount)
-		local data = { name = itemName, count = amount }
+		local data = { name = itemName, count = amount, metadata = itemMetadata }
 		TriggerEvent("vorp_inventory:Server:OnItemRemoved", data, _source)
 		if item:getCount() - amount <= 0 then
 			DBService.DeleteItem(charid, item:getId())
@@ -1050,7 +1051,7 @@ function InventoryService.GiveItem(itemId, amount, target)
 				limit = svItem:getLimit(),
 				label = svItem:getLabel(),
 				name = itemName,
-				type = "item_inventory",
+				type = "item_standard",
 				metadata = item:getMetadata(),
 				canUse = svItem:getCanUse(),
 				canRemove = svItem:getCanRemove(),
@@ -1688,7 +1689,7 @@ function InventoryService.MoveToCustom(obj)
 			end
 			local metadataLabel = item.metadata?.label or item.label
 			InventoryService.subItem(_source, "default", item.id, amount)
-			TriggerEvent("vorp_inventory:Server:OnItemMovedToCustomInventory", { id = item.id, name = item.name, amount = amount }, invId, _source)
+			TriggerEvent("vorp_inventory:Server:OnItemMovedToCustomInventory", { id = item.id, name = item.name, amount = amount, metadata = item.metadata }, invId, _source)
 			TriggerClientEvent("vorpInventory:removeItem", _source, item.name, item.id, amount)
 			Core.NotifyRightTip(_source, T.movedToStorage .. " " .. amount .. " " .. metadataLabel, 2000)
 
@@ -1791,7 +1792,7 @@ function InventoryService.TakeFromCustom(obj)
 				return Core.NotifyObjective(_source, T.cantRemoveItem, 2000)
 			end
 
-			TriggerEvent("vorp_inventory:Server:OnItemTakenFromCustomInventory", { id = itemAdded:getId(), name = item.name, amount = amount }, invId, _source)
+			TriggerEvent("vorp_inventory:Server:OnItemTakenFromCustomInventory", { id = itemAdded:getId(), name = item.name, amount = amount, metadata = itemAdded:getMetadata() }, invId, _source)
 			TriggerClientEvent("vorpInventory:receiveItem", _source, item.name, itemAdded:getId(), amount, itemAdded:getMetadata(), itemAdded:getDegradation(), itemAdded:getPercentage())
 			InventoryService.reloadInventory(_source, invId)
 			InventoryService.DiscordLogs(invId, item.name, amount, sourceName, "Take")
