@@ -667,7 +667,9 @@ CreateThread(function()
 								SimulatePlayerInputGait(PlayerId(), speed, -1, heading, false, false)
 								repeat Wait(0) until not IsNuiFocused()
 								isWalking = false
-								--	ResetPlayerInputGait(PlayerId()) -- no need to reset also pressing any key will reset it keep the ped walking
+								if GetMount(player) > 0 or IsPedInAnyVehicle(player, false) then
+									ResetPlayerInputGait(PlayerId()) -- needs to reset on vehcicles or mount or only works for the first time for walking no need pressing the W key will reset it it seems
+								end
 							end)
 						end
 					end
