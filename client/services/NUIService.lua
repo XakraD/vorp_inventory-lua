@@ -640,7 +640,8 @@ function NUIService.initiateData()
 end
 
 local blockInventory = false
--- Main loo
+local isWalking = false
+
 CreateThread(function()
 	local controlVar = false -- best to use variable than to check statebag every frame
 
@@ -656,6 +657,20 @@ CreateThread(function()
 				local hogtied = IsPedHogtied(player) == 1
 				local cuffed = IsPedCuffed(player)
 				if not hogtied and not cuffed and not InventoryIsDisabled then
+					if Config.AllowWalkingWhileInventoryOpen then
+						if IsControlPressed(1, `INPUT_MOVE_UP_ONLY`) == 1 and not isWalking then
+							isWalking = true
+							local speed = GetEntitySpeed(player)
+							local heading = GetEntityHeading(player)
+							CreateThread(function()
+								repeat Wait(0) until IsNuiFocused()
+								SimulatePlayerInputGait(PlayerId(), speed, -1, heading, false, false)
+								repeat Wait(0) until not IsNuiFocused()
+								isWalking = false
+								--	ResetPlayerInputGait(PlayerId()) -- no need to reset also pressing any key will reset it keep the ped walking
+							end)
+						end
+					end
 					NUIService.OpenInv()
 				end
 			end
