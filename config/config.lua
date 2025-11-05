@@ -2,83 +2,85 @@ Lang = "English"
 
 Config = {
 	-- ======================= DEVELOPMENT ============================== --
-	Debug                      = false, -- If your server is live set this to false.  to true only if you are testing things
+	Debug                          = false, -- If your server is live set this to false.  to true only if you are testing things
 
-	InventoryOrder             = "items", -- Items or weapons what should should first in inventory
+	InventoryOrder                 = "items", -- Items or weapons what should should first in inventory
 
-	DevMode                    = false, -- If your server is live set this to false.  to true only if you are testing things (auto load inventory when script restart and before character selection. Alos add /getInv command)
+	DevMode                        = false, -- If your server is live set this to false.  to true only if you are testing things (auto load inventory when script restart and before character selection. Alos add /getInv command)
 
-	dbupdater                  = true,
+	dbupdater                      = true,
 	-- ======================= CONFIGURATION ============================= --
-	ShowCharacterNameOnGive    = false, -- When giving an item, show the character name of nearby players instead of their player ID. if set to false, show the player ID
+	AllowWalkingWhileInventoryOpen = true, -- If true, the player can walk while the inventory is open as ong they press and hold W key and press I to open inventory
 
-	DoubleClickToUse           = true, -- If toggled to false, items in inventory will right click then left click "use"
+	ShowCharacterNameOnGive        = false, -- When giving an item, show the character name of nearby players instead of their player ID. if set to false, show the player ID
 
-	NewPlayers                 = false, -- If you dont want new players to give money or items then set to true. this can avoid cheaters giving stuff on first join
+	DoubleClickToUse               = true, -- If toggled to false, items in inventory will right click then left click "use"
 
-	CoolDownNewPlayer          = 120, -- In seconds how long they have to wait before they can give items or money
+	NewPlayers                     = false, -- If you dont want new players to give money or items then set to true. this can avoid cheaters giving stuff on first join
+
+	CoolDownNewPlayer              = 120, -- In seconds how long they have to wait before they can give items or money
 
 	-- GOLD ITEM LIKE DOLLARS
-	UseRolItem                 = false, -- To show rol in inventory
+	UseRolItem                     = false, -- To show rol in inventory
 
-	UseGoldItem                = false,
+	UseGoldItem                    = false,
 
-	AddGoldItem                = false,   -- Should there be an item in inventory to represent gold
+	AddGoldItem                    = false,   -- Should there be an item in inventory to represent gold
 
-	AddDollarItem              = true,    -- Should there be an item in inventory to represent dollars
+	AddDollarItem                  = true,    -- Should there be an item in inventory to represent dollars
 
-	AddAmmoItem                = true,    -- Should there be an item in inventory to represent the gun belt
+	AddAmmoItem                    = true,    -- Should there be an item in inventory to represent the gun belt
 
-	InventorySearchable        = true,    -- Should the search bar appear in inventories
+	InventorySearchable            = true,    -- Should the search bar appear in inventories
 
-	InventorySearchAutoFocus   = true,    -- Search autoofocuses when you type
+	InventorySearchAutoFocus       = true,    -- Search autoofocuses when you type
 
-	DisableDeathInventory      = true,    -- Prevent the ability to access inventory while dead
+	DisableDeathInventory          = true,    -- Prevent the ability to access inventory while dead
 
-	OpenKey                    = 0xC1989F95, -- I
+	OpenKey                        = 0xC1989F95, -- I
 
-	UseFilter                  = true,    -- If true then will use the filter opening inventory
+	UseFilter                      = true,    -- If true then will use the filter opening inventory
 
-	Filter                     = "OJDominoBlur",
+	Filter                         = "OJDominoBlur",
 
-	PickupKey                  = 0x760A9C6F, -- G key PROMPT PICKUP
+	PickupKey                      = 0x760A9C6F, -- G key PROMPT PICKUP
 
-	discordid                  = true,    -- Turn to true if ur using discord whitelist
+	discordid                      = true,    -- Turn to true if ur using discord whitelist
 
-	DeleteOnlyDontDrop         = false,   -- If true then dropping items only deletes from inventory and box on the floor is not created
+	DeleteOnlyDontDrop             = false,   -- If true then dropping items only deletes from inventory and box on the floor is not created
 
-	UseLanternPutOnBelt        = true,    -- If true then lanterns will be put on belt
+	UseLanternPutOnBelt            = true,    -- If true then lanterns will be put on belt
 
-	WeightMeasure              = "kg",    -- Weight measure (kg, lbs, etc)
+	WeightMeasure                  = "kg",    -- Weight measure (kg, lbs, etc)
 
-	DeleteItemOnUseWhenExpired = false,   -- if true items on use that are expired will be deleted
+	DeleteItemOnUseWhenExpired     = false,   -- if true items on use that are expired will be deleted
 
-	DeletePickups              = {
+	DeletePickups                  = {
 		Enable = false, -- if true it will add timer to delete pickups
 		Time = 10, -- after this time pick up wll be deleted, IN MINUTES
 	},
 
-	DuelWield                  = true, 	  -- If true duel wielding will be allowed.
+	DuelWield                      = true, -- If true duel wielding will be allowed.
 
-	SpamDelay				   = 2000,    -- ms | The minimum time that must elapse between using one item and being able to use another item in the inventory.
+	SpamDelay                      = 2000, -- ms | The minimum time that must elapse between using one item and being able to use another item in the inventory.
 
 	-- ==================== SOUND CONFIGURATION ==================== --
-	SFX = {								  -- Inventory Sound Effects
-		OpenInventory = true,			  -- The sound effect when open the inventory
-		CloseInventory = true,			  -- The sound effect when close the inventory
-		ItemHover = true,				  -- The sound effect when hovering the mouse cursor over an item/choose the item in the inventory
+	SFX                            = { -- Inventory Sound Effects
+		OpenInventory = true,       -- The sound effect when open the inventory
+		CloseInventory = true,      -- The sound effect when close the inventory
+		ItemHover = true,           -- The sound effect when hovering the mouse cursor over an item/choose the item in the inventory
 
-		ItemDrop = true,                  -- The sound effect when drop the item
-		MoneyDrop = true,                 -- The sound effect when drop the money
-		GoldDrop = true,                  -- The sound effect when drop the gold
-		PickUp = true,                    -- The sound effect when pick up the item
+		ItemDrop = true,            -- The sound effect when drop the item
+		MoneyDrop = true,           -- The sound effect when drop the money
+		GoldDrop = true,            -- The sound effect when drop the gold
+		PickUp = true,              -- The sound effect when pick up the item
 	},
 
 	-- =================== CLEAR ITEMS WEAPONS MONEY GOLD ===================== --
 
-	UseClearAll                = false, -- If you want to use the clear item function
+	UseClearAll                    = false, -- If you want to use the clear item function
 
-	OnPlayerRespawn            = {
+	OnPlayerRespawn                = {
 		Money = {
 			JobLock         = { "police", "doctor" }, -- Wont remove from these jobs
 			ClearMoney      = true,          -- If true then removes all money from player
@@ -106,27 +108,27 @@ Config = {
 	},
 
 	-- HOW MANY WEAPONS ALLOWED PER PLAYER FOR ITEMS IS IN VORP CORE CONFIG
-	MaxItemsInInventory        = {
+	MaxItemsInInventory            = {
 		Weapons = 6,
 	},
 
 	-- HERE YOU CAN SET THE MAX AMOUNT OF WEAPONS PER JOB (IF YOU WANT)
-	JobsAllowed                = {
+	JobsAllowed                    = {
 		police = 10 -- Job name and max weapons allowed dont allow less than the above
 	},
 
 	-- FIRST JOIN
-	startItems                 = {
+	startItems                     = {
 		consumable_raspberrywater = 2, -- ITEMS SAME NAME AS IN DATABASE
 		ammorevolvernormal = 1   -- AMMO SAME NAME AS IN THE DATABASE
 	},
 
-	startWeapons               = {
+	startWeapons                   = {
 		"WEAPON_MELEE_KNIFE" -- WEAPON HASH NAME
 	},
 
 	-- Items that dont get added up torwards your max weapon count
-	notweapons                 = {
+	notweapons                     = {
 		WEAPON_KIT_BINOCULARS_IMPROVED = true,
 		WEAPON_KIT_BINOCULARS = true,
 		WEAPON_FISHINGROD = true,
@@ -141,14 +143,14 @@ Config = {
 	},
 
 	-- Weapons that are considered non throwables
-	nonAmmoThrowables          = {
+	nonAmmoThrowables              = {
 		WEAPON_MELEE_CLEAVER = true,
 		WEAPON_MELEE_HATCHET = true,
 		WEAPON_MELEE_HATCHET_HUNTER = true
 	},
 
 	-- Weapons that dont need serial numbers
-	noSerialNumber             = {
+	noSerialNumber                 = {
 		WEAPON_MELEE_KNIFE = true,
 		WEAPON_MELEE_KNIFE_JAWBONE = true,
 		WEAPON_MELEE_KNIFE_TRADER = true,
@@ -181,9 +183,9 @@ Config = {
 		WEAPON_MOONSHINEJUG_MP = true,
 	},
 
-	UseWeaponModels            = true, -- If true, weapons will spawn with a model other wise they default to the default_box prop
+	UseWeaponModels                = true, -- If true, weapons will spawn with a model other wise they default to the default_box prop
 	-- for dropped weapons , some will spawn standing so we modify their rotation
-	weaponAdjustments          = {
+	weaponAdjustments              = {
 		WEAPON_MELEE_KNIFE = 90.0,
 		WEAPON_BOW = 90.0,
 		WEAPON_BOW_IMPROVED = 90.0,
@@ -205,7 +207,7 @@ Config = {
 	},
 
 	-- dropp items can have a diferent model added them here item name and object
-	spawnableProps             = {
+	spawnableProps                 = {
 		default_box = "p_cottonbox01x", -- default when object is not found will always spawn this object for weapon or items
 		money_bag = "p_moneybag02x", -- prop for the money pickup
 		gold_bag = "s_pickup_goldbar01x", -- prop for the gold pickup
