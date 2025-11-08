@@ -660,7 +660,10 @@ CreateThread(function()
 					if Config.AllowWalkingWhileInventoryOpen then
 						if IsControlPressed(1, `INPUT_MOVE_UP_ONLY`) == 1 and not isWalking then
 							isWalking = true
-							local speed = GetEntitySpeed(player)
+							local _isWalking = IsPedWalking(player)
+							local isRunning = IsPedRunning(player)
+							local isSprinting = IsPedSprinting(player)
+							local speed = _isWalking and 1.0 or isRunning and 2.0 or isSprinting and 3.0 or 0.0
 							local heading = GetEntityHeading(player)
 							CreateThread(function()
 								repeat Wait(0) until IsNuiFocused()
