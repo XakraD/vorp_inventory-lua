@@ -486,11 +486,11 @@ SharedData.Weapons = {
         HashName = "WEAPON_FISHINGROD",
         Weight = 1.10,
     },
-    WEAPON_MACHETE_HORROR = {
+    WEAPON_MELEE_MACHETE_HORROR = {
         Name = "Machete Horror",
         Desc = "this one scares people",
         AttachPoint = "",
-        HashName = "WEAPON_MACHETE_HORROR",
+        HashName = "WEAPON_MELEE_MACHETE_HORROR",
         Weight = 1.40,
     },
     WEAPON_MELEE_HAMMER = {
