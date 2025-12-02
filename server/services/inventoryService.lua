@@ -1604,7 +1604,25 @@ function InventoryService.MoveToCustom(obj)
 	local _source = source
 	local data = json.decode(obj)
 	local invId <const> = tostring(data.id)
-	if not CustomInventoryInfos[invId] then return end
+	if not CustomInventoryInfos[invId] then
+		return print("InventoryService.MoveToCustom: inventory not found with id: ", invId)
+	end
+
+	-- can only move items if this inventory is in use meaning was opened by the server
+	if not CustomInventoryInfos[invId]:isInUse() then
+		return print("inventory was not opened from the server user:", GetPlayerName(_source), "Tried to move items to:", invId, "possible Cheat!!")
+	end
+
+	-- this user did not open inventory through the server
+	if not INVENTORY_IN_USE[_source] then
+		return print("player:", GetPlayerName(_source), "did not open inventory through the server:", invId, "possible Cheat!!")
+	end
+
+	-- is the id the same as the one in use?
+	if INVENTORY_IN_USE[_source] ~= invId then
+		return print("player:", GetPlayerName(_source), "tried to move items to:", invId, "when the inventory allowed id for this user is:" .. INVENTORY_IN_USE[_source] .. " possible Cheat!!")
+	end
+
 
 	local item = data.item
 	local amount = tonumber(data.number)
@@ -1705,7 +1723,23 @@ function InventoryService.TakeFromCustom(obj)
 
 	local data = json.decode(obj)
 	local invId <const> = tostring(data.id)
-	if not CustomInventoryInfos[invId] then return end
+	if not CustomInventoryInfos[invId] then
+		return print("InventoryService.TakeFromCustom: inventory not found with id: ", invId)
+	end
+
+	-- can only take items if this user had opened the inventory through the server
+	if not CustomInventoryInfos[invId]:isInUse() then
+		return print("inventory was not opened from the server user:", GetPlayerName(_source), "Tried to take items from:", invId, "possible Cheat!!")
+	end
+	-- this user did not open inventory through the server
+	if not INVENTORY_IN_USE[_source] then
+		return print("player:", GetPlayerName(_source), "did not open inventory through the server:", invId, "possible Cheat!!")
+	end
+
+	-- is the id the same as the one in use?
+	if INVENTORY_IN_USE[_source] ~= invId then
+		return print("player:", GetPlayerName(_source), "tried to take items from:", invId, "when the inventory allowed id for this user is:" .. INVENTORY_IN_USE[_source] .. " possible Cheat!!")
+	end
 
 	local item = data.item
 	local amount = tonumber(data.number)

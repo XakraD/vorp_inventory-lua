@@ -77,7 +77,7 @@ function cacheImage(item) {
     if (item.type === "item_weapon") return;
 
     const image = item.metadata?.image;
-    if (image && imageCache[image] == null) {
+    if (image && !(image in imageCache)) {
         preloadImages([image]);
     }
 }

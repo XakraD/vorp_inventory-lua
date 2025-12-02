@@ -27,6 +27,7 @@ function CustomInventoryAPI:New(data)
     instance.useweight = data.useWeight or false
     instance.weight = data.weight or 0.0
     instance.webhook = data.webhook or false
+    instance.inUse = false
     return instance
 end
 
@@ -120,6 +121,18 @@ end
 ---@return boolean
 function CustomInventoryAPI:isShared()
     return self.shared
+end
+
+--- each inventory can only be used by one user at the time
+---@return boolean
+function CustomInventoryAPI:isInUse()
+    return self.inUse
+end
+
+--- set inventory in use state
+---@param state boolean @state
+function CustomInventoryAPI:setInUse(state)
+    self.inUse = state
 end
 
 --- is permission enabled for this inventory

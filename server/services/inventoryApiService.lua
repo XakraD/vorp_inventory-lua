@@ -1,5 +1,6 @@
-local T    = TranslationInv.Langs[Lang]
-local Core = exports.vorp_core:GetCore()
+local T          = TranslationInv.Langs[Lang]
+local Core       = exports.vorp_core:GetCore()
+INVENTORY_IN_USE = {}
 
 --used to sync time to the clients
 CreateThread(function()
@@ -8,7 +9,6 @@ CreateThread(function()
 		GlobalState.TimeNow = os.time()
 	end
 end)
-
 
 ---@class InventoryAPI
 InventoryAPI         = {}
@@ -32,6 +32,7 @@ InventoryAPI         = {}
 ---@field whitelistWeapons boolean
 ---@field limitedWeapons table<string, integer>
 ---@field webhook string | boolean
+---@field inUse boolean
 CustomInventoryInfos = {
 	default = {
 		id = "default",
@@ -51,7 +52,8 @@ CustomInventoryInfos = {
 		whitelistWeapons = false,
 		limitedWeapons = {},
 		webook = false,
-		--TODO: Add parameter to use contaner with weight
+		inUse = false,
+		--TODO: Add parameter to use container with weight
 	}
 }
 
@@ -1650,7 +1652,6 @@ end
 exports("subWeapon", InventoryAPI.subWeapon)
 
 
-
 ---get User by identifier total count of weapons or weight
 ---@param identifier string user identifier
 ---@param charId number user charid
@@ -1885,18 +1886,30 @@ exports("setCustomInventoryWeaponLimit", InventoryAPI.setCustomInventoryWeaponLi
 function InventoryAPI.openInventory(source, id)
 	local _source = source
 
+	-- its main inventory
 	if not id then
 		return TriggerClientEvent("vorp_inventory:OpenInv", _source)
 	end
 
 	if not CustomInventoryInfos[id] or not UsersInventories[id] then
-		return
+		return print("InventoryAPI.openInventory: inventory not found with id: ", id)
 	end
 
 	local sourceCharacter = Core.getUser(_source)
 	if not sourceCharacter then
-		return
+		return print("InventoryAPI.openInventory: source character not found with id: ", _source)
 	end
+
+	-- is it being used by anyone else?
+	if CustomInventoryInfos[id]:isInUse() then
+		return Core.NotifyObjective(_source, T.SomeoneUseing, 5000)
+	end
+	CustomInventoryInfos[id]:setInUse(true)
+	-- for player dropp event or inventory client close so we dont have to use loops
+	if INVENTORY_IN_USE[_source] then
+		return Core.NotifyObjective(_source, "You are already in an inventory, please close it first", 5000)
+	end
+	INVENTORY_IN_USE[_source] = id
 
 	sourceCharacter = sourceCharacter.getUsedCharacter
 	local identifier = sourceCharacter.identifier
@@ -1972,6 +1985,11 @@ exports("openInventory", InventoryAPI.openInventory)
 function InventoryAPI.closeInventory(source, id)
 	local _source = source
 	if id and CustomInventoryInfos[id] then
+		if CustomInventoryInfos[id]:isInUse(_source) then
+			return print("InventoryAPI.closeInventory: inventory is not in use by: ", _source, " To close it ID: ", id)
+		end
+		CustomInventoryInfos[id]:setInUse(_source, nil)
+		INVENTORY_IN_USE[_source] = nil
 		return TriggerClientEvent("vorp_inventory:CloseCustomInv", _source)
 	end
 

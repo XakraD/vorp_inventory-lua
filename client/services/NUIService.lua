@@ -2,7 +2,6 @@ local isProcessingPay     = false
 local timerUse            = 0
 local candrop             = true
 local cangive             = true
-local CanOpen             = true
 local InventoryIsDisabled = false
 local T                   = TranslationInv.Langs[Lang]
 local Core                = exports.vorp_core:GetCore()
@@ -69,13 +68,11 @@ function NUIService.ReloadInventory(inventory, packed)
 	SynPending = false
 end
 
+local inCustomInventory = false
 function NUIService.OpenCustomInventory(name, id, capacity, weight)
-	CanOpen = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
-	if not CanOpen then return end
-
+	inCustomInventory = true
 	ApplyPosfx()
 	DisplayRadar(false)
-	CanOpen = false
 	SetNuiFocus(true, true)
 	SendNUIMessage({
 		action = "display",
@@ -97,10 +94,6 @@ function NUIService.NUITakeFromCustom(obj)
 end
 
 function NUIService.OpenPlayerInventory(name, id, type)
-	CanOpen = Core.Callback.TriggerAwait("vorp_inventory:Server:CanOpenCustom", id)
-	if not CanOpen then return end
-
-	CanOpen = false
 	ApplyPosfx()
 	DisplayRadar(false)
 	SetNuiFocus(true, true)
@@ -126,6 +119,7 @@ function NUIService.TransferLimitExceeded(maxValue)
 	Core.NotifyRightTip(message, 4000)
 end
 
+-- was closed by the client
 function NUIService.CloseInv()
 	if Config.UseFilter then
 		AnimpostfxStop(Config.Filter)
@@ -145,15 +139,16 @@ function NUIService.CloseInv()
 		end
 	end
 
-	if not CanOpen then
-		TriggerServerEvent("vorp_inventory:Server:UnlockCustomInv")
-	end
 	DisplayRadar(true)
 	SetNuiFocus(false, false)
 	SendNUIMessage({ action = "hide" })
 	InInventory = false
 	TriggerEvent("vorp_stables:setClosedInv", false)
 	TriggerEvent("syn:closeinv")
+	if inCustomInventory then
+		inCustomInventory = false
+		TriggerServerEvent("vorp_inventory:Server:CloseCustomInventory")
+	end
 end
 
 function NUIService.setProcessingPayFalse()

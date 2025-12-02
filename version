@@ -1,3 +1,11 @@
+<4.4>
+- fixes a critical issue where users could dupe items when using xhr in dev tools 
+- fixes weapon name for WEAPON_MELEE_MACHETE_HORROR
+- added auto walk feature when opening inventory
+- fixed wrong item type for give item 
+- added metadata to events onItemRemoved 
+- fixed useExpired variable
+- added latent event for server to client items table 
 <4.3>
 - added copy serial number button for weapons (configurable)
 - added new item column useExpired to flag items that can be used when expired (new column on sql code needed)

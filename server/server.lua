@@ -32,37 +32,25 @@ RegisterServerEvent("vorpinventory:netduplog", function()
     end
 end)
 
-RegisterServerEvent("vorp_inventory:Server:UnlockCustomInv", function()
-    local _source <const> = source
-    for i, value in pairs(InventoryBeingUsed) do
-        if value == _source then
-            InventoryBeingUsed[i] = nil
-            break
-        end
-    end
-end)
 
 AddEventHandler('playerDropped', function()
     local _source <const> = source
     if _source then
         local user <const>    = Core.getUser(_source)
+
         local weapons <const> = UsersWeapons.default
 
         if AmmoData[_source] then
             AmmoData[_source] = nil
         end
 
-        for i, value in pairs(InventoryBeingUsed) do
-            if value == _source then
-                InventoryBeingUsed[i] = nil
-                break
-            end
+        if INVENTORY_IN_USE[_source] then
+            INVENTORY_IN_USE[_source] = nil
         end
 
         if not user then return end
 
         local charid <const> = user.getUsedCharacter.charIdentifier
-
         for key, value in pairs(weapons) do
             if value.charId == charid then
                 UsersWeapons.default[key] = nil
@@ -89,13 +77,22 @@ Core.Callback.Register("vorpinventory:get_slots", function(source, cb, _)
     })
 end)
 
-Core.Callback.Register("vorp_inventory:Server:CanOpenCustom", function(source, cb, id)
-    id = tostring(id)
-    if not InventoryBeingUsed[id] then
-        InventoryBeingUsed[id] = source
-        return cb(true)
+
+RegisterServerEvent("vorp_inventory:Server:CloseCustomInventory", function()
+    local _source <const> = source
+    -- here we will do a look up if this source was in any inventory
+    if not INVENTORY_IN_USE[_source] then
+        return print("player:", GetPlayerName(_source), "did not open inventory through the server  but it closed it meaning it opened from the client", "possible Cheat!!")
+    end
+    local id <const> = INVENTORY_IN_USE[_source]
+    if not CustomInventoryInfos[id] then
+        return print("player:", GetPlayerName(_source), "tried to close inventory with id:", id, "but it was not found", "possible Cheat!!")
     end
 
-    Core.NotifyObjective(source, T.SomeoneUseing, 5000)
-    return cb(false)
+    if not CustomInventoryInfos[id]:isInUse() then
+        return print("player:", GetPlayerName(_source), "tried to close inventory with id:", id, "but it was not in use", "possible Cheat!!")
+    end
+
+    CustomInventoryInfos[id]:setInUse(false)
+    INVENTORY_IN_USE[_source] = nil
 end)
