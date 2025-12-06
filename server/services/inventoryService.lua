@@ -304,7 +304,9 @@ end
 function InventoryService.addItem(source, invId, name, amount, metadata, data, cb)
 	local _source <const> = source
 	local user <const> = Core.getUser(_source)
-	if not user then return cb(nil) end
+	if not user then
+		return cb(nil)
+	end
 
 	local sourceCharacter <const> = user.getUsedCharacter
 	local identifier <const> = sourceCharacter.identifier
@@ -325,7 +327,7 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 	local function createItem()
 		local degrade <const> = svItem:getMaxDegradation()
 		local isExpired <const> = degrade ~= 0 and os.time() or nil
-
+		local promise = promise.new()
 		DBService.CreateItem(charIdentifier, svItem:getId(), amount, metadata, name, isExpired, function(craftedItem)
 			local item <const> = Item:New({
 				id = craftedItem.id,
@@ -394,15 +396,19 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 					)
 				end
 			end
-
-
-			userInventory[craftedItem.id] = item
-			if invId == "default" then
-				TriggerEvent("vorp_inventory:Server:OnItemCreated", { name = item:getName(), count = amount, metadata = item:getMetadata() }, _source)
-			end
-
-			return cb(item)
+			promise:resolve(item)
 		end, invId)
+
+		local item = Citizen.Await(promise)
+		if not item then
+			return cb(nil)
+		end
+
+		userInventory[item:getId()] = item
+		if invId == "default" then
+			TriggerEvent("vorp_inventory:Server:OnItemCreated", { name = item:getName(), count = amount, metadata = item:getMetadata() }, _source)
+		end
+		return cb(item)
 	end
 
 	-- item exists in inventory by name and metadata?
@@ -413,14 +419,20 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 		if amount > 0 then
 			-- if item is not a degradation item
 			if svItem:getMaxDegradation() == 0 then
-				item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
+				local success = item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
+				if not success then
+					return cb(false)
+				end
 				DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
 				return cb(item)
 			else
 				-- if item is degradation item
 				-- if is the correct item with the same values increase amount
 				if item:getPercentage() == data.percentage then
-					item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
+					local success = item:addCount(amount, CustomInventoryInfos[invId].ignoreItemStackLimit)
+					if not success then
+						return cb(false)
+					end
 					DBService.SetItemAmount(item:getOwner(), item:getId(), item:getCount())
 					return cb(item)
 				end
@@ -429,6 +441,7 @@ function InventoryService.addItem(source, invId, name, amount, metadata, data, c
 			return createItem()
 		end
 		-- error
+		print("DUPE DEBUG 4: addItem returning nil - amount <= 0 for item: " .. name)
 		return cb(nil)
 	end
 	-- item does not exist in inventory, or metadata is different create new item
@@ -513,7 +526,7 @@ function InventoryService.onPickup(data)
 		end
 		local info <const> = { degradation = pickup.degradation, isPickup = true }
 		InventoryService.addItem(_source, "default", pickup.name, pickup.amount, pickup.metadata, info, function(item)
-			if item ~= nil and ItemPickUps[uid] then
+			if item and ItemPickUps[uid] then
 				ItemPickUps[uid] = nil
 
 				TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
@@ -1771,6 +1784,18 @@ function InventoryService.TakeFromCustom(obj)
 			return Core.NotifyObjective(_source, T.fullInventory, 2000)
 		end
 
+		local userWeapons = UsersWeapons.default
+		local weapon = userWeapons[item.id]
+		if weapon then
+			return print(GetPlayerName(_source) .. " tried to take a weapon from:" .. invId .. ", but already has it on main inventory with the same ID:" .. item.id .. "Possible Cheat!!")
+		end
+
+		local _userWeapons = UsersWeapons[invId]
+		local _weapon = _userWeapons[item.id]
+		if not _weapon then
+			return print(GetPlayerName(_source) .. " tried to take a weapon from:" .. invId .. ", but ID doesnt exist Possible Cheat!!")
+		end
+
 		local query = "UPDATE loadout SET curr_inv = 'default', charidentifier = @charid, identifier = @identifier WHERE id = @weaponId"
 		local params = { identifier = sourceIdentifier, weaponId = item.id, charid = sourceCharIdentifier }
 		DBService.updateAsync(query, params)
@@ -1804,7 +1829,13 @@ function InventoryService.TakeFromCustom(obj)
 	else
 		if item.count and amount > item.count then
 			SvUtils.Trem(_source)
-			return print(T.itemExceedsLimit)
+			return print(GetPlayerName(_source) .. " tried to take an item from:" .. invId .. ", but the item count is less than the amount requested:" .. amount .. "Possible Cheat!!")
+		end
+
+		local _userInventory = UsersInventories.default
+		local _item = _userInventory[sourceIdentifier]
+		if _item and _item[item.id] then
+			return print(GetPlayerName(_source) .. " tried to take an item from:" .. invId .. ", but already has it on main inventory with the same ID:" .. item.id .. "Possible Cheat!!")
 		end
 
 		local canCarryItem = InventoryAPI.canCarryItem(_source, item.name, amount)
@@ -1822,8 +1853,10 @@ function InventoryService.TakeFromCustom(obj)
 
 			local result = InventoryService.subItem(_source, invId, item.id, amount)
 			if not result then
+				print(GetPlayerName(_source) .. " tried to take an item from:" .. invId .. " tried to use nui dev tools to dupe items Possible Cheat!!")
+				InventoryService.subItem(_source, "default", itemAdded:getId(), itemAdded:getCount())
 				SvUtils.Trem(_source)
-				return Core.NotifyObjective(_source, T.cantRemoveItem, 2000)
+				return
 			end
 
 			TriggerEvent("vorp_inventory:Server:OnItemTakenFromCustomInventory", { id = itemAdded:getId(), name = item.name, amount = amount, metadata = itemAdded:getMetadata() }, invId, _source)
