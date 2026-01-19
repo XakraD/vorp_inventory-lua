@@ -3,7 +3,7 @@ if Config.DevMode then
         if (GetCurrentResourceName() ~= resourceName) then
             return
         end
-  
+
         SendNUIMessage({ action = "hide" })
         TriggerServerEvent("DEV:loadweapons")
         TriggerServerEvent("vorpinventory:getItemsTable")
@@ -46,6 +46,9 @@ end)
 -- ENABLE PUSH TO TALK
 CreateThread(function()
     repeat Wait(5000) until LocalPlayer.state.IsInSession
+    if not Config.EnablePushToTalk then
+        return
+    end
     local isNuiFocused = false
 
     while true do

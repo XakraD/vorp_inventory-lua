@@ -1,6 +1,9 @@
 Lang = "English"
 
 Config = {
+
+	EnablePushToTalk               = true, -- If true, the player can use push to talk to talk to other players while inventory is open
+
 	-- ======================= DEVELOPMENT ============================== --
 	Debug                          = false, -- If your server is live set this to false.  to true only if you are testing things
 
