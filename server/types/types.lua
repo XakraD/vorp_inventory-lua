@@ -384,8 +384,9 @@ function exports.vorp_inventory:addWeaponsToCustomInventory(invId, weapons, char
 ---@param item string item name
 ---@param itemCraftedId number? item crafted id if defined will return the amount of the item crafted id
 ---@param callback fun(amount:number)? callback function async or sync leave nil
+---@param metadata table? if contains metadata then we look up for items with the same metadata only
 ---@return number
-function exports.vorp_inventory:getCustomInventoryItemCount(invId, item, itemCraftedId, callback) end
+function exports.vorp_inventory:getCustomInventoryItemCount(invId, item, itemCraftedId, callback, metadata) end
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- get amount weapon in custom inventory
@@ -428,7 +429,6 @@ function exports.vorp_inventory:getCustomInventoryWeapons(invId, callback) end
 --- @param callback fun(success:boolean)? async or sync callback
 --- @return boolean
 function exports.vorp_inventory:updateCustomInventoryItem(invId, item_id, metadata, amount, callback) end
-
 
 --- see [documentation](https://docs.vorp-core.com/api-reference/inventory)<br>
 --- remove weapon from custom inventory by weapon id

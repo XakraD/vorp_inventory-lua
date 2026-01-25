@@ -2133,13 +2133,13 @@ local function updateItemAmount(id, identifier, amount, itemcraftedid, metadata,
 end
 
 local function updateItemInCustomInventory(id, identifier, itemCraftedId, amount, metadata, value, item, charid, isExpired, name)
-	local existingItem = nil
-
 	local customInventory <const> = UsersInventories[id]
 	if not customInventory then
 		return print("shared inventory does not exist with id " .. id)
 	end
 
+
+	local existingItem = nil
 	if CustomInventoryInfos[id]:isShared() then
 		existingItem = UsersInventories[id][itemCraftedId]
 	else
@@ -2151,21 +2151,23 @@ local function updateItemInCustomInventory(id, identifier, itemCraftedId, amount
 	if existingItem then
 		updateItemAmount(id, identifier, value.amount, itemCraftedId, metadata, name)
 	else
-		-- If the item doesn't exist in memory, we need to add it because we dont have a loader on server start, we miss some data in the database, like is shared and identifiers
-		local result3 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id = @id", { id = itemCraftedId })
-		if result3[1] then
-			local itemData = {
-				name = value.name,
-				amount = amount + value.amount,
-				metadata = json.decode(result3[1].metadata) or {}
-			}
-			updateItem({ id = itemCraftedId }, itemData, item, charid, isExpired, id, identifier)
+		local dbCheck = DBService.queryAwait("SELECT ci.amount, ic.metadata FROM character_inventories ci LEFT JOIN items_crafted ic ON ic.id = ci.item_crafted_id WHERE ci.item_crafted_id = @id AND ci.inventory_type = @invType", { id = itemCraftedId, invType = id })
+		if not dbCheck[1] then
+			return print("[ERROR] updateItemInCustomInventory called but item doesn't exist in DB")
 		end
+
+		-- load item into cache with current amount
+		local itemData = {
+			name = value.name,
+			amount = dbCheck[1].amount,
+			metadata = json.decode(dbCheck[1].metadata) or {}
+		}
+		updateItem({ id = itemCraftedId }, itemData, item, charid, isExpired, id, identifier)
+		updateItemAmount(id, identifier, value.amount, itemCraftedId, metadata, name)
 	end
 end
 
 function InventoryService.addItemsToCustomInventory(id, items, charid, identifier)
-	local newTable = {}
 	local result <const> = DBService.queryAwait("SELECT inventory_type FROM character_inventories WHERE inventory_type = @id", { id = id })
 
 	if not result[1] then
@@ -2210,6 +2212,7 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 							updateItemInCustomInventory(id, identifier, itemCraftedId, value.amount, itemMetadata, value, item, charid, isExpired, value.name)
 						end
 					else
+						local newTable = {}
 						for _, v in ipairs(resulItems) do
 							local result2 = DBService.queryAwait("SELECT metadata FROM items_crafted WHERE id =@id", { id = v.item_crafted_id })
 							local metadata = json.decode(result2[1].metadata)
@@ -2224,7 +2227,7 @@ function InventoryService.addItemsToCustomInventory(id, items, charid, identifie
 								updateItem(itemcraftedid, value, item, charid, isExpired, id, identifier)
 							end, id)
 						else
-							local itemCraftedId = result1[1].item_crafted_id
+							local itemCraftedId = newTable[1].item_crafted_id
 							updateItemInCustomInventory(id, identifier, itemCraftedId, value.amount, itemMetadata, value, item, charid, isExpired, value.name)
 						end
 					end
