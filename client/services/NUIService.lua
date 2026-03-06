@@ -540,12 +540,12 @@ local function loadItemsAndWeapons()
 end
 
 function NUIService.LoadInv()
-	local payload = {}
+	local payload <const> = {}
 
 	Core.Callback.TriggerAsync("vorpinventory:get_slots", function(result)
 		if not result then return end
 
-		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", result.totalInvWeight), info = string.format("%.1f", result.slots) })
+		SendNUIMessage({ action = "changecheck", check = string.format("%.1f", (result.totalInvWeight or 0)), info = string.format("%.1f", (result.slots or 0)) })
 		SendNUIMessage({
 			action = "updateStatusHud",
 			show   = not IsRadarHidden(),

@@ -1,9 +1,7 @@
-local Core <const>       = exports.vorp_core:GetCore()
-local InventoryBeingUsed = {}
-local T <const>          = TranslationInv.Langs[Lang]
+local Core <const> = exports.vorp_core:GetCore()
 
 if Config.DevMode then
-    Log.Warning("^1[DEV] ^7You are in dev mode, dont use this in production live servers")
+    print("^1[DEV] ^7DEV MODE IS ENABLED, THIS IS NOT FOR PRODUCTION SERVERS")
 end
 
 RegisterServerEvent("syn:stopscene")
@@ -69,7 +67,7 @@ end)
 
 Core.Callback.Register("vorpinventory:get_slots", function(source, cb, _)
     local user <const> = Core.getUser(source)
-    if not user then return end
+    if not user then return cb(nil) end
 
     local character <const>      = user.getUsedCharacter
     local totalItems <const>     = InventoryAPI.getUserTotalCountItems(character.identifier, character.charIdentifier)
@@ -103,5 +101,3 @@ RegisterServerEvent("vorp_inventory:Server:CloseCustomInventory", function()
     CustomInventoryInfos[id]:setInUse(false)
     INVENTORY_IN_USE[_source] = nil
 end)
-
-
