@@ -1,6 +1,7 @@
-local T          = TranslationInv.Langs[Lang]
-local Core       = exports.vorp_core:GetCore()
-INVENTORY_IN_USE = {}
+local T                        = TranslationInv.Langs[Lang]
+local Core                     = exports.vorp_core:GetCore()
+INVENTORY_IN_USE               = {}
+local REGISTERED_ITEMS <const> = {}
 
 --used to sync time to the clients
 CreateThread(function()
@@ -187,33 +188,40 @@ exports("getUserInventoryItems", InventoryAPI.getInventory)
 ---@param name string item name
 ---@param cb function callback
 function InventoryAPI.registerUsableItem(name, cb, resource)
-	if Config.Debug then
-		SetTimeout(9000, function()
-			print("Callback for item[^3" .. name .. "^7] ^2Registered!^7")
-		end)
-	end
-
 	if not name then
-		return print("InventoryAPI.registerUsableItem: name is required")
+		return print("InventoryAPI.registerUsableItem: name is required", resource)
 	end
 
-	-- this is just to help users see whats wrong with their items and to fix them
-	SetTimeout(20000, function()
-		if not ServerItems[name] then
-			print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7", resource or "")
-		end
-
-		if ServerItems[name] and not ServerItems[name].canUse then
-			print("^3Warning^7: item", name, " is not usable in database , ^1 you need to set usable to 1 in database ^7", resource or "")
-		end
-	end)
-
-	if UsableItemsFunctions[name] then
-		print("^3Warning^7: item ", name, " is already registered, ^1 cant register the same item twice ^7", resource or "")
-		print("^5Info:^7 if you restarting a script this is normal and you can ignore it!.^7")
+	if not REGISTERED_ITEMS[name] then
+		REGISTERED_ITEMS[name] = { resources = { resource }, count = 1 }
+	else
+		REGISTERED_ITEMS[name].count = REGISTERED_ITEMS[name].count + 1
+		REGISTERED_ITEMS[name].resources[#REGISTERED_ITEMS[name].resources + 1] = resource
 	end
+
 	UsableItemsFunctions[name] = cb
 end
+
+CreateThread(function()
+	SetTimeout(15000, function()
+		print(">>>>>>>>>> ^1DEBUG: Starting item debug ^7 <<<<<<<<<<<<")
+		for name, data in pairs(REGISTERED_ITEMS) do
+			if not ServerItems[name] then
+				print("^3Warning^7: item ", name, " was added as usabled but ^1 does not exist in database ^7")
+			end
+
+			if ServerItems[name] and not ServerItems[name].canUse then
+				print("^3Warning^7: item", name, " is not set as usable in database , ^1 you need to set usable to 1 in items database ^7")
+			end
+
+			if data.count > 1 then
+				print("^3Warning^7: item ", name, " is being registered by multiple resources, ^1 can't register the same item multiple times only one.^7 resources: ", table.concat(data.resources, ", ") or "")
+			end
+		end
+		table.wipe(REGISTERED_ITEMS)
+		print(">>>>>>>>>> ^1DEBUG: Item debug finished ^7 <<<<<<<<<<<<")
+	end)
+end)
 
 exports("registerUsableItem", InventoryAPI.registerUsableItem)
 

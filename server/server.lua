@@ -4,6 +4,7 @@ if Config.DevMode then
     print("^1[DEV] ^7DEV MODE IS ENABLED, THIS IS NOT FOR PRODUCTION SERVERS")
 end
 
+
 RegisterServerEvent("syn:stopscene")
 AddEventHandler("syn:stopscene", function(x)
     local _source <const> = source
