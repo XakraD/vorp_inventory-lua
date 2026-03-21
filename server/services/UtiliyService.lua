@@ -29,7 +29,7 @@ function SvUtils.FindAllWeaponsByName(invId, name)
 
     for _, weapon in pairs(userWeapons) do
         if name == weapon:getName() then
-            weapons[#weapons + 1] = weapons
+            weapons[#weapons + 1] = weapon
         end
     end
 

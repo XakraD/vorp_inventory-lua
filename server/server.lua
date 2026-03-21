@@ -102,3 +102,64 @@ RegisterServerEvent("vorp_inventory:Server:CloseCustomInventory", function()
     CustomInventoryInfos[id]:setInUse(false)
     INVENTORY_IN_USE[_source] = nil
 end)
+
+-- SERVER EVENTS ONLY
+local ALLOWED_CONTEXT_MENU_EVENTS <const> = {}
+
+RegisterServerEvent("vorpinventory:validateContextMenuEvent", function(data)
+    local _source <const> = source
+
+    if not data or type(data) ~= "table" then return end
+
+    if not data.event?.server then return end
+
+    if next(ALLOWED_CONTEXT_MENU_EVENTS) == nil then
+        return print("no events whitelisted", GetPlayerName(_source), " tried to call event:", data.event.server, "but no events were whitelisted", "possible Cheat!!")
+    end
+
+    if not ALLOWED_CONTEXT_MENU_EVENTS[joaat(data.event.server)] then
+        return print("event not whitelisted", GetPlayerName(_source), " tried to call event:", data.event.server, "but it was not whitelisted", "possible Cheat!!")
+    end
+
+    TriggerEvent(data.event.server, _source, data.event?.arguments, data.itemid)
+end)
+
+---@param event string | table
+---@param resourcename string
+exports("addAllowedContextMenuEvent", function(event, resourcename)
+    if not resourcename then return print("resourcename is required use GetCurrentResourceName() as argument") end
+
+    if not event then return print("event name is required", resourcename) end
+
+    if type(event) == "table" then
+        for _, v in pairs(event) do
+            ALLOWED_CONTEXT_MENU_EVENTS[joaat(v)] = true
+        end
+        return
+    end
+
+    if type(event) ~= "string" then return print("invalid eventname must be a string", resourcename) end
+    ALLOWED_CONTEXT_MENU_EVENTS[joaat(event)] = true
+
+    --  print("added event ", event, "from", resourcename)
+end)
+
+---@param event string | table
+---@param resourcename string
+exports("removeAllowedContextMenuEvent", function(event, resourcename)
+    if not resourcename then return print("resourcename is required use GetCurrentResourceName() as argument") end
+
+    if not event then return print("event name is required", resourcename) end
+
+    if type(event) == "table" then
+        for _, v in pairs(event) do
+            ALLOWED_CONTEXT_MENU_EVENTS[joaat(v)] = nil
+        end
+        return
+    end
+
+    if type(event) ~= "string" then return print("invalid event name must be a string", resourcename) end
+    ALLOWED_CONTEXT_MENU_EVENTS[joaat(event)] = nil
+
+    -- print("removed event ", event, "from", resourcename)
+end)

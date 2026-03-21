@@ -52,7 +52,7 @@ CustomInventoryInfos = {
 		BlackListItems = {},
 		whitelistWeapons = false,
 		limitedWeapons = {},
-		webook = false,
+		webhook = false,
 		inUse = false,
 		--TODO: Add parameter to use container with weight
 	}

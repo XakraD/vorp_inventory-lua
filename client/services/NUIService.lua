@@ -469,7 +469,6 @@ local function loadItems()
 							else
 								item.metadata.orgdescription = ""
 							end
-						else
 						end
 						item.metadata.description = T.cansell .. "<span style=color:Green;>" .. v.price .. "</span>"
 					end
@@ -506,7 +505,6 @@ local function loadWeapons()
 		weapon.serial_number = currentWeapon:getSerialNumber()
 		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.custom_desc = currentWeapon:getCustomDesc()
-		weapon.custom_label = currentWeapon:getCustomLabel()
 		weapon.weight = currentWeapon:getWeight()
 		table.insert(weapons, weapon)
 	end
@@ -749,6 +747,6 @@ function NUIService.ContextMenu(data)
 	if data.event?.client then
 		TriggerEvent(data.event.client, data.event?.arguments, data.itemid)
 	elseif data.event?.server then
-		TriggerServerEvent(data.event.server, data.event?.arguments, data.itemid)
+		TriggerServerEvent("vorpinventory:validateContextMenuEvent", data)
 	end
 end

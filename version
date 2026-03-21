@@ -1,3 +1,10 @@
+<4.5>
+- Fixed items not being removed when an exploit was detected.
+- Fixed custom inventories marked as "in use" for a class not being cleared when a player left the server.
+- Fixed a missing callback return in the server info slots callback.
+- Refactored the item debug feature. It previously relied on a timeout, which could return incorrect info if the server took too long to start.
+- Fixed various small issues and typos.
+- Added validation for server events triggered through the item metadata `contextMenu` feature
 <4.4>
 - fixes a critical issue where users could dupe items when using xhr in dev tools 
 - fixes weapon name for WEAPON_MELEE_MACHETE_HORROR

@@ -83,10 +83,16 @@ end
 
 InventoryApiService.subComponent = function(weaponId, component)
     if UserWeapons[weaponId] ~= nil then
+        local found = false
         for _, v in pairs(UserWeapons[weaponId]:getAllComponents()) do
             if v == component then
-                return
+                found = true
+                break
             end
+        end
+
+        if not found then
+            return
         end
 
         UserWeapons[weaponId]:quitComponent(component)
