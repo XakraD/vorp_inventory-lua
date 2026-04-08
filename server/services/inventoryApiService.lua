@@ -1915,7 +1915,7 @@ function InventoryAPI.openInventory(source, id)
 	CustomInventoryInfos[id]:setInUse(true)
 	-- for player dropp event or inventory client close so we dont have to use loops
 	if INVENTORY_IN_USE[_source] then
-		return Core.NotifyObjective(_source, "You are already in an inventory, please close it first", 5000)
+		return Core.NotifyObjective(_source, T.AlreadyInUse, 5000)
 	end
 	INVENTORY_IN_USE[_source] = id
 

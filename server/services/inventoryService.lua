@@ -531,7 +531,7 @@ function InventoryService.onPickup(data)
 
 				TriggerClientEvent("vorpInventory:sharePickupClient", -1, data, 2)
 				TriggerClientEvent("vorpInventory:receiveItem", _source, pickup.name, item:getId(), pickup.amount, pickup.metadata, item.degradation, item.percentage)
-				TriggerClientEvent("vorpInventory:playerAnim", _source, uid)
+				TriggerClientEvent("vorpInventory:playerPickUpAnim", _source, uid)
 
 				local charname <const>, _, steamname <const> = getSourceInfo(_source)
 				local title <const>                          = T.itempickup
@@ -587,7 +587,7 @@ function InventoryService.onPickup(data)
 					local description = "**" .. T.WebHookLang.Weapontype .. ":** `" .. weaponName .. "`\n**" .. T.WebHookLang.charname .. ":** `" .. charname .. "`\n**" .. T.WebHookLang.serialnumber .. "** `" .. serialNumber .. "`\n **" .. T.WebHookLang.Desc .. "** `" .. weaponCustomDesc .. "` \n **" .. T.WebHookLang.Steamname .. "** `" .. steamname .. "`"
 					local info = { source = _source, name = Logs.WebHook.webhookname, title = title, description = description, webhook = Logs.WebHook.webhook, color = Logs.WebHook.colorweppickupd }
 					TriggerClientEvent("vorpInventory:sharePickupClient", -1, dataweapon, 2)
-					TriggerClientEvent("vorpInventory:playerAnim", _source, uid)
+					TriggerClientEvent("vorpInventory:playerPickUpAnim", _source, uid)
 					InventoryService.addWeapon(_source, weaponId)
 					SvUtils.SendDiscordWebhook(info)
 				end
@@ -617,7 +617,7 @@ function InventoryService.onPickupMoney(data)
 		SvUtils.SendDiscordWebhook(info)
 
 		TriggerClientEvent("vorpInventory:shareMoneyPickupClient", -1, data.obj, nil, nil, nil, 2)
-		TriggerClientEvent("vorpInventory:playerAnim", _source, data.obj)
+		TriggerClientEvent("vorpInventory:playerPickUpAnim", _source, data.obj)
 		local character = Core.getUser(_source).getUsedCharacter
 		character.addCurrency(0, data.amount)
 		MoneyPickUps[data.uuid] = nil
@@ -636,7 +636,7 @@ function InventoryService.onPickupGold(data)
 
 		local goldAmount = data.amount
 		TriggerClientEvent("vorpInventory:shareGoldPickupClient", -1, data.obj, goldAmount, data.coords, data.uuid, 2)
-		TriggerClientEvent("vorpInventory:playerAnim", _source, data.obj)
+		TriggerClientEvent("vorpInventory:playerPickUpAnim", _source, data.obj)
 
 		local character = Core.getUser(_source).getUsedCharacter
 		local charname, _, steamname = getSourceInfo(_source)
