@@ -27,8 +27,24 @@ AddEventHandler('syn_weapons:weaponused', function(data)
     end)
 end)
 
-SQL = {
-    Delete = 'DELETE FROM loadout WHERE id = @id',
-    Condition = 'UPDATE loadout SET conditionlevel = @degradation, dirtlevel = @dirt, rustlevel = @soot, mudlevel = @damage WHERE id = @id',
-    Comps = 'UPDATE loadout SET comps = @comps WHERE id = @id',
+Updates = {
+    Condition = function(source, weaponId, weaponStatus)
+        local Parameters = {
+            degradation = weaponStatus.degradation,
+            dirt = weaponStatus.dirt,
+            soot = weaponStatus.soot,
+            damage = weaponStatus.damage,
+            id = weaponId,
+        }
+
+        exports.oxmysql:execute('UPDATE loadout SET conditionlevel = @degradation, dirtlevel = @dirt, rustlevel = @soot, mudlevel = @damage WHERE id = @id', Parameters)
+    end,
+    
+    Comps = function(source, weaponId, oldComps, newComps)
+        local Parameters = {
+            comps = json.encode(newComps),
+            id = weaponId,
+        }
+        exports.oxmysql:execute('UPDATE loadout SET comps = @comps WHERE id = @id', Parameters)
+    end,
 }
